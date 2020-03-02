@@ -6,6 +6,9 @@ using UnityEditor.PackageManager.Requests;
 
 namespace Innoactive.Creator.Editors.Utils
 {
+    /// <summary>
+    /// Makes sure the XR-Interaction package is enabled.
+    /// </summary>
     [InitializeOnLoad]
     public class XRInteractionPackageValidator
     {
