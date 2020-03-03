@@ -17,6 +17,9 @@ namespace Innoactive.Creator.SceneObjects.Properties
 
         private bool isBeingUsed;
 
+        /// <summary>
+        /// Returns true if the GameObject is being used.
+        /// </summary>
         public virtual bool IsBeingUsed
         {
             get { return isBeingUsed; }
@@ -118,4 +121,3 @@ namespace Innoactive.Creator.SceneObjects.Properties
         }
     }
 }
-
