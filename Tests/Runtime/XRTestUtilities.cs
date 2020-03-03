@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿#if UNITY_EDITOR && CREATOR_XR_INTERACTION
+
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -73,3 +75,5 @@ namespace Innoactive.Creator.XR.Tests
         }
     }
 }
+
+#endif

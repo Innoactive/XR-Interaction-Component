@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if CREATOR_XR_INTERACTION
+
+using System;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
@@ -116,3 +118,5 @@ namespace Innoactive.Creator.SceneObjects.Properties
         }
     }
 }
+
+#endif

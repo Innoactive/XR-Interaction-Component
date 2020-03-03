@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.PackageManager;
@@ -12,6 +13,7 @@ namespace Innoactive.Creator.Editors.Utils
     [InitializeOnLoad]
     public class XRInteractionPackageValidator
     {
+        private const string CreatorXRInteractionSymbol = "CREATOR_XR_INTERACTION";
         private const string XRInteractionPackage = "com.unity.xr.interaction.toolkit";
         private static ListRequest listRequest;
         private static AddRequest addRequest;
@@ -21,14 +23,22 @@ namespace Innoactive.Creator.Editors.Utils
             RequestPackageList();
             EditorApplication.update += EditorUpdate;
         }
-        
+
         private static void EditorUpdate()
         {
             PackageCollection packageCollection = RetrievePackageListResult();
 
-            if (packageCollection != null && IsPackageEnabledInCollection(XRInteractionPackage, packageCollection) == false)
+            if (packageCollection != null)
             {
-                addRequest = EnablePackage(XRInteractionPackage);
+                if (IsPackageEnabledInCollection(XRInteractionPackage, packageCollection))
+                {
+                    ValidateScriptingSymbols();
+                    EditorApplication.update -= EditorUpdate;
+                }
+                else
+                {
+                    addRequest = EnablePackage(XRInteractionPackage);
+                }
             }
             
             LogFinalPackageStatus();
@@ -53,6 +63,7 @@ namespace Innoactive.Creator.Editors.Utils
                 // UB can't occur in this case.
                 // ReSharper disable once DelegateSubtraction
                 EditorApplication.update -= EditorUpdate;
+                Debug.LogErrorFormat("There was an error trying to enable '{0}'.\n{1}", XRInteractionPackage, listRequest.Error.message);
             }
             else
             {
@@ -83,16 +94,33 @@ namespace Innoactive.Creator.Editors.Utils
 
             if (addRequest.Status == StatusCode.Success)
             {
+                ValidateScriptingSymbols();
                 Debug.LogFormat("The package '{0}' has been automatically added", addRequest.Result.displayName);
             }
             else if (addRequest.Status >= StatusCode.Failure)
             {
-                Debug.LogErrorFormat("There was an error trying to enable {0}.\n{1}", XRInteractionPackage, addRequest.Error.message);
+                Debug.LogErrorFormat("There was an error trying to enable '{0}'.\n{1}", XRInteractionPackage, addRequest.Error.message);
             }
 
             addRequest = null;
 
             EditorApplication.update -= EditorUpdate;
+        }
+        
+        private static void ValidateScriptingSymbols()
+        {
+            BuildTarget buildTarget = EditorUserBuildSettings.activeBuildTarget;
+            BuildTargetGroup buildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
+            List<string> symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup).Split(';').ToList();
+
+            if (symbols.Contains(CreatorXRInteractionSymbol) == false)
+            {
+                symbols.Add(CreatorXRInteractionSymbol);
+
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, string.Join(";", symbols.ToArray()));
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+            }
         }
     }
 }

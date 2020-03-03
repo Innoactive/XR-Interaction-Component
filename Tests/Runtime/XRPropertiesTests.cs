@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR && CREATOR_XR_INTERACTION
+
+using System;
 using System.Collections;
 using System.Reflection;
 using NUnit.Framework;
@@ -173,3 +175,5 @@ namespace Innoactive.Creator.XR.Tests
         
     }
 }
+
+#endif
