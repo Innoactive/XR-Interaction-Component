@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -11,8 +12,9 @@ namespace Innoactive.Creator.XR.Tests
 {
     public class XRPropertiesTests : RuntimeTests
     {
-        private bool wasTouched;
-        private bool wasUnTouched;
+        private bool actionDone;
+        private bool actionUndone;
+        private Type senderType;
         
         [SetUp]
         public override void SetUp()
@@ -20,8 +22,8 @@ namespace Innoactive.Creator.XR.Tests
             base.SetUp();
             XRTestUtilities.CreateInteractionManager();
 
-            wasTouched = false;
-            wasUnTouched = false;
+            actionDone = false;
+            actionUndone = false;
         }
         
         [UnityTest]
@@ -29,26 +31,27 @@ namespace Innoactive.Creator.XR.Tests
         {
             XRGrabInteractable interactable = XRTestUtilities.CreateGrabInteractable();
             XR_TouchableProperty touchProperty = interactable.gameObject.AddComponent<XR_TouchableProperty>();
+            senderType = touchProperty.GetType();
             
-            touchProperty.Touched += OnTouched;
-            touchProperty.Untouched += OnUntouched;
+            touchProperty.Touched += OnActionDone;
+            touchProperty.Untouched += OnActionUndone;
             
             Assert.IsFalse(touchProperty.IsBeingTouched);
             
             XRDirectInteractor interactor = XRTestUtilities.CreateDirectInteractor();
             
-            yield return new WaitUntil(()=> wasTouched);
+            yield return new WaitUntil(()=> actionDone);
             
             Assert.IsTrue(touchProperty.IsBeingTouched);
             
             interactor.transform.position = Vector3.up * 100;
             
-            yield return new WaitUntil(()=> wasUnTouched);
+            yield return new WaitUntil(()=> actionUndone);
             
             Assert.IsFalse(touchProperty.IsBeingTouched);
 
-            touchProperty.Touched -= OnTouched;
-            touchProperty.Untouched -= OnUntouched;
+            touchProperty.Touched -= OnActionDone;
+            touchProperty.Untouched -= OnActionUndone;
         }
         
         [UnityTest]
@@ -56,34 +59,115 @@ namespace Innoactive.Creator.XR.Tests
         {
             XRGrabInteractable interactable = XRTestUtilities.CreateGrabInteractable();
             XR_TouchableProperty touchProperty = interactable.gameObject.AddComponent<XR_TouchableProperty>();
+            senderType = touchProperty.GetType();
             
-            touchProperty.Touched += OnTouched;
-            touchProperty.Untouched += OnUntouched;
+            touchProperty.Touched += OnActionDone;
+            touchProperty.Untouched += OnActionUndone;
             
             Assert.IsFalse(touchProperty.IsBeingTouched);
             
             touchProperty.FastForwardTouch();
             
-            yield return new WaitUntil(()=> wasTouched && wasUnTouched);
+            yield return new WaitUntil(()=> actionDone && actionUndone);
             
             Assert.IsFalse(touchProperty.IsBeingTouched);
             
-            touchProperty.Touched -= OnTouched;
-            touchProperty.Untouched -= OnUntouched;
-        }
-
-        private void OnTouched(object sender, EventArgs e)
-        {
-            wasTouched = true;
-            Debug.LogWarning("OnTouched");
-            Assert.That(sender is XR_TouchableProperty);
+            touchProperty.Touched -= OnActionDone;
+            touchProperty.Untouched -= OnActionUndone;
         }
         
-        private void OnUntouched(object sender, EventArgs e)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        [UnityTest]
+        public IEnumerator XRGrabbablePropertyTest()
         {
-            wasUnTouched = true;
-            Debug.LogWarning("OnUntouched");
-            Assert.That(sender is XR_TouchableProperty);
+            XRGrabInteractable interactable = XRTestUtilities.CreateGrabInteractable();
+            XR_GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<XR_GrabbableProperty>();
+            senderType = grabbableProperty.GetType();
+            
+            grabbableProperty.Grabbed += OnActionDone;
+            grabbableProperty.Ungrabbed += OnActionUndone;
+            
+            Assert.IsFalse(grabbableProperty.IsGrabbed);
+            
+            XRDirectInteractor interactor = XRTestUtilities.CreateDirectInteractor();
+            XRController controller = interactor.GetComponent<XRController>();
+            
+            XRTestUtilities.SimulateGrab(controller, true);
+            
+            yield return new WaitUntil(()=> actionDone);
+            
+            Assert.IsTrue(grabbableProperty.IsGrabbed);
+            
+            XRTestUtilities.SimulateGrab(controller, false);
+            
+            yield return new WaitUntil(()=> actionUndone);
+            
+            Assert.IsFalse(grabbableProperty.IsGrabbed);
+
+            grabbableProperty.Grabbed -= OnActionDone;
+            grabbableProperty.Ungrabbed -= OnActionUndone;
+        }
+
+        // [UnityTest]
+        // public IEnumerator XRUsablePropertyTest()
+        // {
+        //     XRGrabInteractable interactable = XRTestUtilities.CreateGrabInteractable();
+        //     XR_UsableProperty usableProperty = interactable.gameObject.AddComponent<XR_UsableProperty>();
+        //     senderType = usableProperty.GetType();
+        //     
+        //     usableProperty.UsageStarted += OnActionDone;
+        //     usableProperty.UsageStopped += OnActionUndone;
+        //     
+        //     Assert.IsFalse(usableProperty.IsBeingUsed);
+        //     
+        //     XRDirectInteractor interactor = XRTestUtilities.CreateDirectInteractor();
+        //     XRController controller = interactor.GetComponent<XRController>();
+        //     
+        //     XRTestUtilities.SimulateGrab(controller, true);
+        //
+        //     yield return null;
+        //     
+        //     XRTestUtilities.SimulateUse(controller, true);
+        //     
+        //     yield return new WaitUntil(()=> actionDone);
+        //     
+        //     Assert.IsTrue(usableProperty.IsBeingUsed);
+        //     
+        //     
+        //     XRTestUtilities.SimulateGrab(controller, false);
+        //     
+        //     yield return null;
+        //     
+        //     XRTestUtilities.SimulateUse(controller, false);
+        //     
+        //     
+        //     yield return new WaitUntil(()=> actionUndone);
+        //     
+        //     Assert.IsFalse(usableProperty.IsBeingUsed);
+        //
+        //     usableProperty.UsageStarted -= OnActionDone;
+        //     usableProperty.UsageStopped -= OnActionUndone;
+        // }
+
+        private void OnActionDone(object sender, EventArgs e)
+        {
+            actionDone = true;
+            Assert.That(sender.GetType() == senderType);
+        }
+        
+        private void OnActionUndone(object sender, EventArgs e)
+        {
+            actionUndone = true;
+            Assert.That(sender.GetType() == senderType);
         }
         
         

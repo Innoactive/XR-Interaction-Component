@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Hub.Unity;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
@@ -32,7 +31,12 @@ namespace Innoactive.Creator.SceneObjects.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRGrabInteractable>(true);
+            Interactable = gameObject.GetComponent<XRBaseInteractable>();
+            
+            if (Interactable == null)
+            {
+                Interactable = gameObject.AddComponent<XRGrabInteractable>();
+            }
 
             Interactable.onActivate.AddListener(HandleXRUsageStarted);
             Interactable.onDeactivate.AddListener(HandleXRUsageStopped);

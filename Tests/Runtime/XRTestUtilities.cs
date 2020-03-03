@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Reflection;
+using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XR.Tests
@@ -50,6 +51,18 @@ namespace Innoactive.Creator.XR.Tests
             CreateGOSphereCollider(interactorGO);
             XRSocketInteractor interactor = interactorGO.AddComponent<XRSocketInteractor>();
             return interactor;
+        }
+
+        public static void SimulateGrab(XRController controller, bool grab)
+        {
+            MethodInfo updateInteractionMethod = controller.GetType().GetMethod("UpdateInteractionType", BindingFlags.NonPublic | BindingFlags.Instance);
+            updateInteractionMethod.Invoke(controller, new object[]{0, grab});
+        }
+        
+        public static void SimulateUse(XRController controller, bool use)
+        {
+            MethodInfo updateInteractionMethod = controller.GetType().GetMethod("UpdateInteractionType", BindingFlags.NonPublic | BindingFlags.Instance);
+            updateInteractionMethod.Invoke(controller, new object[]{1, use});
         }
 
         private static void CreateGOSphereCollider(GameObject go, bool isTrigger = true)
