@@ -6,7 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
-namespace Innoactive.Creator.SceneObjects.Properties
+namespace Innoactive.Creator.XR.SceneObjects.Properties
 {
     /// <summary>
     /// XR implementation of <see cref="IGrabbableProperty"/>.
@@ -32,7 +32,9 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
         protected XRBaseInteractable Interactable;
-
+        
+        private LayerMask cacheLayers = 0;
+        
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -123,7 +125,7 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected virtual void StartSelecting()
         {
-            Interactable.interactionLayerMask = -1;
+            Interactable.interactionLayerMask = cacheLayers;
         }
         
         /// <summary>
@@ -131,6 +133,7 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected virtual void StopSelecting()
         {
+            cacheLayers = Interactable.interactionLayerMask;
             Interactable.interactionLayerMask = 0;
         }
     }

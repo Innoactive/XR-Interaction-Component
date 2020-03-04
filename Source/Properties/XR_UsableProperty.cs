@@ -6,7 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
-namespace Innoactive.Creator.SceneObjects.Properties
+namespace Innoactive.Creator.XR.SceneObjects.Properties
 {
     /// <summary>
     /// XR implementation of <see cref="IUsableProperty"/>.
@@ -16,8 +16,6 @@ namespace Innoactive.Creator.SceneObjects.Properties
     {
         public event EventHandler<EventArgs> UsageStarted;
         public event EventHandler<EventArgs> UsageStopped;
-
-        private bool isBeingUsed;
 
         /// <summary>
         /// Returns true if the GameObject is being used.
@@ -31,6 +29,9 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
         protected XRBaseInteractable Interactable;
+        
+        private bool isBeingUsed;
+        private LayerMask cacheLayers = 0;
 
         protected override void OnEnable()
         {
@@ -111,7 +112,7 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected virtual void StartUsing()
         {
-            Interactable.interactionLayerMask = -1;
+            Interactable.interactionLayerMask = cacheLayers;
         }
         
         /// <summary>
@@ -119,6 +120,7 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected virtual void StopUsing()
         {
+            cacheLayers = Interactable.interactionLayerMask;
             Interactable.interactionLayerMask = 0;
         }
     }

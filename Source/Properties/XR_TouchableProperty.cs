@@ -1,11 +1,12 @@
 ﻿#if CREATOR_XR_INTERACTION
 
 using System;
+using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
-namespace Innoactive.Creator.SceneObjects.Properties
+namespace Innoactive.Creator.XR.SceneObjects.Properties
 { 
     /// <summary>
     /// XR implementation of <see cref="ITouchableProperty"/>.
@@ -31,6 +32,8 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected XRBaseInteractable Interactable;
 
+        private LayerMask cacheLayers = 0;
+        
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -106,7 +109,7 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected virtual void StartHovering()
         {
-            Interactable.interactionLayerMask = -1;
+            Interactable.interactionLayerMask = cacheLayers;
         }
         
         /// <summary>
@@ -114,6 +117,7 @@ namespace Innoactive.Creator.SceneObjects.Properties
         /// </summary>
         protected virtual void StopHovering()
         {
+            cacheLayers = Interactable.interactionLayerMask;
             Interactable.interactionLayerMask = 0;
         }
     }

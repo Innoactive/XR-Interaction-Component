@@ -1,13 +1,11 @@
 ﻿#if UNITY_EDITOR && CREATOR_XR_INTERACTION
 
-using System;
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Creator.SceneObjects.Properties;
+using Innoactive.Creator.XR.SceneObjects.Properties;
 using Innoactive.Hub.Unity.Tests.Training;
 
 namespace Innoactive.Creator.XR.Tests
