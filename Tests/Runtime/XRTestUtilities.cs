@@ -55,16 +55,25 @@ namespace Innoactive.Creator.XR.Tests
             return interactor;
         }
 
-        public static void SimulateGrab(XRController controller, bool grab)
+        public static void SimulateGrab(XRController controller)
         {
-            MethodInfo updateInteractionMethod = controller.GetType().GetMethod("UpdateInteractionType", BindingFlags.NonPublic | BindingFlags.Instance);
-            updateInteractionMethod.Invoke(controller, new object[]{0, grab});
+            InvokeControllerInteractionType(controller, new object[] { 0, true });
         }
         
-        public static void SimulateUse(XRController controller, bool use)
+        public static void SimulateUngrab(XRController controller)
+        {
+            InvokeControllerInteractionType(controller, new object[] { 0, false });
+        }
+        
+        public static void SimulateUse(XRController controller)
+        {
+            InvokeControllerInteractionType(controller, new object[] { 1, true });
+        }
+
+        private static void InvokeControllerInteractionType(XRController controller, object[] args)
         {
             MethodInfo updateInteractionMethod = controller.GetType().GetMethod("UpdateInteractionType", BindingFlags.NonPublic | BindingFlags.Instance);
-            updateInteractionMethod.Invoke(controller, new object[]{1, use});
+            updateInteractionMethod.Invoke(controller, args);
         }
 
         private static void CreateGOSphereCollider(GameObject go, bool isTrigger = true)
