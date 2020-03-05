@@ -3,6 +3,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Innoactive.Hub.Unity;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
@@ -22,27 +23,24 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// </summary>
         public virtual bool IsBeingUsed
         {
-            get { return isBeingUsed; }
+            get
+            {
+                return Interactable != null && Interactable.IsActivated;
+            }
         }
 
         /// <summary>
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
-        protected XRBaseInteractable Interactable;
+        protected XRInteractableObject Interactable;
         
-        private bool isBeingUsed;
         private LayerMask cacheLayers = 0;
 
         protected override void OnEnable()
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRBaseInteractable>();
-            
-            if (Interactable == null)
-            {
-                Interactable = gameObject.AddComponent<XRGrabInteractable>();
-            }
+            Interactable = gameObject.GetComponent<XRInteractableObject>(true);
 
             Interactable.onActivate.AddListener(HandleXRUsageStarted);
             Interactable.onDeactivate.AddListener(HandleXRUsageStopped);
@@ -58,13 +56,11 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         private void HandleXRUsageStarted(XRBaseInteractor interactor)
         {
-            isBeingUsed = true;
             EmitUsageStarted();
         }
 
         private void HandleXRUsageStopped(XRBaseInteractor interactor)
         {
-            isBeingUsed = false;
             EmitUsageStopped();
         }
 
@@ -80,14 +76,15 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         protected override void InternalSetLocked(bool lockState)
         {
-            if (lockState)
+            if (IsBeingUsed)
             {
-                StopUsing();
+                if (lockState)
+                {
+                    Interactable.ForceStopInteracting();
+                }
             }
-            else
-            {
-                StartUsing();
-            }
+
+            Interactable.IsUsable = lockState == false;
         }
 
         /// <summary>
@@ -97,31 +94,13 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             if (IsBeingUsed)
             {
-                StopUsing();
-                StartUsing();
+                Interactable.ForceStopInteracting();
             }
             else
             {
                 EmitUsageStarted();
                 EmitUsageStopped();
             }
-        }
-        
-        /// <summary>
-        /// Starts interaction with <see cref="Interactable"/>.
-        /// </summary>
-        protected virtual void StartUsing()
-        {
-            Interactable.interactionLayerMask = cacheLayers;
-        }
-        
-        /// <summary>
-        /// Stops interaction with <see cref="Interactable"/>.
-        /// </summary>
-        protected virtual void StopUsing()
-        {
-            cacheLayers = Interactable.interactionLayerMask;
-            Interactable.interactionLayerMask = 0;
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Creator.XR.SceneObjects.Properties;
 using Innoactive.Hub.Unity.Tests.Training;
 
@@ -22,53 +21,50 @@ namespace Innoactive.Creator.XR.Tests
         [UnityTest]
         public IEnumerator XRTouchablePropertyTest()
         {
-            XRBaseInteractable interactable = XRTestUtilities.CreateGrabInteractable();
+            XRInteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             XR_TouchableProperty touchProperty = interactable.gameObject.AddComponent<XR_TouchableProperty>();
-            WaitForSecondsRealtime wait = new WaitForSecondsRealtime(0.25f);
             
-            Assert.IsFalse(interactable.isHovered);
             Assert.IsFalse(touchProperty.IsBeingTouched);
 
-            XRDirectInteractor interactor = XRTestUtilities.CreateDirectInteractor();
+            XRTestUtilities.CreateDirectInteractor();
             
-            yield return wait;
-
-            Assert.IsTrue(interactable.isHovered);
+            yield return new WaitUntil(()=>touchProperty.IsBeingTouched);
+            
             Assert.IsTrue(touchProperty.IsBeingTouched);
-
-            interactor.transform.position = Vector3.up * 100;
-
-            yield return wait;
-            
-            Assert.IsFalse(interactable.isHovered);
-            Assert.IsFalse(touchProperty.IsBeingTouched);
         }
 
         [UnityTest]
         public IEnumerator XRGrabbablePropertyTest()
         {
-            XRBaseInteractable interactable = XRTestUtilities.CreateGrabInteractable();
+            XRInteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             XR_GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<XR_GrabbableProperty>();
             
-            Assert.IsFalse(interactable.isSelected);
             Assert.IsFalse(grabbableProperty.IsGrabbed);
             
-            XRDirectInteractor interactor = XRTestUtilities.CreateDirectInteractor();
-            XRController controller = interactor.GetComponent<XRController>();
+            XRTestUtilities.CreateDirectInteractor();
+
+            yield return null;
             
-            XRTestUtilities.SimulateGrab(controller);
+            interactable.AttemptGrab();
             
             yield return null;
             
-            Assert.IsTrue(interactable.isSelected);
             Assert.IsTrue(grabbableProperty.IsGrabbed);
+        }
+        
+        [UnityTest]
+        public IEnumerator XRUsablePropertyTest()
+        {
+            XRInteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
+            XR_UsableProperty grabbableProperty = interactable.gameObject.AddComponent<XR_UsableProperty>();
             
-            XRTestUtilities.SimulateUngrab(controller);
+            Assert.IsFalse(grabbableProperty.IsBeingUsed);
+
+            interactable.ForceUse();
             
-            yield return null;
+            Assert.IsTrue(grabbableProperty.IsBeingUsed);
             
-            Assert.IsFalse(interactable.isSelected);
-            Assert.IsFalse(grabbableProperty.IsGrabbed);
+            yield break;
         }
     }
 }

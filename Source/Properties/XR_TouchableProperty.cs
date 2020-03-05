@@ -3,6 +3,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Innoactive.Hub.Unity;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
@@ -30,7 +31,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// <summary>
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
-        protected XRBaseInteractable Interactable;
+        protected XRInteractableObject Interactable;
 
         private LayerMask cacheLayers = 0;
         
@@ -38,12 +39,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRBaseInteractable>();
-            
-            if (Interactable == null)
-            {
-                Interactable = gameObject.AddComponent<XRGrabInteractable>();
-            }
+            Interactable = gameObject.GetComponent<XRInteractableObject>(true);
 
             Interactable.onFirstHoverEnter.AddListener(HandleXRTouched);
             Interactable.onLastHoverExit.AddListener(HandleXRUntouched);
@@ -79,46 +75,29 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         protected override void InternalSetLocked(bool lockState)
         {
-            if (lockState)
+            if (IsBeingTouched)
             {
-                StopHovering();
+                if (lockState)
+                {
+                    Interactable.ForceStopInteracting();
+                }
             }
-            else
-            {
-                StartHovering();
-            }
+
+            Interactable.enabled = lockState == false;
         }
 
         /// <inheritdoc />
         public void FastForwardTouch()
         {
-            if (Interactable.isHovered)
+            if (IsBeingTouched)
             {
-                StopHovering();
-                StartHovering();
+                Interactable.ForceStopInteracting();
             }
             else
             {
                 EmitTouched();
                 EmitUntouched();
             }
-        }
-
-        /// <summary>
-        /// Starts interaction with <see cref="Interactable"/>.
-        /// </summary>
-        protected virtual void StartHovering()
-        {
-            Interactable.interactionLayerMask = cacheLayers;
-        }
-        
-        /// <summary>
-        /// Stops interaction with <see cref="Interactable"/>.
-        /// </summary>
-        protected virtual void StopHovering()
-        {
-            cacheLayers = Interactable.interactionLayerMask;
-            Interactable.interactionLayerMask = 0;
         }
     }
 }

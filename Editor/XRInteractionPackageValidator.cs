@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 
-namespace Innoactive.Creator.Editors.Utils
+namespace Innoactive.Creator.XR.Editors.Utils
 {
     /// <summary>
     /// Makes sure the XR-Interaction package is enabled.

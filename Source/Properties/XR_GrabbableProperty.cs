@@ -3,6 +3,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Innoactive.Hub.Unity;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
@@ -31,7 +32,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// <summary>
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
-        protected XRBaseInteractable Interactable;
+        protected XRInteractableObject Interactable;
         
         private LayerMask cacheLayers = 0;
         
@@ -39,12 +40,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRBaseInteractable>();
-            
-            if (Interactable == null)
-            {
-                Interactable = gameObject.AddComponent<XRGrabInteractable>();
-            }
+            Interactable = gameObject.GetComponent<XRInteractableObject>(true);
 
             Interactable.onSelectEnter.AddListener(HandleXRGrabbed);
             Interactable.onSelectExit.AddListener(HandleXRUngrabbed);
@@ -80,14 +76,15 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         protected override void InternalSetLocked(bool lockState)
         {
-            if (lockState)
+            if (IsGrabbed)
             {
-                StopSelecting();
+                if (lockState)
+                {
+                    Interactable.ForceStopInteracting();
+                }
             }
-            else
-            {
-                StartSelecting();
-            }
+            
+            Interactable.IsGrabbable = lockState == false;
         }
 
         /// <summary>
@@ -95,23 +92,10 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// </summary>
         public void FastForwardGrab()
         {
-            SimulateGrabActions();
-        }
-
-        /// <summary>
-        /// Instantaneously simulate that the object was ungrabbed.
-        /// </summary>
-        public void FastForwardUngrab()
-        {
-            SimulateGrabActions();
-        }
-
-        private void SimulateGrabActions()
-        {
             if (Interactable.isSelected)
             {
-                StopSelecting();
-                StartSelecting();
+                Interactable.AttemptGrab();
+                Interactable.ForceStopInteracting();
             }
             else
             {
@@ -119,22 +103,21 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
                 EmitUngrabbed();
             }
         }
-        
+
         /// <summary>
-        /// Starts interaction with <see cref="Interactable"/>.
+        /// Instantaneously simulate that the object was ungrabbed.
         /// </summary>
-        protected virtual void StartSelecting()
+        public void FastForwardUngrab()
         {
-            Interactable.interactionLayerMask = cacheLayers;
-        }
-        
-        /// <summary>
-        /// Stops interaction with <see cref="Interactable"/>.
-        /// </summary>
-        protected virtual void StopSelecting()
-        {
-            cacheLayers = Interactable.interactionLayerMask;
-            Interactable.interactionLayerMask = 0;
+            if (Interactable.isSelected)
+            {
+                Interactable.ForceStopInteracting();
+            }
+            else
+            {
+                EmitGrabbed();
+                EmitUngrabbed();
+            }
         }
     }
 }
