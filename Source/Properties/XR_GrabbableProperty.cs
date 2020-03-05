@@ -76,6 +76,8 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         protected override void InternalSetLocked(bool lockState)
         {
+            Interactable.IsGrabbable = lockState == false;
+            
             if (IsGrabbed)
             {
                 if (lockState)
@@ -83,8 +85,6 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
                     Interactable.ForceStopInteracting();
                 }
             }
-            
-            Interactable.IsGrabbable = lockState == false;
         }
 
         /// <summary>

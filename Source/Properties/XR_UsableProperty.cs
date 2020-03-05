@@ -76,6 +76,8 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         protected override void InternalSetLocked(bool lockState)
         {
+            Interactable.IsUsable = lockState == false;
+            
             if (IsBeingUsed)
             {
                 if (lockState)
@@ -83,8 +85,6 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
                     Interactable.ForceStopInteracting();
                 }
             }
-
-            Interactable.IsUsable = lockState == false;
         }
 
         /// <summary>
