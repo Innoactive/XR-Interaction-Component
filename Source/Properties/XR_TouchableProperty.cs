@@ -75,7 +75,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
 
         protected override void InternalSetLocked(bool lockState)
         {
-            Interactable.enabled = lockState == false;
+            Interactable.IsTouchable = lockState == false;
             
             if (IsBeingTouched)
             {
