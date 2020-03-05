@@ -76,11 +76,11 @@ namespace Innoactive.Creator.XR
         }
 
         /// <summary>
-        /// Forces to use the currently touched interactable without needing to press the use button on the controller.
+        /// Attempt to use the currently selected interactable without needing to press the use button on the controller.
         /// </summary>
         public virtual void ForceUse()
         {
-            onActivate?.Invoke(selectingInteractor);
+            OnActivate(selectingInteractor);
         }
 
         /// <inheritdoc />
@@ -129,11 +129,6 @@ namespace Innoactive.Creator.XR
             {
                 isGrabbable = true;
             }
-        }
-
-        void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space)) ForceStopInteracting();
         }
     }
 }
