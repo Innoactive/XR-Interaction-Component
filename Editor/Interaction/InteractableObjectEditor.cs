@@ -7,7 +7,7 @@ namespace Innoactive.Creator.XRInteraction.Editors
     /// Copy of 'XRGrabInteractableEditor' adapted to edit <see cref="InteractableObject"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableObject))]
-    public class InteractableObjectEditor : Editor
+    internal class InteractableObjectEditor : Editor
     {
         SerializedProperty m_AttachTransform;
         SerializedProperty m_AttachEaseInTime;
