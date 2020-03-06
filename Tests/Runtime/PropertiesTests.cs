@@ -24,7 +24,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
         
         [UnityTest]
-        public IEnumerator TouchablePropertyTest()
+        public IEnumerator TouchableProperty()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             TouchableProperty touchProperty = interactable.gameObject.AddComponent<TouchableProperty>();
@@ -45,7 +45,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
 
         [UnityTest]
-        public IEnumerator GrabbablePropertyTest()
+        public IEnumerator GrabbableProperty()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<GrabbableProperty>();
@@ -66,7 +66,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
 
         [UnityTest]
-        public IEnumerator UsablePropertyTest()
+        public IEnumerator UsableProperty()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             UsableProperty usableProperty = interactable.gameObject.AddComponent<UsableProperty>();
@@ -85,7 +85,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
         
         [UnityTest]
-        public IEnumerator FastForwardTouchTest()
+        public IEnumerator FastForwardTouch()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             TouchableProperty touchProperty = interactable.gameObject.AddComponent<TouchableProperty>();
@@ -122,7 +122,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
         
         [UnityTest]
-        public IEnumerator FastForwardGrabTest()
+        public IEnumerator FastForwardGrab()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<GrabbableProperty>();
@@ -159,7 +159,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
         
         [UnityTest]
-        public IEnumerator FastForwardUngrabTest()
+        public IEnumerator FastForwardUngrab()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<GrabbableProperty>();
@@ -196,7 +196,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
         }
         
         [UnityTest]
-        public IEnumerator FastForwardUseTest()
+        public IEnumerator FastForwardUse()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
             UsableProperty usableProperty = interactable.gameObject.AddComponent<UsableProperty>();
