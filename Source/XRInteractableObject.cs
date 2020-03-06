@@ -1,7 +1,9 @@
 ﻿#if CREATOR_XR_INTERACTION
 
+using System;
 using System.Collections;
 using System.Linq;
+using Boo.Lang;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -54,8 +56,9 @@ namespace Innoactive.Creator.XR
         }
 
         /// <summary>
-        /// Forces the interactable to no longer be interacted with and will cause an interactor to drop this interactable and stop touching it.
+        /// Forces all hovering and selecting interactors to not have interactions with this interactable for one frame.
         /// </summary>
+        /// <remarks>Interactions are not disabled immediately.</remarks>
         public virtual void ForceStopInteracting()
         {
             if (IsActivated)
@@ -63,16 +66,7 @@ namespace Innoactive.Creator.XR
                 OnDeactivate(selectingInteractor);
             }
             
-            StartCoroutine(ForceStopInteractingAtEndOfFrame());
-        }
-
-        /// <summary>
-        /// Attempt to be grabbed by any hovering interactor without needing to press the grab button on the controller.
-        /// </summary>
-        public virtual void AttemptGrab()
-        {
-            XRBaseInteractor interactor = hoveringInteractors.First();
-            OnSelectEnter(interactor);
+            StartCoroutine(StopInteractingForOneFrame());
         }
 
         /// <summary>
@@ -103,31 +97,31 @@ namespace Innoactive.Creator.XR
             }
         }
         
-        private IEnumerator ForceStopInteractingAtEndOfFrame()
+        private IEnumerator StopInteractingForOneFrame()
         {
-            bool wasHovered = isHovered;
-            bool wasSelected = isSelected;
+            List<XRBaseInteractor> interactors = new List<XRBaseInteractor>(hoveringInteractors);
             
-            if (wasHovered && isTouchable)
+            if (interactors.Contains(selectingInteractor) == false)
             {
-                isTouchable = false;
+                interactors.Add(selectingInteractor);
             }
             
-            if (wasSelected == isGrabbable)
+            foreach (XRBaseInteractor interactor in interactors)
             {
-                isGrabbable = false;
-            }
-
-            yield return null;
-            
-            if (wasHovered && isHovered == false)
-            {
-                isTouchable = true;
+                if (interactor != null)
+                {
+                    interactor.enableInteractions = false;
+                }
             }
             
-            if (wasSelected && isSelected == false)
+            yield return new WaitUntil(() => isHovered == false && isSelected == false);
+            
+            foreach (XRBaseInteractor interactor in interactors)
             {
-                isGrabbable = true;
+                if (interactor != null)
+                {
+                    interactor.enableInteractions = true;
+                }
             }
         }
     }
