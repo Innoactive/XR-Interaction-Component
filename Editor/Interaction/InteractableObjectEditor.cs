@@ -6,10 +6,10 @@ using UnityEngine;
 namespace Innoactive.Creator.XR.Editors
 {
     /// <summary>
-    /// 'XRGrabInteractableEditor' adapted to edit <see cref="XRInteractableObject"/>.
+    /// 'XRGrabInteractableEditor' adapted to edit <see cref="InteractableObject"/>.
     /// </summary>
-    [CustomEditor(typeof(XRInteractableObject))]
-    public class XRInteractableObjectEditor : Editor
+    [CustomEditor(typeof(InteractableObject))]
+    public class InteractableObjectEditor : Editor
     {
         SerializedProperty m_AttachTransform;
         SerializedProperty m_AttachEaseInTime;
@@ -102,7 +102,7 @@ namespace Innoactive.Creator.XR.Editors
         public override void OnInspectorGUI()
         {
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((XRInteractableObject)target), typeof(XRInteractableObject), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((InteractableObject)target), typeof(InteractableObject), false);
             GUI.enabled = true;
 
             serializedObject.Update();

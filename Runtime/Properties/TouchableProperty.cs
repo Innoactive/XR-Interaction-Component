@@ -12,7 +12,8 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
     /// <summary>
     /// XR implementation of <see cref="ITouchableProperty"/>.
     /// </summary>
-    public class XR_TouchableProperty : LockableProperty, ITouchableProperty
+    [RequireComponent(typeof(InteractableObject))]
+    public class TouchableProperty : LockableProperty, ITouchableProperty
     {
         public event EventHandler<EventArgs> Touched;
         public event EventHandler<EventArgs> Untouched;
@@ -31,7 +32,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// <summary>
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
-        protected XRInteractableObject Interactable;
+        protected InteractableObject Interactable;
 
         private LayerMask cacheLayers = 0;
         
@@ -39,7 +40,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRInteractableObject>(true);
+            Interactable = gameObject.GetComponent<InteractableObject>(true);
 
             Interactable.onFirstHoverEnter.AddListener(HandleXRTouched);
             Interactable.onLastHoverExit.AddListener(HandleXRUntouched);

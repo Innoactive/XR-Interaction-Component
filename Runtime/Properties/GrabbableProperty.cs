@@ -1,6 +1,7 @@
 ﻿#if CREATOR_XR_INTERACTION
 
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Hub.Unity;
@@ -12,8 +13,8 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
     /// <summary>
     /// XR implementation of <see cref="IGrabbableProperty"/>.
     /// </summary>
-    [RequireComponent(typeof(XR_TouchableProperty))]
-    public class XR_GrabbableProperty : LockableProperty, IGrabbableProperty
+    [RequireComponent(typeof(TouchableProperty))]
+    public class GrabbableProperty : LockableProperty, IGrabbableProperty
     {
         public event EventHandler<EventArgs> Grabbed;
         public event EventHandler<EventArgs> Ungrabbed;
@@ -32,7 +33,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// <summary>
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
-        protected XRInteractableObject Interactable;
+        protected InteractableObject Interactable;
         
         private LayerMask cacheLayers = 0;
         
@@ -40,7 +41,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRInteractableObject>(true);
+            Interactable = gameObject.GetComponent<InteractableObject>(true);
 
             Interactable.onSelectEnter.AddListener(HandleXRGrabbed);
             Interactable.onSelectExit.AddListener(HandleXRUngrabbed);
@@ -94,8 +95,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             if (Interactable.isSelected)
             {
-                Interactable.AttemptGrab();
-                Interactable.ForceStopInteracting();
+                StartCoroutine(UngrabGrabAndRelease());
             }
             else
             {
@@ -117,6 +117,25 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
             {
                 EmitGrabbed();
                 EmitUngrabbed();
+            }
+        }
+
+        private IEnumerator UngrabGrabAndRelease()
+        {
+            Interactable.ForceStopInteracting();
+                
+            XRBaseInteractor interactor = Interactable.selectingInteractor;
+
+            yield return new WaitUntil(() => Interactable.isHovered == false && Interactable.isSelected == false);
+            
+            if (interactor != null)
+            {
+                DirectInteractor directInteractor = (DirectInteractor)interactor;
+                directInteractor.AttemptGrab();
+
+                yield return null;
+                
+                Interactable.ForceStopInteracting();
             }
         }
     }

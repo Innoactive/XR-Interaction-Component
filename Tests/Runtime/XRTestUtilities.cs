@@ -14,21 +14,21 @@ namespace Innoactive.Creator.XR.Tests
             return manager;
         }
 
-        internal static XRDirectInteractor CreateDirectInteractor()
+        internal static DirectInteractor CreateDirectInteractor()
         {
             GameObject interactorGO = new GameObject("XR Interactor");
             CreateGOSphereCollider(interactorGO);
-            XRDirectInteractor interactor = interactorGO.AddComponent<XRDirectInteractor>();
+            DirectInteractor interactor = interactorGO.AddComponent<DirectInteractor>();
             XRController controller = interactorGO.GetComponent<XRController>();
             controller.enableInputTracking = false;
             return interactor;
         }
         
-        public static XRInteractableObject CreateInteractableObjcet()
+        public static InteractableObject CreateInteractableObjcet()
         {
             GameObject interactableGO = new GameObject("XR Interactable");
             CreateGOSphereCollider(interactableGO, false);
-            XRInteractableObject interactable = interactableGO.AddComponent<XRInteractableObject>();
+            InteractableObject interactable = interactableGO.AddComponent<InteractableObject>();
             Rigidbody rigidBody = interactableGO.GetComponent<Rigidbody>();
             rigidBody.useGravity = false;
             rigidBody.isKinematic = true;

@@ -12,8 +12,8 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
     /// <summary>
     /// XR implementation of <see cref="IUsableProperty"/>.
     /// </summary>
-    [RequireComponent(typeof(XR_GrabbableProperty))]
-    public class XR_UsableProperty : LockableProperty, IUsableProperty
+    [RequireComponent(typeof(GrabbableProperty))]
+    public class UsableProperty : LockableProperty, IUsableProperty
     {
         public event EventHandler<EventArgs> UsageStarted;
         public event EventHandler<EventArgs> UsageStopped;
@@ -32,7 +32,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// <summary>
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
-        protected XRInteractableObject Interactable;
+        protected InteractableObject Interactable;
         
         private LayerMask cacheLayers = 0;
 
@@ -40,7 +40,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<XRInteractableObject>(true);
+            Interactable = gameObject.GetComponent<InteractableObject>(true);
 
             Interactable.onActivate.AddListener(HandleXRUsageStarted);
             Interactable.onDeactivate.AddListener(HandleXRUsageStopped);

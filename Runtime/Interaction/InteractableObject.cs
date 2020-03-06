@@ -1,9 +1,7 @@
 ﻿#if CREATOR_XR_INTERACTION
 
-using System;
 using System.Collections;
-using System.Linq;
-using Boo.Lang;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -11,7 +9,7 @@ namespace Innoactive.Creator.XR
 {
     /// <inheritdoc />
     /// <remarks>Allows locking interactions.</remarks>
-    public class XRInteractableObject : XRGrabInteractable
+    public class InteractableObject : XRGrabInteractable
     {
         private bool isTouchable = true;
         private bool isGrabbable = true;
