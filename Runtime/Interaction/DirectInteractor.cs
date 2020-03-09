@@ -4,10 +4,13 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XR
 {
+    /// <inheritdoc />
+    /// <remarks>Adds extra control over applicable interactions.</remarks>
     public class DirectInteractor : XRDirectInteractor
     {
         private bool forceGrab;
 
+        /// <inheritdoc />
         public override bool isSelectActive
         {
             get

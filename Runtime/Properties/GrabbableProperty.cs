@@ -34,9 +34,7 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         /// Reference to attached 'XRGrabInteractable'.
         /// </summary>
         protected InteractableObject Interactable;
-        
-        private LayerMask cacheLayers = 0;
-        
+
         protected override void OnEnable()
         {
             base.OnEnable();

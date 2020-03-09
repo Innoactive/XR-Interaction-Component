@@ -2,33 +2,22 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XR
 {
     /// <inheritdoc />
-    /// <remarks>Allows locking interactions.</remarks>
+    /// <remarks>Adds extra control over applicable interactions.</remarks>
     public class InteractableObject : XRGrabInteractable
     {
         private bool isTouchable = true;
         private bool isGrabbable = true;
         private bool isUsable = true;
 
-        public bool IsActivated { get; private set; }
-
-        public bool IsInSocket
-        {
-            get { return selectingSocket != null; }
-        }
-        
         private XRSocketInteractor selectingSocket;
         
-        /// <summary>
-        /// Get the current selecting 'XRSocketInteractor' for this interactable.
-        /// </summary>
-        public XRSocketInteractor SelectingSocket { get { return selectingSocket; } } 
-
         /// <summary>
         /// Determines if the Interactable Object can be touched.
         /// </summary>
@@ -52,7 +41,25 @@ namespace Innoactive.Creator.XR
         {
             set { isUsable = value; }
         }
+        
+        /// <summary>
+        /// Gets whether this interactable is currently being activated.
+        /// </summary>
+        public bool IsActivated { get; private set; }
 
+        /// <summary>
+        /// Gets whether this interactable is currently being selected by any 'XRSocketInteractor'.
+        /// </summary>
+        public bool IsInSocket
+        {
+            get { return selectingSocket != null; }
+        }
+        
+        /// <summary>
+        /// Get the current selecting 'XRSocketInteractor' for this interactable.
+        /// </summary>
+        public XRSocketInteractor SelectingSocket { get { return selectingSocket; } } 
+        
         /// <inheritdoc />
         public override bool IsHoverableBy(XRBaseInteractor interactor)
         {
@@ -151,22 +158,16 @@ namespace Innoactive.Creator.XR
                 interactors.Add(selectingInteractor);
             }
             
-            foreach (XRBaseInteractor interactor in interactors)
+            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
             {
-                if (interactor != null)
-                {
-                    interactor.enableInteractions = false;
-                }
+                interactor.enableInteractions = false;
             }
             
             yield return new WaitUntil(() => isHovered == false && isSelected == false);
             
-            foreach (XRBaseInteractor interactor in interactors)
+            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
             {
-                if (interactor != null)
-                {
-                    interactor.enableInteractions = true;
-                }
+                interactor.enableInteractions = true;
             }
         }
     }
