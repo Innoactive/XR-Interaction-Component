@@ -11,9 +11,7 @@
         "GUID:190979c3ed6e41c448f5e9925429edf9",
         "GUID:fe685ec1767f73d42b749ea8045bfe43"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
@@ -22,8 +20,8 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "UNITY_INCLUDE_TESTS",
-        "CREATOR_XR_INTERACTION"
+        "CREATOR_XR_INTERACTION",
+        "UNITY_INCLUDE_TESTS"
     ],
     "versionDefines": [],
     "noEngineReferences": false
