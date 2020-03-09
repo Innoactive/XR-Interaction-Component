@@ -1,6 +1,4 @@
-﻿#if CREATOR_XR_INTERACTION
-
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Hub.Unity;
@@ -100,5 +98,3 @@ namespace Innoactive.Creator.XR.SceneObjects.Properties
         }
     }
 }
-
-#endif

@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR && CREATOR_XR_INTERACTION
-
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -8,10 +6,10 @@ using UnityEngine.TestTools;
 using Innoactive.Creator.XR.SceneObjects.Properties;
 using Innoactive.Hub.Training;
 using Innoactive.Hub.Training.Conditions;
+using Innoactive.Creator.Core.Tests.Utils;
 using Innoactive.Hub.Training.Interaction.Conditions;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.Utils.Builders;
-using Innoactive.Hub.Unity.Tests.Training;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XR.Tests
@@ -29,7 +27,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator TouchablePropertyTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.TouchableProperty touchProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.TouchableProperty>();
+            TouchableProperty touchProperty = interactable.gameObject.AddComponent<TouchableProperty>();
 
             Assert.IsFalse(touchProperty.IsBeingTouched);
 
@@ -50,7 +48,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator GrabbablePropertyTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.GrabbableProperty>();
+            GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<GrabbableProperty>();
             
             Assert.IsFalse(grabbableProperty.IsGrabbed);
             
@@ -71,7 +69,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator UsablePropertyTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.UsableProperty usableProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.UsableProperty>();
+            UsableProperty usableProperty = interactable.gameObject.AddComponent<UsableProperty>();
             
             Assert.IsFalse(usableProperty.IsBeingUsed);
 
@@ -90,7 +88,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator FastForwardTouchTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.TouchableProperty touchProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.TouchableProperty>();
+            TouchableProperty touchProperty = interactable.gameObject.AddComponent<TouchableProperty>();
             bool wasTouched = false;
 
             touchProperty.Touched += (sender, args) =>
@@ -127,7 +125,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator FastForwardGrabTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.GrabbableProperty>();
+            GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<GrabbableProperty>();
             bool wasGrabbed = false;
 
             grabbableProperty.Grabbed += (sender, args) =>
@@ -164,7 +162,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator FastForwardUngrabTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.GrabbableProperty>();
+            GrabbableProperty grabbableProperty = interactable.gameObject.AddComponent<GrabbableProperty>();
             bool wasUngrabbed = false;
 
             grabbableProperty.Ungrabbed += (sender, args) =>
@@ -201,7 +199,7 @@ namespace Innoactive.Creator.XR.Tests
         public IEnumerator FastForwardUseTest()
         {
             InteractableObject interactable = XRTestUtilities.CreateInteractableObjcet();
-            SceneObjects.Properties.UsableProperty usableProperty = interactable.gameObject.AddComponent<SceneObjects.Properties.UsableProperty>();
+            UsableProperty usableProperty = interactable.gameObject.AddComponent<UsableProperty>();
             bool wasUsed = false;
 
             usableProperty.UsageStarted += (sender, args) =>
@@ -235,5 +233,3 @@ namespace Innoactive.Creator.XR.Tests
         }
     }
 }
-
-#endif

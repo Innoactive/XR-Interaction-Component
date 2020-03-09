@@ -1,12 +1,10 @@
-﻿#if CREATOR_XR_INTERACTION
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Innoactive.Creator.XR.Editors
 {
     /// <summary>
-    /// 'XRDirectInteractorEditor' adapted to edit <see cref="DirectInteractor"/>.
+    /// Copy of 'XRDirectInteractorEditor' adapted to edit <see cref="DirectInteractor"/>.
     /// </summary>
     [CustomEditor(typeof(DirectInteractor))]
     internal class DirectInteractorEditor : Editor
@@ -232,5 +230,3 @@ namespace Innoactive.Creator.XR.Editors
         }
     }
 }
-
-#endif

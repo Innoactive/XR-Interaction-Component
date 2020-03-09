@@ -1,6 +1,4 @@
-﻿#if CREATOR_XR_INTERACTION
-
-using UnityEngine.XR.Interaction.Toolkit;
+﻿using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XR
 {
@@ -34,5 +32,3 @@ namespace Innoactive.Creator.XR
         }
     }
 }
-
-#endif

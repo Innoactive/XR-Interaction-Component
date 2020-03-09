@@ -112,11 +112,11 @@ namespace Innoactive.Creator.XR.Editors.Utils
             BuildTarget buildTarget = EditorUserBuildSettings.activeBuildTarget;
             BuildTargetGroup buildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
             List<string> symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup).Split(';').ToList();
-
+        
             if (symbols.Contains(CreatorXRInteractionSymbol) == false)
             {
                 symbols.Add(CreatorXRInteractionSymbol);
-
+        
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, string.Join(";", symbols.ToArray()));
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);

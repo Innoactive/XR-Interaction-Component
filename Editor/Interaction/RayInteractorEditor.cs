@@ -1,12 +1,10 @@
-﻿#if CREATOR_XR_INTERACTION
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Innoactive.Creator.XR.Editors
 {
     /// <summary>
-    /// 'XRRayInteractorEditor' adapted to edit <see cref="RayInteractor"/>.
+    /// Copy of 'XRRayInteractorEditor' adapted to edit <see cref="RayInteractor"/>.
     /// </summary>
     [CustomEditor(typeof(RayInteractor))]
     [CanEditMultipleObjects]
@@ -350,5 +348,3 @@ namespace Innoactive.Creator.XR.Editors
         }
     }
 }
-
-#endif

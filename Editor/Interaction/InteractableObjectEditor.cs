@@ -1,12 +1,10 @@
-﻿#if CREATOR_XR_INTERACTION
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Innoactive.Creator.XR.Editors
 {
     /// <summary>
-    /// 'XRGrabInteractableEditor' adapted to edit <see cref="InteractableObject"/>.
+    /// Copy of 'XRGrabInteractableEditor' adapted to edit <see cref="InteractableObject"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableObject))]
     public class InteractableObjectEditor : Editor
@@ -180,5 +178,3 @@ namespace Innoactive.Creator.XR.Editors
         }
     }
 }
-
-#endif
