@@ -17,6 +17,18 @@ namespace Innoactive.Creator.XR
 
         public bool IsActivated { get; private set; }
 
+        public bool IsInSocket
+        {
+            get { return selectingSocket != null; }
+        }
+        
+        private XRSocketInteractor selectingSocket;
+        
+        /// <summary>
+        /// Get the current selecting 'XRSocketInteractor' for this interactable.
+        /// </summary>
+        public XRSocketInteractor SelectingSocket { get { return selectingSocket; } } 
+
         /// <summary>
         /// Determines if the Interactable Object can be touched.
         /// </summary>
@@ -50,6 +62,11 @@ namespace Innoactive.Creator.XR
         /// <inheritdoc />
         public override bool IsSelectableBy(XRBaseInteractor interactor)
         {
+            if (IsInSocket && interactor == selectingSocket)
+            {
+                return true;
+            }
+            
             return isGrabbable && base.IsSelectableBy(interactor);
         }
 
@@ -73,6 +90,36 @@ namespace Innoactive.Creator.XR
         public virtual void ForceUse()
         {
             OnActivate(selectingInteractor);
+        }
+
+        /// <inheritdoc />
+        protected override void OnSelectEnter(XRBaseInteractor interactor)
+        {
+            base.OnSelectEnter(interactor);
+
+            if (IsInSocket == false)
+            {
+                XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();
+
+                if (socket != null)
+                {
+                    selectingSocket = socket;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void OnSelectExit(XRBaseInteractor interactor)
+        {
+            base.OnSelectExit(interactor);
+            
+            if (IsInSocket == false)
+            {
+                if (IsInSocket && interactor == selectingSocket)
+                {
+                    selectingSocket = null;
+                }
+            }
         }
 
         /// <inheritdoc />
