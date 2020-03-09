@@ -1,12 +1,15 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XR
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Interactable component that allows basic "grab" functionality.
+    /// Can attach to selecting interactor and follow it around while obeying physics (and inherit velocity when released).
+    /// </summary>
     /// <remarks>Adds extra control over applicable interactions.</remarks>
     public class InteractableObject : XRGrabInteractable
     {
@@ -58,13 +61,23 @@ namespace Innoactive.Creator.XR
         /// </summary>
         public XRSocketInteractor SelectingSocket { get { return selectingSocket; } } 
         
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines if this interactable can be hovered by a given interactor.
+        /// </summary>
+        /// <param name="interactor">Interactor to check for a valid hover state with.</param>
+        /// <returns>True if hovering is valid this frame, False if not.</returns>
+        /// <remarks>It always returns false when <see cref="IsTouchable"/> is false.</remarks>
         public override bool IsHoverableBy(XRBaseInteractor interactor)
         {
             return isTouchable && base.IsHoverableBy(interactor);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines if this interactable can be selected by a given interactor.
+        /// </summary>
+        /// <param name="interactor">Interactor to check for a valid selection with.</param>
+        /// <returns>True if selection is valid this frame, False if not.</returns>
+        /// <remarks>It always returns false when <see cref="IsGrabbable"/> is false.</remarks>
         public override bool IsSelectableBy(XRBaseInteractor interactor)
         {
             if (IsInSocket && interactor == selectingSocket)
@@ -97,7 +110,9 @@ namespace Innoactive.Creator.XR
             OnActivate(selectingInteractor);
         }
 
-        /// <inheritdoc />
+        /// <summary>This method is called by the interaction manager 
+        /// when the interactor first initiates selection of an interactable.</summary>
+        /// <param name="interactor">Interactor that is initiating the selection.</param>
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
@@ -113,7 +128,9 @@ namespace Innoactive.Creator.XR
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>This method is called by the interaction manager 
+        /// when the interactor ends selection of an interactable.</summary>
+        /// <param name="interactor">Interactor that is ending the selection.</param>
         protected override void OnSelectExit(XRBaseInteractor interactor)
         {
             base.OnSelectExit(interactor);
@@ -127,7 +144,9 @@ namespace Innoactive.Creator.XR
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>This method is called by the interaction manager 
+        /// when the interactor sends an activation event down to an interactable.</summary>
+        /// <param name="interactor">Interactor that is sending the activation event.</param>
         protected override void OnActivate(XRBaseInteractor interactor)
         {
             if (isUsable)
@@ -137,7 +156,9 @@ namespace Innoactive.Creator.XR
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>This method is called by the interaction manager 
+        /// when the interactor sends a deactivation event down to an interactable.</summary>
+        /// <param name="interactor">Interactor that is sending the activation event.</param>
         protected override void OnDeactivate(XRBaseInteractor interactor)
         {
             if (isUsable)
