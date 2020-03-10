@@ -5,7 +5,7 @@ using Innoactive.Hub.Unity;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
-namespace Innoactive.Creator.XR.SceneObjects.Properties
+namespace Innoactive.Creator.XRInteraction.SceneObjects.Properties
 { 
     /// <summary>
     /// XR implementation of <see cref="ITouchableProperty"/>.

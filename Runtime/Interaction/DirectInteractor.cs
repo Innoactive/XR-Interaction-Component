@@ -1,6 +1,6 @@
 ﻿using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XR
+namespace Innoactive.Creator.XRInteraction
 {
     /// <summary>
     /// Interactor used for directly interacting with interactables that are touching. This is handled via trigger volumes
