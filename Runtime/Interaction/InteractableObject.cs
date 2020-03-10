@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XR
+namespace Innoactive.Creator.XRInteraction
 {
     /// <summary>
     /// Interactable component that allows basic "grab" functionality.

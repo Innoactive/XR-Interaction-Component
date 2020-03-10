@@ -1,6 +1,6 @@
 ﻿using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XR
+namespace Innoactive.Creator.XRInteraction
 {
     /// <summary>
     /// Interactor used for interacting with interactables at a distance. This is handled via raycasts

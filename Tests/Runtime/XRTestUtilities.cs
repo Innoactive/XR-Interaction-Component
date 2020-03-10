@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XR.Tests
+namespace Innoactive.Creator.XRInteraction.Tests
 {
     public static class XRTestUtilities
     {

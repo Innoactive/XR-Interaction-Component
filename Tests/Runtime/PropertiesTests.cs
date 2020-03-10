@@ -3,16 +3,16 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Innoactive.Creator.XR.SceneObjects.Properties;
 using Innoactive.Hub.Training;
 using Innoactive.Hub.Training.Conditions;
 using Innoactive.Creator.Core.Tests.Utils;
+using Innoactive.Creator.XRInteraction.SceneObjects.Properties;
 using Innoactive.Hub.Training.Interaction.Conditions;
 using Innoactive.Hub.Training.SceneObjects.Properties;
 using Innoactive.Hub.Training.Utils.Builders;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XR.Tests
+namespace Innoactive.Creator.XRInteraction.Tests
 {
     public class PropertiesTests : RuntimeTests
     {
