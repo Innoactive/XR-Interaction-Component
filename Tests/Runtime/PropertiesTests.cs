@@ -1,15 +1,14 @@
 ﻿using System.Collections;
 using System.Linq;
+using Innoactive.Creator.BasicInteraction.Conditions;
+using Innoactive.Creator.Core;
+using Innoactive.Creator.Core.SceneObjects.Properties;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Innoactive.Hub.Training;
-using Innoactive.Hub.Training.Conditions;
-using Innoactive.Creator.Core.Tests.Utils;
-using Innoactive.Creator.XRInteraction.SceneObjects.Properties;
-using Innoactive.Hub.Training.Interaction.Conditions;
-using Innoactive.Hub.Training.SceneObjects.Properties;
-using Innoactive.Hub.Training.Utils.Builders;
+using Innoactive.Creator.Core.Utils.Builders;
+using Innoactive.Creator.Tests.Utils;
+using Innoactive.Creator.XRInteraction.Properties;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XRInteraction.Tests

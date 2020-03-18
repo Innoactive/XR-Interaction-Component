@@ -1,8 +1,9 @@
-﻿using UnityEditor;
+﻿using Innoactive.Creator.XRInteraction;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XRInteraction.Editors
+namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
     /// Copy of 'XRSocketInteractorEditor' adapted to edit <see cref="SnapZone"/>.

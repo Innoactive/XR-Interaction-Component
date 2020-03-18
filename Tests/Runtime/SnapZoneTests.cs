@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Innoactive.Creator.Core.Tests.Utils;
-using Innoactive.Creator.XRInteraction.SceneObjects.Properties;
-using Innoactive.Hub.Training;
-using Innoactive.Hub.Training.Conditions;
-using Innoactive.Hub.Training.Configuration;
-using Innoactive.Hub.Training.Configuration.Modes;
+using Innoactive.Creator.BasicInteraction.Conditions;
+using Innoactive.Creator.Core;
+using Innoactive.Creator.Core.Configuration;
+using Innoactive.Creator.Core.Configuration.Modes;
+using Innoactive.Creator.Tests.Utils;
+using Innoactive.Creator.XRInteraction.Properties;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;

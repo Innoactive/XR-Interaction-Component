@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using Innoactive.Creator.XRInteraction;
+using UnityEditor;
 using UnityEngine;
 
-namespace Innoactive.Creator.XRInteraction.Editors
+namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
     /// Copy of 'XRRayInteractorEditor' adapted to edit <see cref="RayInteractor"/>.
