@@ -1,6 +1,6 @@
 ﻿using System;
 using Innoactive.Creator.BasicInteraction.Properties;
-using Innoactive.Creator.Core.SceneObjects.Properties;
+using Innoactive.Creator.Core.Properties;
 using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;

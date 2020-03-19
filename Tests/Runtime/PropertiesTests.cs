@@ -2,7 +2,7 @@
 using System.Linq;
 using Innoactive.Creator.BasicInteraction.Conditions;
 using Innoactive.Creator.Core;
-using Innoactive.Creator.Core.SceneObjects.Properties;
+using Innoactive.Creator.Core.Properties;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
