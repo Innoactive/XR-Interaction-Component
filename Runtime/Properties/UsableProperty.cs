@@ -1,11 +1,11 @@
 ﻿using System;
+using Innoactive.Creator.BasicInteraction.Properties;
+using Innoactive.Creator.Core.Properties;
+using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Hub.Unity;
-using Innoactive.Hub.Training.SceneObjects.Properties;
-using Innoactive.Hub.Training.SceneObjects.Interaction.Properties;
 
-namespace Innoactive.Creator.XRInteraction.SceneObjects.Properties
+namespace Innoactive.Creator.XRInteraction.Properties
 {
     /// <summary>
     /// XR implementation of <see cref="IUsableProperty"/>.
