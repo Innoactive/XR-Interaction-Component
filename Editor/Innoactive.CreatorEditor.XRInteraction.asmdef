@@ -2,7 +2,9 @@
     "name": "Innoactive.CreatorEditor.XRInteraction",
     "references": [
         "GUID:c8561f9de838ac04d8feeda695bc572d",
+        "GUID:e476a81b6ef7b824686666349a591a9a",
         "GUID:474da18fc7b8c9c4c9db09e343483375",
+        "GUID:05a23dc99adcd7045af6fda7a3ed6ccd",
         "GUID:5bac2de3e0a43884ba7b23da0c8de186",
         "GUID:fe685ec1767f73d42b749ea8045bfe43"
     ],
@@ -17,6 +19,12 @@
     "defineConstraints": [
         "CREATOR_XR_INTERACTION"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "0.9.3",
+            "define": ""
+        }
+    ],
     "noEngineReferences": false
 }
