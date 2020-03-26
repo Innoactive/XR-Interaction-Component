@@ -7,7 +7,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// <summary>
     /// Scene setup for XR-Interaction.
     /// </summary>
-    public class XRSceneSetup : OnInteractionFrameworkSetup
+    public class XRInteractionSceneSetup : InteractionFrameworkSceneSetup
     {
         /// <inheritdoc />
         public override void Setup()
