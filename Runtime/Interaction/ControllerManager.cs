@@ -1,9 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// Handles teleportation interactions.
+/// <remarks>this class is borrowed from the XR Interaction Toolkit Examples</remarks>
+/// <para>For more information about XR Interaction Toolkit Examples see: <see href="https://github.com/Unity-Technologies/XR-Interaction-Toolkit-Examples"/></para>
+/// </summary>
 [DefaultExecutionOrder(kControllerManagerUpdateOrder)]
 public class ControllerManager : MonoBehaviour
 {
