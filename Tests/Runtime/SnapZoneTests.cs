@@ -58,7 +58,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
             yield return null;
 
             SnappedCondition condition = new SnappedCondition(mockedProperty, snapZoneProperty);
-            condition.Configure(RuntimeConfigurator.Configuration.GetCurrentMode());
+            condition.Configure(RuntimeConfigurator.Configuration.Modes.CurrentMode);
 
             // When activated
             condition.LifeCycle.Activate();
@@ -94,7 +94,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
             yield return null;
 
             SnappedCondition condition = new SnappedCondition(mockedProperty, snapZoneProperty);
-            condition.Configure(RuntimeConfigurator.Configuration.GetCurrentMode());
+            condition.Configure(RuntimeConfigurator.Configuration.Modes.CurrentMode);
 
             // When activated
             condition.LifeCycle.Activate();
@@ -130,7 +130,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
             yield return null;
 
             SnappedCondition condition = new SnappedCondition(mockedProperty, snapZoneProperty);
-            condition.Configure(RuntimeConfigurator.Configuration.GetCurrentMode());
+            condition.Configure(RuntimeConfigurator.Configuration.Modes.CurrentMode);
 
             yield return null;
             
@@ -171,7 +171,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
             yield return null;
 
             SnappedCondition condition = new SnappedCondition(mockedProperty, snapZoneProperty);
-            condition.Configure(RuntimeConfigurator.Configuration.GetCurrentMode());
+            condition.Configure(RuntimeConfigurator.Configuration.Modes.CurrentMode);
             
             yield return null;
             
@@ -212,7 +212,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
             yield return null;
 
             SnappedCondition condition = new SnappedCondition(mockedProperty, snapZoneProperty);
-            condition.Configure(RuntimeConfigurator.Configuration.GetCurrentMode());
+            condition.Configure(RuntimeConfigurator.Configuration.Modes.CurrentMode);
             yield return null;
             condition.Update();
 
