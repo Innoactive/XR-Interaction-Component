@@ -17,20 +17,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private void SetupXR()
         {
-            Camera camera = Camera.main;
-            
-            if (camera != null)
-            {
-                Object.DestroyImmediate(camera.gameObject);
-            }
-        
-            GameObject xrSetup = GameObject.Find("[XR_Setup]");
-            
-            if (xrSetup == null)
-            {
-                GameObject prefab = Object.Instantiate(Resources.Load("[XR_Setup]", typeof(GameObject))) as GameObject;
-                prefab.name = prefab.name.Replace("(Clone)", string.Empty);
-            }
+            RemoveMainCamera();
+            SetupPrefab("[XR_Setup]");
         }
     }
 }
