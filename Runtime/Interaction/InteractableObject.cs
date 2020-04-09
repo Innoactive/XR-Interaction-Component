@@ -11,6 +11,7 @@ namespace Innoactive.Creator.XRInteraction
     /// Can attach to selecting interactor and follow it around while obeying physics (and inherit velocity when released).
     /// </summary>
     /// <remarks>Adds extra control over applicable interactions.</remarks>
+    [RequireComponent(typeof(InteractableHighlighter))]
     public class InteractableObject : XRGrabInteractable
     {
         private bool isTouchable = true;
