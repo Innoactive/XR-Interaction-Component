@@ -1,0 +1,119 @@
+﻿using UnityEngine;
+using UnityEditor;
+using Innoactive.Creator.XRInteraction;
+
+namespace Innoactive.CreatorEditor.XRInteraction
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    [CustomEditor(typeof(InteractableHighlighter)), CanEditMultipleObjects]
+    public class InteractableHighlighterEditor : Editor
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        internal class HighlightCase
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly GUIContent SectionTitle;
+            
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly GUIContent ColorProperty = new GUIContent("Highlight Color", "Color to be used for highlighting this Interactable Object's section if no material is present.");
+            
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly GUIContent MaterialProperty = new GUIContent("Highlight Material", "Material to be used for highlighting this Interactable Object's section.");
+            
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly SerializedProperty HighlightMaterialProperty;
+            
+            /// <summary>
+            /// 
+            /// </summary>
+            public readonly SerializedProperty HighlightColorProperty;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public bool ShowSection
+            {
+                get => showSection;
+                set => showSection = HighlightEnablingProperty.boolValue = value;
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public int TabIndex;
+            
+            private SerializedProperty HighlightEnablingProperty;
+            private bool showSection;
+
+            internal HighlightCase(SerializedObject serializedObject, string sectionTitle, string colorPropertyName, string materialPropertyName, string highlightEnablingPropertyName, bool showSection)
+            {
+                SectionTitle = new GUIContent(sectionTitle, $"Shows settings corresponding to {sectionTitle}");
+                HighlightColorProperty = serializedObject.FindProperty(colorPropertyName);
+                HighlightMaterialProperty = serializedObject.FindProperty(materialPropertyName);
+                HighlightEnablingProperty = serializedObject.FindProperty(highlightEnablingPropertyName);
+                ShowSection = showSection;
+            }
+        }
+        
+        private readonly string[] tabs = {"Color", "Material"};
+        private HighlightCase onTouchHighlighting;
+        private HighlightCase onGrabHighlighting;
+
+        private void OnEnable()
+        {
+            onTouchHighlighting = new HighlightCase(serializedObject, "On Touch Highlight", "touchHighlightColor", "touchHighlightMaterial", "allowOnTouchHighlight", true);
+            onGrabHighlighting = new HighlightCase(serializedObject, "On Grab Highlight", "grabHighlightColor", "grabHighlightMaterial", "allowOnGrabHighlight", false);
+        }
+
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            
+            DrawTouchHighlightSection(onTouchHighlighting);
+            DrawTouchHighlightSection(onGrabHighlighting);
+            
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DrawTouchHighlightSection(HighlightCase highlightCase)
+        {
+            highlightCase.ShowSection = EditorGUILayout.ToggleLeft(highlightCase.SectionTitle, highlightCase.ShowSection);
+            EditorGUILayout.Separator();
+            
+            if (highlightCase.ShowSection)
+            {
+                DrawHighlightOptions(highlightCase);
+            }
+        }
+
+        private void DrawHighlightOptions(HighlightCase highlightCase)
+        {
+            highlightCase.TabIndex = GUILayout.Toolbar (highlightCase.TabIndex, tabs);
+            EditorGUILayout.Space(5);
+            
+            switch (highlightCase.TabIndex)
+            {
+                case 0:
+                    EditorGUILayout.PropertyField(highlightCase.HighlightColorProperty, highlightCase.ColorProperty);
+                    break;
+                case 1:
+                    EditorGUILayout.PropertyField(highlightCase.HighlightMaterialProperty, highlightCase.MaterialProperty);
+                    break;
+            }
+            
+            EditorGUILayout.Separator();
+        }
+    }
+}

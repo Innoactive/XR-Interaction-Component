@@ -1,9 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -12,44 +10,51 @@ namespace Innoactive.Creator.XRInteraction
     /// <summary>
     /// 
     /// </summary>
-    [RequireComponent(typeof(InteractableObject))]
     public sealed class InteractableHighlighter : MonoBehaviour
     {
-        private InteractableObject interactableObject;
-        
-        [SerializeField]
-        private  Material touchHighlightMat;
-        
-        [SerializeField]
-        private  Material grabHighlightMat;
-        // [Tooltip("An array of child gameObjects to not render a highlight for. Things like transparent parts, vfx, etc.")]
-        // public GameObject[] hideHighlight;
-        //
-        // [Tooltip("Higher is better")]
-        // public int hoverPriority = 0;
-        
-        private SkinnedMeshRenderer[] cachedSkinnedRenderers;
-        private MeshRenderer[] cachedMeshRenderers;
-        private MeshFilter[] cachedMeshFilters;
-
         /// <summary>
         /// 
         /// </summary>
         public InteractableObject InteractableObject => interactableObject;
 
-        private void Update()
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool AllowOnTouchHighlight
         {
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                RefreshCachedRenderers();
-                StartHighlighting("Test");
-            }
-            
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                StopHighlighting("Test");
-            }
+            get => allowOnTouchHighlight;
+            set => allowOnTouchHighlight = value;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool AllowOnGrabHighlight
+        {
+            get => allowOnGrabHighlight;
+            set => allowOnGrabHighlight = value;
+        }
+
+        [SerializeField]
+        private bool allowOnTouchHighlight = true;
+        [SerializeField]
+        private bool allowOnGrabHighlight;
+        
+        [SerializeField]
+        private  Material touchHighlightMaterial;
+        [SerializeField]
+        private  Material grabHighlightMaterial;
+        
+        [SerializeField]
+        private Color touchHighlightColor = new Color32(64, 200, 255, 50);
+        [SerializeField]
+        private Color grabHighlightColor;
+
+        private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
+        private InteractableObject interactableObject;
+        private SkinnedMeshRenderer[] cachedSkinnedRenderers;
+        private MeshRenderer[] cachedMeshRenderers;
+        private MeshFilter[] cachedMeshFilters;
 
         private void Awake()
         {
@@ -69,13 +74,77 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
             interactableObject.onSelectExit.RemoveListener(OnUngrabbed);
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="highlightID"></param>
+        /// <param name="highlightMaterial"></param>
+        public void StartHighlighting(string highlightID, Material highlightMaterial)
+        {
+            if (externalHighlights.ContainsKey(highlightID) == false)
+            {
+                bool shouldContinueHighlighting = true;
+                externalHighlights.Add(highlightID, shouldContinueHighlighting);
+                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="highlightID"></param>
+        /// <param name="highlightColor"></param>
+        public void StartHighlighting(string highlightID, Color highlightColor)
+        {
+            if (externalHighlights.ContainsKey(highlightID) == false)
+            {
+                bool shouldContinueHighlighting = true;
+                externalHighlights.Add(highlightID, shouldContinueHighlighting);
+                Material highlightMaterial = NewHighlightMaterial(highlightColor);
+                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="highlightID"></param>
+        /// <param name="highlightTexture"></param>
+        public void StartHighlighting(string highlightID, Texture highlightTexture)
+        {
+            if (externalHighlights.ContainsKey(highlightID) == false)
+            {
+                bool shouldContinueHighlighting = true;
+                externalHighlights.Add(highlightID, shouldContinueHighlighting);
+                Material highlightMaterial = NewHighlightMaterial(highlightTexture);
+                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="highlightID"></param>
+        public void StopHighlighting(string highlightID)
+        {
+            if (externalHighlights.ContainsKey(highlightID))
+            {
+                externalHighlights[highlightID] = false;
+            }
+        }
 
         private void OnHoverBegin(XRBaseInteractor interactor)
         {
             if (ShouldHighlightHovering())
             {
+                if (touchHighlightMaterial == null)
+                {
+                    touchHighlightMaterial = NewHighlightMaterial(touchHighlightColor);
+                }
+                
                 RefreshCachedRenderers();
-                StartCoroutine(Highlight(touchHighlightMat, ShouldHighlightHovering));
+                StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightHovering));
             }
         }
 
@@ -83,40 +152,29 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (ShouldHighlightSelecting())
             {
-                StartCoroutine(Highlight(grabHighlightMat, ShouldHighlightSelecting));
+                if (grabHighlightMaterial == null)
+                {
+                    grabHighlightMaterial = NewHighlightMaterial(grabHighlightColor);
+                }
+                
+                StartCoroutine(Highlight(grabHighlightMaterial, ShouldHighlightSelecting));
             }
         }
 
         private void OnUngrabbed(XRBaseInteractor interactor)
         {
             if (ShouldHighlightHovering())
-            { 
-                StartCoroutine(Highlight(touchHighlightMat, ShouldHighlightHovering));
-            }
-        }
-        
-        private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
-
-        public void StartHighlighting(string highlightID, Material highlightMaterial = null)
-        {
-            if (externalHighlights.ContainsKey(highlightID) == false)
             {
-                bool shouldContinueHighlighting = true;
-                externalHighlights.Add(highlightID, shouldContinueHighlighting);
-                StartCoroutine(Highlight(grabHighlightMat, ()=> externalHighlights[highlightID]));
-            }
-        }
-        
-        public void StopHighlighting(string highlightID)
-        {
-            if (externalHighlights.ContainsKey(highlightID))
-            {
-                externalHighlights[highlightID] = false;
-                externalHighlights.Remove(highlightID);
+                if (touchHighlightMaterial == null)
+                {
+                    touchHighlightMaterial = NewHighlightMaterial(touchHighlightColor);
+                }
+                
+                StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightHovering));
             }
         }
 
-        private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting)
+        private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
         {
             while (shouldContinueHighlighting())
             {
@@ -138,6 +196,11 @@ namespace Innoactive.Creator.XRInteraction
 
             ReenableRenderers(cachedSkinnedRenderers);
             ReenableRenderers(cachedMeshRenderers);
+
+            if (string.IsNullOrEmpty(highlightID) == false && externalHighlights.ContainsKey(highlightID))
+            {
+                externalHighlights.Remove(highlightID);
+            }
         }
 
         private void RefreshCachedRenderers()
@@ -171,12 +234,38 @@ namespace Innoactive.Creator.XRInteraction
 
         private bool ShouldHighlightHovering()
         {
-            return touchHighlightMat != null && interactableObject.isHovered && interactableObject.isSelected == false;
+            return allowOnTouchHighlight && interactableObject.isHovered && interactableObject.isSelected == false;
         }
 
         private bool ShouldHighlightSelecting()
         {
-            return grabHighlightMat != null && interactableObject.isSelected;
+            return allowOnGrabHighlight && interactableObject.isSelected;
+        }
+
+        private Material NewHighlightMaterial(Color highlightColor)
+        {
+            Material material = CreateHighlightMaterial();
+            material.color = highlightColor;
+            return material;
+        }
+        
+        private Material NewHighlightMaterial(Texture mainTexture)
+        {
+            Material material = CreateHighlightMaterial();
+            material.mainTexture = mainTexture;
+            return material;
+        }
+        
+        private Material CreateHighlightMaterial()
+        {
+            Shader shader = Shader.Find("Standard");
+
+            if (shader == null)
+            {
+                throw new NullReferenceException();
+            }
+            
+            return new Material(shader);
         }
     }
 }
