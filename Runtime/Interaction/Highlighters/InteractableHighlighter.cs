@@ -195,6 +195,11 @@ namespace Innoactive.Creator.XRInteraction
 
         private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
         {
+            if (cachedSkinnedRenderers.Length == 0 && cachedMeshRenderers.Length == 0)
+            {
+                RefreshCachedRenderers();
+            }
+            
             while (shouldContinueHighlighting())
             {
                 DisableRenders(cachedSkinnedRenderers);

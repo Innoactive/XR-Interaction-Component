@@ -28,7 +28,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         }
 
         /// <summary>
-        /// Reference to attached 'XRGrabInteractable'.
+        /// Reference to attached <see cref="InteractableObject"/>.
         /// </summary>
         protected InteractableObject Interactable;
 
