@@ -25,7 +25,7 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         public bool IsTouchable
         {
-            set { isTouchable = value; }
+            set => isTouchable = value;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         public bool IsGrabbable
         {
-            set { isGrabbable = value; }
+            set => isGrabbable = value;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         public bool IsUsable
         {
-            set { isUsable = value; }
+            set => isUsable = value;
         }
         
         /// <summary>
@@ -52,16 +52,13 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>
         /// Gets whether this <see cref="InteractableObject"/> is currently being selected by any 'XRSocketInteractor'.
         /// </summary>
-        public bool IsInSocket
-        {
-            get { return selectingSocket != null; }
-        }
-        
+        public bool IsInSocket => selectingSocket != null;
+
         /// <summary>
         /// Get the current selecting 'XRSocketInteractor' for this <see cref="InteractableObject"/>.
         /// </summary>
-        public XRSocketInteractor SelectingSocket { get { return selectingSocket; } } 
-        
+        public XRSocketInteractor SelectingSocket => selectingSocket;
+
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> can be hovered by a given interactor.
         /// </summary>
@@ -136,12 +133,9 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnSelectExit(interactor);
             
-            if (IsInSocket == false)
+            if (IsInSocket && interactor == selectingSocket)
             {
-                if (IsInSocket && interactor == selectingSocket)
-                {
-                    selectingSocket = null;
-                }
+                selectingSocket = null;
             }
         }
 

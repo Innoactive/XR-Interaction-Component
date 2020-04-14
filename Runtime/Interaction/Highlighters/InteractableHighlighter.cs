@@ -292,17 +292,30 @@ namespace Innoactive.Creator.XRInteraction
 
         private void DrawHighlightedObject(Mesh mesh, Component renderer, Material material)
         {
-            Matrix4x4 matrix = Matrix4x4.TRS(renderer.transform.position, renderer.transform.rotation, renderer.transform.lossyScale);
-            Graphics.DrawMesh(mesh, matrix, material, renderer.transform.gameObject.layer);
+            LayerMask layerMask = renderer.gameObject.layer;
+            Transform rendersTransform = renderer.transform;
+            Matrix4x4 matrix = Matrix4x4.TRS(rendersTransform.position, rendersTransform.rotation, rendersTransform.lossyScale);
+            
+            Graphics.DrawMesh(mesh, matrix, material, layerMask);
         }
 
         private bool ShouldHighlightTouching()
         {
+            if (interactableObject.IsInSocket)
+            {
+                return allowOnTouchHighlight && interactableObject.isHovered;
+            }
+            
             return allowOnTouchHighlight && interactableObject.isHovered && interactableObject.isSelected == false;
         }
 
         private bool ShouldHighlightGrabbing()
         {
+            if (interactableObject.IsInSocket)
+            {
+                return false;
+            }
+            
             return allowOnGrabHighlight && interactableObject.isSelected && interactableObject.IsActivated == false;
         }
         
