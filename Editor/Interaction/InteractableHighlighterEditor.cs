@@ -16,7 +16,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         internal class HighlightCase
         {
             /// <summary>
-            /// Title and tooltip for an specified drawer.
+            /// Title and tooltip for a specified drawer.
             /// </summary>
             public readonly GUIContent GUISectionTitleContent;
             
