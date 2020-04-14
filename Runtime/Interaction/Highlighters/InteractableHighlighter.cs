@@ -95,6 +95,24 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.onDeactivate.RemoveListener(OnUnused);
         }
         
+        private void OnValidate()
+        {
+            if (allowOnTouchHighlight && touchHighlightMaterial != null)
+            {
+                touchHighlightMaterial.color = touchHighlightColor;
+            }
+            
+            if (allowOnGrabHighlight && grabHighlightMaterial != null)
+            {
+                grabHighlightMaterial.color = grabHighlightColor;
+            }
+            
+            if (allowOnUseHighlight && useHighlightMaterial != null)
+            {
+                useHighlightMaterial.color = useHighlightColor;
+            }
+        }
+        
         /// <summary>
         /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightMaterial"/>.
         /// </summary>
