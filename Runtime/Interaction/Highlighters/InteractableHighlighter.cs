@@ -2,23 +2,24 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XRInteraction
 {
     /// <summary>
-    /// 
+    /// Handles highlighting for attached <see cref="InteractableObject"/>.
     /// </summary>
     public sealed class InteractableHighlighter : MonoBehaviour
     {
         /// <summary>
-        /// 
+        /// Reference to the <see cref="InteractableObject"/>.
         /// </summary>
         public InteractableObject InteractableObject => interactableObject;
 
         /// <summary>
-        /// 
+        /// Determines if this <see cref="InteractableObject"/> should be highlighted when touched.
         /// </summary>
         public bool AllowOnTouchHighlight
         {
@@ -27,7 +28,7 @@ namespace Innoactive.Creator.XRInteraction
         }
 
         /// <summary>
-        /// 
+        /// Determines if this <see cref="InteractableObject"/> should be highlighted when grabbed.
         /// </summary>
         public bool AllowOnGrabHighlight
         {
@@ -41,14 +42,14 @@ namespace Innoactive.Creator.XRInteraction
         private bool allowOnGrabHighlight;
         
         [SerializeField]
-        private  Material touchHighlightMaterial;
+        private Material touchHighlightMaterial;
         [SerializeField]
-        private  Material grabHighlightMaterial;
+        private Material grabHighlightMaterial;
         
         [SerializeField]
         private Color touchHighlightColor = new Color32(64, 200, 255, 50);
         [SerializeField]
-        private Color grabHighlightColor;
+        private Color grabHighlightColor = new Color32(255, 0, 0, 50);
 
         private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
         private InteractableObject interactableObject;
@@ -58,7 +59,7 @@ namespace Innoactive.Creator.XRInteraction
 
         private void Awake()
         {
-            interactableObject = GetComponent<InteractableObject>();
+            interactableObject = gameObject.GetComponent<InteractableObject>(true);
         }
 
         private void OnEnable()
@@ -76,10 +77,9 @@ namespace Innoactive.Creator.XRInteraction
         }
         
         /// <summary>
-        /// 
+        /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightMaterial"/>.
         /// </summary>
-        /// <param name="highlightID"></param>
-        /// <param name="highlightMaterial"></param>
+        /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
         public void StartHighlighting(string highlightID, Material highlightMaterial)
         {
             if (externalHighlights.ContainsKey(highlightID) == false)
@@ -91,10 +91,9 @@ namespace Innoactive.Creator.XRInteraction
         }
         
         /// <summary>
-        /// 
+        /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightColor"/>.
         /// </summary>
-        /// <param name="highlightID"></param>
-        /// <param name="highlightColor"></param>
+        /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
         public void StartHighlighting(string highlightID, Color highlightColor)
         {
             if (externalHighlights.ContainsKey(highlightID) == false)
@@ -107,10 +106,9 @@ namespace Innoactive.Creator.XRInteraction
         }
         
         /// <summary>
-        /// 
+        /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightTexture"/>.
         /// </summary>
-        /// <param name="highlightID"></param>
-        /// <param name="highlightTexture"></param>
+        /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
         public void StartHighlighting(string highlightID, Texture highlightTexture)
         {
             if (externalHighlights.ContainsKey(highlightID) == false)
@@ -123,9 +121,8 @@ namespace Innoactive.Creator.XRInteraction
         }
         
         /// <summary>
-        /// 
+        /// Stops a highlight of given <paramref name="highlightID"/>.
         /// </summary>
-        /// <param name="highlightID"></param>
         public void StopHighlighting(string highlightID)
         {
             if (externalHighlights.ContainsKey(highlightID))
@@ -262,7 +259,7 @@ namespace Innoactive.Creator.XRInteraction
 
             if (shader == null)
             {
-                throw new NullReferenceException();
+                throw new NullReferenceException("Standard shader could not be found.");
             }
             
             return new Material(shader);

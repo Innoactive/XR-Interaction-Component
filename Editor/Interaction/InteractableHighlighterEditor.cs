@@ -5,43 +5,43 @@ using Innoactive.Creator.XRInteraction;
 namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
-    /// 
+    /// Draws for configuration settings for <see cref="InteractableHighlighter"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableHighlighter)), CanEditMultipleObjects]
     public class InteractableHighlighterEditor : Editor
     {
         /// <summary>
-        /// 
+        /// Keeps references for different interaction highlight cases.
         /// </summary>
         internal class HighlightCase
         {
             /// <summary>
-            /// 
+            /// Title and tooltip for an specified drawer.
             /// </summary>
-            public readonly GUIContent SectionTitle;
+            public readonly GUIContent GUISectionTitleContent;
             
             /// <summary>
-            /// 
+            /// Title and tooltip for an specified drawer.
             /// </summary>
-            public readonly GUIContent ColorProperty = new GUIContent("Highlight Color", "Color to be used for highlighting this Interactable Object's section if no material is present.");
+            public readonly GUIContent GUIColorPropertyContent = new GUIContent("Highlight Color", "Color to be used for highlighting this Interactable Object's section if no material is present.");
             
             /// <summary>
-            /// 
+            /// Title and tooltip for an specified drawer.
             /// </summary>
-            public readonly GUIContent MaterialProperty = new GUIContent("Highlight Material", "Material to be used for highlighting this Interactable Object's section.");
+            public readonly GUIContent GUIMaterialPropertyContent = new GUIContent("Highlight Material", "Material to be used for highlighting this Interactable Object's section.");
             
             /// <summary>
-            /// 
+            /// Data stream to an specified field of <see cref="InteractableHighlighter"/>.
             /// </summary>
             public readonly SerializedProperty HighlightMaterialProperty;
             
             /// <summary>
-            /// 
+            /// Data stream to an specified field of <see cref="InteractableHighlighter"/>.
             /// </summary>
             public readonly SerializedProperty HighlightColorProperty;
 
             /// <summary>
-            /// 
+            /// Determines if this highlight case should be drawn.
             /// </summary>
             public bool ShowSection
             {
@@ -50,7 +50,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
 
             /// <summary>
-            /// 
+            /// Keeps track of currently selected tab index.
             /// </summary>
             public int TabIndex;
             
@@ -59,7 +59,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             internal HighlightCase(SerializedObject serializedObject, string sectionTitle, string colorPropertyName, string materialPropertyName, string highlightEnablingPropertyName, bool showSection)
             {
-                SectionTitle = new GUIContent(sectionTitle, $"Shows settings corresponding to {sectionTitle}");
+                GUISectionTitleContent = new GUIContent(sectionTitle, $"Shows settings corresponding to {sectionTitle}");
                 HighlightColorProperty = serializedObject.FindProperty(colorPropertyName);
                 HighlightMaterialProperty = serializedObject.FindProperty(materialPropertyName);
                 HighlightEnablingProperty = serializedObject.FindProperty(highlightEnablingPropertyName);
@@ -83,13 +83,13 @@ namespace Innoactive.CreatorEditor.XRInteraction
             
             DrawTouchHighlightSection(onTouchHighlighting);
             DrawTouchHighlightSection(onGrabHighlighting);
-            
+
             serializedObject.ApplyModifiedProperties();
         }
 
         private void DrawTouchHighlightSection(HighlightCase highlightCase)
         {
-            highlightCase.ShowSection = EditorGUILayout.ToggleLeft(highlightCase.SectionTitle, highlightCase.ShowSection);
+            highlightCase.ShowSection = EditorGUILayout.ToggleLeft(highlightCase.GUISectionTitleContent, highlightCase.ShowSection);
             EditorGUILayout.Separator();
             
             if (highlightCase.ShowSection)
@@ -106,10 +106,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
             switch (highlightCase.TabIndex)
             {
                 case 0:
-                    EditorGUILayout.PropertyField(highlightCase.HighlightColorProperty, highlightCase.ColorProperty);
+                    EditorGUILayout.PropertyField(highlightCase.HighlightColorProperty, highlightCase.GUIColorPropertyContent);
                     break;
                 case 1:
-                    EditorGUILayout.PropertyField(highlightCase.HighlightMaterialProperty, highlightCase.MaterialProperty);
+                    EditorGUILayout.PropertyField(highlightCase.HighlightMaterialProperty, highlightCase.GUIMaterialPropertyContent);
                     break;
             }
             
