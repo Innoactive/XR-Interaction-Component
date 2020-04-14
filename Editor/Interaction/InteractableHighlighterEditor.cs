@@ -16,27 +16,27 @@ namespace Innoactive.CreatorEditor.XRInteraction
         internal class HighlightCase
         {
             /// <summary>
-            /// Title and tooltip for an specified drawer.
+            /// Title and tooltip for a specified drawer.
             /// </summary>
             public readonly GUIContent GUISectionTitleContent;
             
             /// <summary>
-            /// Title and tooltip for an specified drawer.
+            /// Title and tooltip for a specified drawer.
             /// </summary>
             public readonly GUIContent GUIColorPropertyContent = new GUIContent("Highlight Color", "Color to be used for highlighting this Interactable Object's section if no material is present.");
             
             /// <summary>
-            /// Title and tooltip for an specified drawer.
+            /// Title and tooltip for a specified drawer.
             /// </summary>
             public readonly GUIContent GUIMaterialPropertyContent = new GUIContent("Highlight Material", "Material to be used for highlighting this Interactable Object's section.");
             
             /// <summary>
-            /// Data stream to an specified field of <see cref="InteractableHighlighter"/>.
+            /// Data stream to a specified field of <see cref="InteractableHighlighter"/>.
             /// </summary>
             public readonly SerializedProperty HighlightMaterialProperty;
             
             /// <summary>
-            /// Data stream to an specified field of <see cref="InteractableHighlighter"/>.
+            /// Data stream to a specified field of <see cref="InteractableHighlighter"/>.
             /// </summary>
             public readonly SerializedProperty HighlightColorProperty;
 

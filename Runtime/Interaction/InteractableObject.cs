@@ -104,7 +104,7 @@ namespace Innoactive.Creator.XRInteraction
         }
 
         /// <summary>
-        /// Attempt to use this <see cref="InteractableObject"/>.
+        /// Attempts to use this <see cref="InteractableObject"/>.
         /// </summary>
         public virtual void ForceUse()
         {
