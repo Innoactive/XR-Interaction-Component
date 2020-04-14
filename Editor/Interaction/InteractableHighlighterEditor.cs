@@ -31,7 +31,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public readonly GUIContent GUIMaterialPropertyContent = new GUIContent("Highlight Material", "Material to be used for highlighting this Interactable Object's section.");
             
             /// <summary>
-            /// Data stream to an specified field of <see cref="InteractableHighlighter"/>.
+            /// Data stream to a specified field of <see cref="InteractableHighlighter"/>.
             /// </summary>
             public readonly SerializedProperty HighlightMaterialProperty;
             
