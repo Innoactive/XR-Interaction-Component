@@ -36,7 +36,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public readonly SerializedProperty HighlightMaterialProperty;
             
             /// <summary>
-            /// Data stream to an specified field of <see cref="InteractableHighlighter"/>.
+            /// Data stream to a specified field of <see cref="InteractableHighlighter"/>.
             /// </summary>
             public readonly SerializedProperty HighlightColorProperty;
 
