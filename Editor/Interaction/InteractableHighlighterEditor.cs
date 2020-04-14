@@ -45,8 +45,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             /// </summary>
             public bool ShowSection
             {
-                get => showSection;
-                set => showSection = HighlightEnablingProperty.boolValue = value;
+                get => HighlightEnablingProperty.boolValue;
+                set => HighlightEnablingProperty.boolValue = value;
             }
 
             /// <summary>
@@ -55,7 +55,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public int TabIndex;
             
             private SerializedProperty HighlightEnablingProperty;
-            private bool showSection;
 
             internal HighlightCase(SerializedObject serializedObject, string sectionTitle, string colorPropertyName, string materialPropertyName, string highlightEnablingPropertyName, bool showSection)
             {
