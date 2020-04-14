@@ -68,9 +68,9 @@ namespace Innoactive.Creator.XRInteraction
 
         private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
         private InteractableObject interactableObject;
-        private SkinnedMeshRenderer[] cachedSkinnedRenderers;
-        private MeshRenderer[] cachedMeshRenderers;
-        private MeshFilter[] cachedMeshFilters;
+        private SkinnedMeshRenderer[] cachedSkinnedRenderers = {};
+        private MeshRenderer[] cachedMeshRenderers = {};
+        private MeshFilter[] cachedMeshFilters = {};
 
         private void Awake()
         {
@@ -79,18 +79,18 @@ namespace Innoactive.Creator.XRInteraction
 
         private void OnEnable()
         {
-            interactableObject.onFirstHoverEnter.AddListener(OnHoverBegin);
+            interactableObject.onFirstHoverEnter.AddListener(OnTouched);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
-            interactableObject.onSelectExit.AddListener(OnUngrabbed);
+            interactableObject.onSelectExit.AddListener(OnReleased);
             interactableObject.onActivate.AddListener(OnUsed);
             interactableObject.onDeactivate.AddListener(OnUnused);
         }
 
         private void OnDisable()
         {
-            interactableObject.onFirstHoverEnter.RemoveListener(OnHoverBegin);
+            interactableObject.onFirstHoverEnter.RemoveListener(OnTouched);
             interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
-            interactableObject.onSelectExit.RemoveListener(OnUngrabbed);
+            interactableObject.onSelectExit.RemoveListener(OnReleased);
             interactableObject.onActivate.RemoveListener(OnUsed);
             interactableObject.onDeactivate.RemoveListener(OnUnused);
         }
@@ -150,7 +150,7 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
 
-        private void OnHoverBegin(XRBaseInteractor interactor)
+        private void OnTouched(XRBaseInteractor interactor)
         {
             OnTouchHighlight();
         }
@@ -160,7 +160,7 @@ namespace Innoactive.Creator.XRInteraction
             OnGrabHighlight();
         }
 
-        private void OnUngrabbed(XRBaseInteractor interactor)
+        private void OnReleased(XRBaseInteractor interactor)
         {
             OnTouchHighlight();
         }
@@ -206,7 +206,7 @@ namespace Innoactive.Creator.XRInteraction
         
         private void OnTouchHighlight()
         {
-            if (ShouldHighlightHovering())
+            if (ShouldHighlightTouching())
             {
                 if (touchHighlightMaterial == null)
                 {
@@ -214,38 +214,43 @@ namespace Innoactive.Creator.XRInteraction
                 }
                 
                 RefreshCachedRenderers();
-                StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightHovering));
+                StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightTouching));
             }
         }
 
         private void OnGrabHighlight()
         {
-            if (ShouldHighlightSelecting())
+            if (ShouldHighlightGrabbing())
             {
                 if (grabHighlightMaterial == null)
                 {
                     grabHighlightMaterial = NewHighlightMaterial(grabHighlightColor);
                 }
                 
-                StartCoroutine(Highlight(grabHighlightMaterial, ShouldHighlightSelecting));
+                StartCoroutine(Highlight(grabHighlightMaterial, ShouldHighlightGrabbing));
             }
         }
 
         private void OnUseHighlight()
         {
-            if (ShouldHighlightActivating())
+            if (ShouldHighlightUsing())
             {
                 if ( useHighlightMaterial == null)
                 {
                     useHighlightMaterial = NewHighlightMaterial(useHighlightColor);
                 }
                 
-                StartCoroutine(Highlight(useHighlightMaterial, ShouldHighlightActivating));
+                StartCoroutine(Highlight(useHighlightMaterial, ShouldHighlightUsing));
             }
         }
 
         private void RefreshCachedRenderers()
         {
+            if (cachedSkinnedRenderers.Any() && cachedSkinnedRenderers.First().enabled == false || cachedMeshRenderers.Any() && cachedMeshRenderers.First().enabled == false)
+            {
+                return;
+            }
+            
             cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>(true).Where(meshRenderer => meshRenderer.enabled).ToArray();
             cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>(true).Where(meshRenderer => meshRenderer.enabled).ToArray();
             cachedMeshFilters = cachedMeshRenderers.Select(meshRenderer => meshRenderer.GetComponent<MeshFilter>()).ToArray();
@@ -273,19 +278,19 @@ namespace Innoactive.Creator.XRInteraction
             Graphics.DrawMesh(mesh, matrix, material, renderer.transform.gameObject.layer);
         }
 
-        private bool ShouldHighlightHovering()
+        private bool ShouldHighlightTouching()
         {
             return allowOnTouchHighlight && interactableObject.isHovered && interactableObject.isSelected == false;
         }
 
-        private bool ShouldHighlightSelecting()
+        private bool ShouldHighlightGrabbing()
         {
             return allowOnGrabHighlight && interactableObject.isSelected && interactableObject.IsActivated == false;
         }
         
-        private bool ShouldHighlightActivating()
+        private bool ShouldHighlightUsing()
         {
-            return allowOnUseHighlight && interactableObject.IsActivated;
+            return allowOnUseHighlight && interactableObject.IsActivated && interactableObject.isSelected;
         }
 
         private Material NewHighlightMaterial(Color highlightColor)
