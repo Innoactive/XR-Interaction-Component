@@ -21,7 +21,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public readonly GUIContent GUISectionTitleContent;
             
             /// <summary>
-            /// Title and tooltip for an specified drawer.
+            /// Title and tooltip for a specified drawer.
             /// </summary>
             public readonly GUIContent GUIColorPropertyContent = new GUIContent("Highlight Color", "Color to be used for highlighting this Interactable Object's section if no material is present.");
             
