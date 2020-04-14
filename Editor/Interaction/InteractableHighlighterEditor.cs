@@ -70,11 +70,13 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private readonly string[] tabs = {"Color", "Material"};
         private HighlightCase onTouchHighlighting;
         private HighlightCase onGrabHighlighting;
+        private HighlightCase onUseHighlighting;
 
         private void OnEnable()
         {
             onTouchHighlighting = new HighlightCase(serializedObject, "On Touch Highlight", "touchHighlightColor", "touchHighlightMaterial", "allowOnTouchHighlight", true);
             onGrabHighlighting = new HighlightCase(serializedObject, "On Grab Highlight", "grabHighlightColor", "grabHighlightMaterial", "allowOnGrabHighlight", false);
+            onUseHighlighting = new HighlightCase(serializedObject, "On Use Highlight", "useHighlightColor", "useHighlightMaterial", "allowOnUseHighlight", false);
         }
 
         public override void OnInspectorGUI()
@@ -83,6 +85,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             
             DrawTouchHighlightSection(onTouchHighlighting);
             DrawTouchHighlightSection(onGrabHighlighting);
+            DrawTouchHighlightSection(onUseHighlighting);
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -101,7 +104,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private void DrawHighlightOptions(HighlightCase highlightCase)
         {
             highlightCase.TabIndex = GUILayout.Toolbar (highlightCase.TabIndex, tabs);
-            EditorGUILayout.Space(5);
+            EditorGUILayout.Separator();
             
             switch (highlightCase.TabIndex)
             {

@@ -35,21 +35,36 @@ namespace Innoactive.Creator.XRInteraction
             get => allowOnGrabHighlight;
             set => allowOnGrabHighlight = value;
         }
+        
+        /// <summary>
+        /// Determines if this <see cref="InteractableObject"/> should be highlighted when used.
+        /// </summary>
+        public bool AllowOnUseHighlight
+        {
+            get => allowOnUseHighlight;
+            set => allowOnUseHighlight = value;
+        }
 
         [SerializeField]
         private bool allowOnTouchHighlight = true;
         [SerializeField]
         private bool allowOnGrabHighlight;
+        [SerializeField]
+        private bool allowOnUseHighlight;
         
         [SerializeField]
         private Material touchHighlightMaterial;
         [SerializeField]
         private Material grabHighlightMaterial;
+        [SerializeField]
+        private Material useHighlightMaterial;
         
         [SerializeField]
         private Color touchHighlightColor = new Color32(64, 200, 255, 50);
         [SerializeField]
         private Color grabHighlightColor = new Color32(255, 0, 0, 50);
+        [SerializeField]
+        private Color useHighlightColor = new Color32(0, 255, 0, 50);
 
         private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
         private InteractableObject interactableObject;
@@ -67,6 +82,8 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.onFirstHoverEnter.AddListener(OnHoverBegin);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
             interactableObject.onSelectExit.AddListener(OnUngrabbed);
+            interactableObject.onActivate.AddListener(OnUsed);
+            interactableObject.onDeactivate.AddListener(OnUsed);
         }
 
         private void OnDisable()
@@ -74,6 +91,8 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.onFirstHoverEnter.RemoveListener(OnHoverBegin);
             interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
             interactableObject.onSelectExit.RemoveListener(OnUngrabbed);
+            interactableObject.onActivate.RemoveListener(OnUsed);
+            interactableObject.onDeactivate.RemoveListener(OnUsed);
         }
         
         /// <summary>
@@ -169,6 +188,21 @@ namespace Innoactive.Creator.XRInteraction
                 
                 StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightHovering));
             }
+        }
+        
+        private void OnUsed(XRBaseInteractor interactor)
+        {
+            if ( useHighlightMaterial == null)
+            {
+                useHighlightMaterial = NewHighlightMaterial(useHighlightColor);
+            }
+            
+            StartHighlighting("OnUsed", useHighlightMaterial);
+        }
+        
+        private void OnUnused(XRBaseInteractor interactor)
+        {
+            StopHighlighting("OnUsed");
         }
 
         private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
