@@ -3,10 +3,10 @@ using System.Linq;
 using Innoactive.Creator.BasicInteraction.Conditions;
 using Innoactive.Creator.Core;
 using Innoactive.Creator.Core.Properties;
+using Innoactive.Creator.Tests.Builder;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Innoactive.Creator.Core.Utils.Builders;
 using Innoactive.Creator.Tests.Utils;
 using Innoactive.Creator.XRInteraction.Properties;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -106,16 +106,16 @@ namespace Innoactive.Creator.XRInteraction.Tests
                         .AddCondition(new TouchedCondition(touchProperty))))
                 .Build();
 
-            TrainingRunner.Initialize(course);
-            TrainingRunner.Run();
+            CourseRunner.Initialize(course);
+            CourseRunner.Run();
 
-            yield return new WaitUntil(()=> TrainingRunner.IsRunning);
+            yield return new WaitUntil(()=> CourseRunner.IsRunning);
             
-            IChapter chapter = TrainingRunner.Current.Data.Current;
+            IChapter chapter = CourseRunner.Current.Data.Current;
             IStep step = chapter.Data.Current;
             ITransition transition = step.Data.Transitions.Data.Transitions.First();
             
-            TrainingRunner.SkipStep(transition);
+            CourseRunner.SkipStep(transition);
 
             yield return new WaitUntil(()=> wasTouched);
         }
@@ -143,16 +143,16 @@ namespace Innoactive.Creator.XRInteraction.Tests
                         .AddCondition(new GrabbedCondition(grabbableProperty))))
                 .Build();
 
-            TrainingRunner.Initialize(course);
-            TrainingRunner.Run();
+            CourseRunner.Initialize(course);
+            CourseRunner.Run();
 
-            yield return new WaitUntil(()=> TrainingRunner.IsRunning);
+            yield return new WaitUntil(()=> CourseRunner.IsRunning);
             
-            IChapter chapter = TrainingRunner.Current.Data.Current;
+            IChapter chapter = CourseRunner.Current.Data.Current;
             IStep step = chapter.Data.Current;
             ITransition transition = step.Data.Transitions.Data.Transitions.First();
             
-            TrainingRunner.SkipStep(transition);
+            CourseRunner.SkipStep(transition);
 
             yield return new WaitUntil(()=> wasGrabbed);
         }
@@ -180,16 +180,16 @@ namespace Innoactive.Creator.XRInteraction.Tests
                         .AddCondition(new ReleasedCondition(grabbableProperty))))
                 .Build();
 
-            TrainingRunner.Initialize(course);
-            TrainingRunner.Run();
+            CourseRunner.Initialize(course);
+            CourseRunner.Run();
 
-            yield return new WaitUntil(()=> TrainingRunner.IsRunning);
+            yield return new WaitUntil(()=> CourseRunner.IsRunning);
             
-            IChapter chapter = TrainingRunner.Current.Data.Current;
+            IChapter chapter = CourseRunner.Current.Data.Current;
             IStep step = chapter.Data.Current;
             ITransition transition = step.Data.Transitions.Data.Transitions.First();
             
-            TrainingRunner.SkipStep(transition);
+            CourseRunner.SkipStep(transition);
 
             yield return new WaitUntil(()=> wasUngrabbed);
         }
@@ -217,16 +217,16 @@ namespace Innoactive.Creator.XRInteraction.Tests
                         .AddCondition(new UsedCondition(usableProperty))))
                 .Build();
 
-            TrainingRunner.Initialize(course);
-            TrainingRunner.Run();
+            CourseRunner.Initialize(course);
+            CourseRunner.Run();
 
-            yield return new WaitUntil(()=> TrainingRunner.IsRunning);
+            yield return new WaitUntil(()=> CourseRunner.IsRunning);
             
-            IChapter chapter = TrainingRunner.Current.Data.Current;
+            IChapter chapter = CourseRunner.Current.Data.Current;
             IStep step = chapter.Data.Current;
             ITransition transition = step.Data.Transitions.Data.Transitions.First();
             
-            TrainingRunner.SkipStep(transition);
+            CourseRunner.SkipStep(transition);
 
             yield return new WaitUntil(()=> wasUsed);
         }

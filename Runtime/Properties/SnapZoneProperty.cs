@@ -1,6 +1,5 @@
 ﻿using System;
 using Innoactive.Creator.BasicInteraction.Properties;
-using Innoactive.Creator.Core.Configuration;
 using Innoactive.Creator.Core.Configuration.Modes;
 using Innoactive.Creator.Core.Properties;
 using Innoactive.Creator.Unity;
@@ -58,7 +57,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             if (SnapZone == null)
             {
-                SnapZone = gameObject.GetComponent<SnapZone>(true);
+                SnapZone = gameObject.GetOrAddComponent<SnapZone>();
             }
 
             SnapZone.onSelectEnter.AddListener(HandleObjectSnapped);
