@@ -35,7 +35,7 @@ namespace Innoactive.Creator.XRInteraction
             get => allowOnGrabHighlight;
             set => allowOnGrabHighlight = value;
         }
-        
+
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> should be highlighted when used.
         /// </summary>
@@ -51,14 +51,14 @@ namespace Innoactive.Creator.XRInteraction
         private bool allowOnGrabHighlight;
         [SerializeField]
         private bool allowOnUseHighlight;
-        
+
         [SerializeField]
         private Material touchHighlightMaterial;
         [SerializeField]
         private Material grabHighlightMaterial;
         [SerializeField]
         private Material useHighlightMaterial;
-        
+
         [SerializeField]
         private Color touchHighlightColor = new Color32(64, 200, 255, 50);
         [SerializeField]
@@ -94,25 +94,25 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.onActivate.RemoveListener(OnUsed);
             interactableObject.onDeactivate.RemoveListener(OnUnused);
         }
-        
+
         private void OnValidate()
         {
             if (allowOnTouchHighlight && touchHighlightMaterial != null)
             {
                 touchHighlightMaterial.color = touchHighlightColor;
             }
-            
+
             if (allowOnGrabHighlight && grabHighlightMaterial != null)
             {
                 grabHighlightMaterial.color = grabHighlightColor;
             }
-            
+
             if (allowOnUseHighlight && useHighlightMaterial != null)
             {
                 useHighlightMaterial.color = useHighlightColor;
             }
         }
-        
+
         /// <summary>
         /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightMaterial"/>.
         /// </summary>
@@ -126,7 +126,7 @@ namespace Innoactive.Creator.XRInteraction
                 StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
             }
         }
-        
+
         /// <summary>
         /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightColor"/>.
         /// </summary>
@@ -141,7 +141,7 @@ namespace Innoactive.Creator.XRInteraction
                 StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
             }
         }
-        
+
         /// <summary>
         /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightTexture"/>.
         /// </summary>
@@ -156,7 +156,7 @@ namespace Innoactive.Creator.XRInteraction
                 StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
             }
         }
-        
+
         /// <summary>
         /// Stops a highlight of given <paramref name="highlightID"/>.
         /// </summary>
@@ -182,12 +182,12 @@ namespace Innoactive.Creator.XRInteraction
         {
             OnTouchHighlight();
         }
-        
+
         private void OnUsed(XRBaseInteractor interactor)
         {
             OnUseHighlight();
         }
-        
+
         private void OnUnused(XRBaseInteractor interactor)
         {
             OnGrabHighlight();
@@ -199,17 +199,17 @@ namespace Innoactive.Creator.XRInteraction
             {
                 RefreshCachedRenderers();
             }
-            
+
             while (shouldContinueHighlighting())
             {
                 DisableRenders(cachedSkinnedRenderers);
                 DisableRenders(cachedMeshRenderers);
-                
+
                 foreach (SkinnedMeshRenderer skinnedRenderer in cachedSkinnedRenderers)
                 {
                     DrawHighlightedObject(skinnedRenderer.sharedMesh, skinnedRenderer, highlightMaterial);
                 }
-                
+
                 foreach (MeshFilter meshFilter in cachedMeshFilters)
                 {
                     DrawHighlightedObject(meshFilter.sharedMesh, meshFilter, highlightMaterial);
@@ -226,7 +226,7 @@ namespace Innoactive.Creator.XRInteraction
                 externalHighlights.Remove(highlightID);
             }
         }
-        
+
         private void OnTouchHighlight()
         {
             if (ShouldHighlightTouching())
@@ -235,7 +235,7 @@ namespace Innoactive.Creator.XRInteraction
                 {
                     touchHighlightMaterial = NewHighlightMaterial(touchHighlightColor);
                 }
-                
+
                 RefreshCachedRenderers();
                 StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightTouching));
             }
@@ -249,7 +249,7 @@ namespace Innoactive.Creator.XRInteraction
                 {
                     grabHighlightMaterial = NewHighlightMaterial(grabHighlightColor);
                 }
-                
+
                 StartCoroutine(Highlight(grabHighlightMaterial, ShouldHighlightGrabbing));
             }
         }
@@ -262,7 +262,7 @@ namespace Innoactive.Creator.XRInteraction
                 {
                     useHighlightMaterial = NewHighlightMaterial(useHighlightColor);
                 }
-                
+
                 StartCoroutine(Highlight(useHighlightMaterial, ShouldHighlightUsing));
             }
         }
@@ -273,9 +273,9 @@ namespace Innoactive.Creator.XRInteraction
             {
                 return;
             }
-            
-            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>(true).Where(meshRenderer => meshRenderer.enabled).ToArray();
-            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>(true).Where(meshRenderer => meshRenderer.enabled).ToArray();
+
+            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>(true).Where(meshRenderer => meshRenderer.gameObject.activeSelf && meshRenderer.enabled).ToArray();
+            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>(true).Where(meshRenderer => meshRenderer.gameObject.activeSelf && meshRenderer.enabled).ToArray();
             cachedMeshFilters = cachedMeshRenderers.Select(meshRenderer => meshRenderer.GetComponent<MeshFilter>()).ToArray();
         }
 
@@ -286,7 +286,7 @@ namespace Innoactive.Creator.XRInteraction
                 activeRenderer.enabled = false;
             }
         }
-        
+
         private void ReenableRenderers(IEnumerable<Renderer> renderers)
         {
             foreach (Renderer renderer in renderers)
@@ -300,7 +300,7 @@ namespace Innoactive.Creator.XRInteraction
             LayerMask layerMask = renderer.gameObject.layer;
             Transform rendersTransform = renderer.transform;
             Matrix4x4 matrix = Matrix4x4.TRS(rendersTransform.position, rendersTransform.rotation, rendersTransform.lossyScale);
-            
+
             Graphics.DrawMesh(mesh, matrix, material, layerMask);
         }
 
@@ -310,7 +310,7 @@ namespace Innoactive.Creator.XRInteraction
             {
                 return allowOnTouchHighlight && interactableObject.isHovered;
             }
-            
+
             return allowOnTouchHighlight && interactableObject.isHovered && interactableObject.isSelected == false;
         }
 
@@ -320,10 +320,10 @@ namespace Innoactive.Creator.XRInteraction
             {
                 return false;
             }
-            
+
             return allowOnGrabHighlight && interactableObject.isSelected && interactableObject.IsActivated == false;
         }
-        
+
         private bool ShouldHighlightUsing()
         {
             return allowOnUseHighlight && interactableObject.IsActivated && interactableObject.isSelected;
@@ -335,14 +335,14 @@ namespace Innoactive.Creator.XRInteraction
             material.color = highlightColor;
             return material;
         }
-        
+
         private Material NewHighlightMaterial(Texture mainTexture)
         {
             Material material = CreateHighlightMaterial();
             material.mainTexture = mainTexture;
             return material;
         }
-        
+
         private Material CreateHighlightMaterial()
         {
             Shader shader = Shader.Find("Standard");
@@ -351,7 +351,7 @@ namespace Innoactive.Creator.XRInteraction
             {
                 throw new NullReferenceException("Standard shader could not be found.");
             }
-            
+
             return new Material(shader);
         }
     }
