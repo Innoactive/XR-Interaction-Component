@@ -1,7 +1,6 @@
 ﻿using System;
 using Innoactive.Creator.BasicInteraction.Properties;
 using Innoactive.Creator.Core.Properties;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -54,7 +53,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<InteractableObject>(true);
+            Interactable = gameObject.GetComponent<InteractableObject>();
+
+            if (Interactable == false)
+            {
+                Interactable = gameObject.AddComponent<InteractableObject>();
+            }
 
             Interactable.onSelectEnter.AddListener(HandleSnappedToDropZone);
             Interactable.onSelectExit.AddListener(HandleUnsnappedFromDropZone);

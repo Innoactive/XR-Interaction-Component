@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -72,13 +71,15 @@ namespace Innoactive.Creator.XRInteraction
         private MeshRenderer[] cachedMeshRenderers = {};
         private MeshFilter[] cachedMeshFilters = {};
 
-        private void Awake()
-        {
-            interactableObject = gameObject.GetComponent<InteractableObject>(true);
-        }
-
         private void OnEnable()
         {
+            interactableObject = gameObject.GetComponent<InteractableObject>();
+
+            if (interactableObject == false)
+            {
+                interactableObject = gameObject.AddComponent<InteractableObject>();
+            }
+            
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
             interactableObject.onSelectExit.AddListener(OnReleased);
