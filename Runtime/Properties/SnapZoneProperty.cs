@@ -54,11 +54,9 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
             
-            SnapZone = gameObject.GetComponent<SnapZone>();
-
             if (SnapZone == false)
             {
-                SnapZone = gameObject.AddComponent<SnapZone>();
+                SnapZone = gameObject.GetOrAddComponent<SnapZone>();
             }
 
             SnapZone.onSelectEnter.AddListener(HandleObjectSnapped);

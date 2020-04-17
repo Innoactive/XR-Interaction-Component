@@ -35,11 +35,9 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetComponent<InteractableObject>();
-
             if (Interactable == false)
             {
-                Interactable = gameObject.AddComponent<InteractableObject>();
+                Interactable = gameObject.GetOrAddComponent<InteractableObject>();
             }
 
             Interactable.onFirstHoverEnter.AddListener(HandleXRTouched);
