@@ -19,12 +19,6 @@
     "defineConstraints": [
         "CREATOR_XR_INTERACTION"
     ],
-    "versionDefines": [
-        {
-            "name": "com.unity.xr.interaction.toolkit",
-            "expression": "0.9.3",
-            "define": ""
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

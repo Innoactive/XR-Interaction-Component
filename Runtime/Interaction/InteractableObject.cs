@@ -11,6 +11,7 @@ namespace Innoactive.Creator.XRInteraction
     /// Can attach to selecting interactor and follow it around while obeying physics (and inherit velocity when released).
     /// </summary>
     /// <remarks>Adds extra control over applicable interactions.</remarks>
+    [RequireComponent(typeof(InteractableHighlighter))]
     public class InteractableObject : XRGrabInteractable
     {
         private bool isTouchable = true;
@@ -20,49 +21,46 @@ namespace Innoactive.Creator.XRInteraction
         private XRSocketInteractor selectingSocket;
         
         /// <summary>
-        /// Determines if the Interactable Object can be touched.
+        /// Determines if this <see cref="InteractableObject"/> can be touched.
         /// </summary>
         public bool IsTouchable
         {
-            set { isTouchable = value; }
+            set => isTouchable = value;
         }
 
         /// <summary>
-        /// Determines if the Interactable Object can be grabbed.
+        /// Determines if this <see cref="InteractableObject"/> can be grabbed.
         /// </summary>
         public bool IsGrabbable
         {
-            set { isGrabbable = value; }
+            set => isGrabbable = value;
         }
 
         /// <summary>
-        /// Determines if the Interactable Object can be used.
+        /// Determines if this <see cref="InteractableObject"/> can be used.
         /// </summary>
         public bool IsUsable
         {
-            set { isUsable = value; }
+            set => isUsable = value;
         }
         
         /// <summary>
-        /// Gets whether this interactable is currently being activated.
+        /// Gets whether this <see cref="InteractableObject"/> is currently being activated.
         /// </summary>
         public bool IsActivated { get; private set; }
 
         /// <summary>
-        /// Gets whether this interactable is currently being selected by any 'XRSocketInteractor'.
+        /// Gets whether this <see cref="InteractableObject"/> is currently being selected by any 'XRSocketInteractor'.
         /// </summary>
-        public bool IsInSocket
-        {
-            get { return selectingSocket != null; }
-        }
-        
+        public bool IsInSocket => selectingSocket != null;
+
         /// <summary>
-        /// Get the current selecting 'XRSocketInteractor' for this interactable.
+        /// Get the current selecting 'XRSocketInteractor' for this <see cref="InteractableObject"/>.
         /// </summary>
-        public XRSocketInteractor SelectingSocket { get { return selectingSocket; } } 
-        
+        public XRSocketInteractor SelectingSocket => selectingSocket;
+
         /// <summary>
-        /// Determines if this interactable can be hovered by a given interactor.
+        /// Determines if this <see cref="InteractableObject"/> can be hovered by a given interactor.
         /// </summary>
         /// <param name="interactor">Interactor to check for a valid hover state with.</param>
         /// <returns>True if hovering is valid this frame, False if not.</returns>
@@ -73,7 +71,7 @@ namespace Innoactive.Creator.XRInteraction
         }
 
         /// <summary>
-        /// Determines if this interactable can be selected by a given interactor.
+        /// Determines if this <see cref="InteractableObject"/> can be selected by a given interactor.
         /// </summary>
         /// <param name="interactor">Interactor to check for a valid selection with.</param>
         /// <returns>True if selection is valid this frame, False if not.</returns>
@@ -89,7 +87,7 @@ namespace Innoactive.Creator.XRInteraction
         }
 
         /// <summary>
-        /// Forces all hovering and selecting interactors to not have interactions with this interactable for one frame.
+        /// Forces all hovering and selecting interactors to not have interactions with this <see cref="InteractableObject"/> for one frame.
         /// </summary>
         /// <remarks>Interactions are not disabled immediately.</remarks>
         public virtual void ForceStopInteracting()
@@ -103,7 +101,7 @@ namespace Innoactive.Creator.XRInteraction
         }
 
         /// <summary>
-        /// Attempt to use the currently selected interactable without needing to press the use button on the controller.
+        /// Attempts to use this <see cref="InteractableObject"/>.
         /// </summary>
         public virtual void ForceUse()
         {
@@ -135,12 +133,9 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnSelectExit(interactor);
             
-            if (IsInSocket == false)
+            if (IsInSocket && interactor == selectingSocket)
             {
-                if (IsInSocket && interactor == selectingSocket)
-                {
-                    selectingSocket = null;
-                }
+                selectingSocket = null;
             }
         }
 

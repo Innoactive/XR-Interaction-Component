@@ -1,10 +1,10 @@
 ﻿using System;
-using Innoactive.Creator.BasicInteraction.Properties;
-using Innoactive.Creator.Core.Configuration.Modes;
-using Innoactive.Creator.Core.Properties;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Innoactive.Creator.Unity;
+using Innoactive.Creator.Core.Properties;
+using Innoactive.Creator.Core.Configuration.Modes;
+using Innoactive.Creator.BasicInteraction.Properties;
 
 namespace Innoactive.Creator.XRInteraction.Properties
 {
@@ -54,8 +54,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
         protected override void OnEnable()
         {
             base.OnEnable();
-
-            if (SnapZone == null)
+            
+            if (SnapZone == false)
             {
                 SnapZone = gameObject.GetOrAddComponent<SnapZone>();
             }

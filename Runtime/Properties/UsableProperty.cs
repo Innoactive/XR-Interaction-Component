@@ -1,9 +1,9 @@
 ﻿using System;
-using Innoactive.Creator.BasicInteraction.Properties;
-using Innoactive.Creator.Core.Properties;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Innoactive.Creator.Unity;
+using Innoactive.Creator.Core.Properties;
+using Innoactive.Creator.BasicInteraction.Properties;
 
 namespace Innoactive.Creator.XRInteraction.Properties
 {
@@ -28,7 +28,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         }
 
         /// <summary>
-        /// Reference to attached 'XRGrabInteractable'.
+        /// Reference to attached <see cref="InteractableObject"/>.
         /// </summary>
         protected InteractableObject Interactable;
 
@@ -36,7 +36,10 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
-            Interactable = gameObject.GetOrAddComponent<InteractableObject>();
+            if (Interactable == false)
+            {
+                Interactable = gameObject.GetOrAddComponent<InteractableObject>();
+            }
 
             Interactable.onActivate.AddListener(HandleXRUsageStarted);
             Interactable.onDeactivate.AddListener(HandleXRUsageStopped);
