@@ -67,6 +67,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         }
         
         private readonly string[] tabs = {"Color", "Material"};
+        private readonly string[] materialTab = {"Material"};
         private HighlightCase onTouchHighlighting;
         private HighlightCase onGrabHighlighting;
         private HighlightCase onUseHighlighting;
@@ -102,19 +103,32 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         private void DrawHighlightOptions(HighlightCase highlightCase)
         {
-            highlightCase.TabIndex = GUILayout.Toolbar (highlightCase.TabIndex, tabs);
-            EditorGUILayout.Separator();
-            
-            switch (highlightCase.TabIndex)
+            bool isThereAMaterial = highlightCase.HighlightMaterialProperty.objectReferenceValue as Material != null;
+
+            if (isThereAMaterial)
             {
-                case 0:
-                    EditorGUILayout.PropertyField(highlightCase.HighlightColorProperty, highlightCase.GUIColorPropertyContent);
-                    break;
-                case 1:
-                    EditorGUILayout.PropertyField(highlightCase.HighlightMaterialProperty, highlightCase.GUIMaterialPropertyContent);
-                    break;
+                GUILayout.Toolbar(highlightCase.TabIndex, materialTab);
+                
+                EditorGUILayout.Separator();
+                EditorGUILayout.PropertyField(highlightCase.HighlightMaterialProperty, highlightCase.GUIMaterialPropertyContent);
             }
+            else
+            {
+                highlightCase.TabIndex = GUILayout.Toolbar(highlightCase.TabIndex, tabs);
+                
+                EditorGUILayout.Separator();
             
+                switch (highlightCase.TabIndex)
+                {
+                    case 0:
+                        EditorGUILayout.PropertyField(highlightCase.HighlightColorProperty, highlightCase.GUIColorPropertyContent);
+                        break;
+                    case 1:
+                        EditorGUILayout.PropertyField(highlightCase.HighlightMaterialProperty, highlightCase.GUIMaterialPropertyContent);
+                        break;
+                }
+            }
+
             EditorGUILayout.Separator();
         }
     }

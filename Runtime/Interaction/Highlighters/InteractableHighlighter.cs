@@ -64,6 +64,10 @@ namespace Innoactive.Creator.XRInteraction
         private Color grabHighlightColor = new Color32(255, 0, 0, 50);
         [SerializeField]
         private Color useHighlightColor = new Color32(0, 255, 0, 50);
+        
+        private Material colorTouchMaterial;
+        private Material colorGrabMaterial;
+        private Material colorUseMaterial;
 
         private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
         private InteractableObject interactableObject;
@@ -98,19 +102,19 @@ namespace Innoactive.Creator.XRInteraction
 
         private void OnValidate()
         {
-            if (allowOnTouchHighlight && touchHighlightMaterial != null)
+            if (allowOnTouchHighlight && colorTouchMaterial != null)
             {
-                touchHighlightMaterial.color = touchHighlightColor;
+                colorTouchMaterial.color = touchHighlightColor;
             }
 
-            if (allowOnGrabHighlight && grabHighlightMaterial != null)
+            if (allowOnGrabHighlight && colorGrabMaterial != null)
             {
-                grabHighlightMaterial.color = grabHighlightColor;
+                colorGrabMaterial.color = grabHighlightColor;
             }
 
-            if (allowOnUseHighlight && useHighlightMaterial != null)
+            if (allowOnUseHighlight && colorUseMaterial != null)
             {
-                useHighlightMaterial.color = useHighlightColor;
+                colorUseMaterial.color = useHighlightColor;
             }
         }
 
@@ -232,13 +236,24 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (ShouldHighlightTouching())
             {
-                if (touchHighlightMaterial == null)
+                Material highlightMaterial = null;
+                
+                if (touchHighlightMaterial != null)
                 {
-                    touchHighlightMaterial = NewHighlightMaterial(touchHighlightColor);
+                    highlightMaterial = touchHighlightMaterial;
+                }
+                else 
+                {
+                    if (colorTouchMaterial == null)
+                    {
+                        colorTouchMaterial = NewHighlightMaterial(touchHighlightColor);
+                    }
+
+                    highlightMaterial = colorTouchMaterial;
                 }
 
                 RefreshCachedRenderers();
-                StartCoroutine(Highlight(touchHighlightMaterial, ShouldHighlightTouching));
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
             }
         }
 
@@ -246,12 +261,23 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (ShouldHighlightGrabbing())
             {
-                if (grabHighlightMaterial == null)
+                Material highlightMaterial = null;
+                
+                if (grabHighlightMaterial != null)
                 {
-                    grabHighlightMaterial = NewHighlightMaterial(grabHighlightColor);
+                    highlightMaterial = grabHighlightMaterial;
                 }
+                else 
+                {
+                    if (colorGrabMaterial == null)
+                    {
+                        colorGrabMaterial = NewHighlightMaterial(grabHighlightColor);
+                    }
 
-                StartCoroutine(Highlight(grabHighlightMaterial, ShouldHighlightGrabbing));
+                    highlightMaterial = colorGrabMaterial;
+                }
+                
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
             }
         }
 
@@ -259,12 +285,23 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (ShouldHighlightUsing())
             {
-                if ( useHighlightMaterial == null)
+                Material highlightMaterial = null;
+                
+                if (useHighlightMaterial != null)
                 {
-                    useHighlightMaterial = NewHighlightMaterial(useHighlightColor);
+                    highlightMaterial = useHighlightMaterial;
                 }
+                else 
+                {
+                    if (colorUseMaterial == null)
+                    {
+                        colorUseMaterial = NewHighlightMaterial(useHighlightColor);
+                    }
 
-                StartCoroutine(Highlight(useHighlightMaterial, ShouldHighlightUsing));
+                    highlightMaterial = colorUseMaterial;
+                }
+                
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
             }
         }
 
