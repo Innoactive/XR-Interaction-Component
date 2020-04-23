@@ -114,7 +114,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
             else
             {
-                highlightCase.TabIndex = GUILayout.Toolbar (highlightCase.TabIndex, tabs);
+                highlightCase.TabIndex = GUILayout.Toolbar(highlightCase.TabIndex, tabs);
                 
                 EditorGUILayout.Separator();
             
