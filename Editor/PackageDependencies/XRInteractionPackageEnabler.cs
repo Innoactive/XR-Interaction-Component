@@ -10,17 +10,25 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
     /// </summary>
     public class XRInteractionPackageEnabler : Dependency
     {
+        private const string CreatorXRInteractionSymbol = "CREATOR_XR_INTERACTION";
+        
         /// <inheritdoc/>
         public override string Package { get; } = "com.unity.xr.interaction.toolkit";
 
         /// <inheritdoc/>
         public override int Priority { get; } = 4;
         
-        private const string CreatorXRInteractionSymbol = "CREATOR_XR_INTERACTION";
+        /// <inheritdoc/>
+        protected override string[] Layers { get; } = {"XR Teleport"};
 
         public XRInteractionPackageEnabler()
         {
             OnPackageEnabled += PostProcess;
+        }
+        
+        ~XRInteractionPackageEnabler()
+        {
+            OnPackageEnabled -= PostProcess;
         }
 
         private void PostProcess(object sender, EventArgs e)

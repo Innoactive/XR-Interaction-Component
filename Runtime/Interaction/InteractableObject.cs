@@ -14,8 +14,13 @@ namespace Innoactive.Creator.XRInteraction
     [RequireComponent(typeof(InteractableHighlighter))]
     public class InteractableObject : XRGrabInteractable
     {
+        [SerializeField]
         private bool isTouchable = true;
+        [SerializeField]
+        
         private bool isGrabbable = true;
+        
+        [SerializeField]
         private bool isUsable = true;
 
         private XRSocketInteractor selectingSocket;
@@ -58,6 +63,15 @@ namespace Innoactive.Creator.XRInteraction
         /// Get the current selecting 'XRSocketInteractor' for this <see cref="InteractableObject"/>.
         /// </summary>
         public XRSocketInteractor SelectingSocket => selectingSocket;
+        
+        /// <summary>
+        /// Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
+        /// </summary>
+        protected override void Reset()
+        {
+            base.Reset();
+            interactionLayerMask = 1;
+        }
 
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> can be hovered by a given interactor.

@@ -1,368 +1,423 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
+using Button = InputHelpers.Button;
 
-/// <summary>
-/// Handles teleportation interactions.
-/// <remarks>this class is borrowed from the XR Interaction Toolkit Examples</remarks>
-/// <para>For more information about XR Interaction Toolkit Examples see: <see href="https://github.com/Unity-Technologies/XR-Interaction-Toolkit-Examples"/></para>
-/// </summary>
-[DefaultExecutionOrder(kControllerManagerUpdateOrder)]
-public class ControllerManager : MonoBehaviour
+namespace Innoactive.Creator.XRInteraction
 {
-    // Slightly after the default, so that any actions such as release or grab can be processed *before* we switch controllers.
-    public const int kControllerManagerUpdateOrder = 10;
-
-    InputDevice m_RightController;
-    InputDevice m_LeftController;
-
-    [SerializeField]
-    [Tooltip("The buttons on the controller that will trigger a transition to the Teleport Controller.")]
-    List<InputHelpers.Button> m_ActivationButtons = new List<InputHelpers.Button>();
     /// <summary>
-    /// The buttons on the controller that will trigger a transition to the Teleport Controller.
+    /// Handles controller states interactions.
+    /// Contains all methods for performing basic math functions.
+    /// <list type="ControllerStates">
+    /// <item>
+    /// <term>Interaction</term>
+    /// <description>Used for selecting and interacting with objects.</description>
+    /// </item>
+    /// <item>
+    /// <term>Teleport</term>
+    /// <description>Used forteleport interactors and queue teleportations.</description>
+    /// </item>
+    /// <item>
+    /// <term>UI</term>
+    /// <description>Used for interacting with Unity.UI elements.</description>
+    /// </item>
+    /// </list>
     /// </summary>
-    public List<InputHelpers.Button> activationButtons { get { return m_ActivationButtons; } set { m_ActivationButtons = value; } }
-
-
-    [SerializeField]
-    [Tooltip("The buttons on the controller that will force a deactivation of the teleport option.")]
-    List<InputHelpers.Button> m_DeactivationButtons = new List<InputHelpers.Button>();
-    /// <summary>
-    /// The buttons on the controller that will trigger a transition to the Teleport Controller.
-    /// </summary>
-    public List<InputHelpers.Button> deactivationButtons { get { return m_DeactivationButtons; } set { m_DeactivationButtons = value; } }
-
-    [SerializeField]
-    [Tooltip("The Game Object which represents the left hand for normal interaction purposes.")]
-    GameObject m_LeftBaseController;
-    /// <summary>
-    /// The Game Object which represents the left hand for normal interaction purposes.
-    /// </summary>
-    public GameObject leftBaseController {  get { return m_LeftBaseController;  } set { m_LeftBaseController = value; } }
-
-    [SerializeField]
-    [Tooltip("The Game Object which represents the left hand when teleporting.")]
-    GameObject m_LeftTeleportController;
-    /// <summary>
-    /// The Game Object which represents the left hand when teleporting.
-    /// </summary>
-    public GameObject leftTeleportController { get { return m_LeftTeleportController; } set { m_LeftTeleportController = value; } }
-
-    [SerializeField]
-    [Tooltip("The Game Object which represents the right hand for normal interaction purposes.")]
-    GameObject m_RightBaseController;
-    /// <summary>
-    /// The Game Object which represents the right hand for normal interaction purposes.
-    /// </summary>
-    public GameObject rightBaseController { get { return m_RightBaseController; } set { m_RightBaseController = value; } }
-
-    [SerializeField]
-    [Tooltip("The Game Object which represents the right hand when teleporting.")]
-    GameObject m_RightTeleportController;
-    /// <summary>
-    /// The Game Object which represents the right hand when teleporting.
-    /// </summary>
-    public GameObject rightTeleportController { get { return m_RightTeleportController; } set { m_RightTeleportController = value; } }
-
-    bool m_LeftTeleportDeactivated = false;
-    bool m_RightTeleportDeactivated = false;
-
-    /// <summary>
-    /// A simple state machine which manages the three pieces of content that are used to represent
-    /// A controller state within the XR Interaction Toolkit
-    /// </summary>
-    struct InteractorController
+    [DefaultExecutionOrder(ControllerManagerUpdateOrder)]
+    public class ControllerManager : MonoBehaviour
     {
-        /// <summary>
-        /// The game object that this state controls
-        /// </summary>
-        public GameObject m_GO;
-        /// <summary>
-        /// The XR Controller instance that is associated with this state
-        /// </summary>
-        public XRController m_XRController;
-        /// <summary>
-        /// The Line renderer that is associated with this state
-        /// </summary>
-        public XRInteractorLineVisual m_LineRenderer;
-        /// <summary>
-        /// The interactor instance that is associated with this state
-        /// </summary>
-        public XRBaseInteractor m_Interactor;
+        // Slightly after the default, so that any actions such as release or grab can be processed *before* we switch controllers.
+        private const int ControllerManagerUpdateOrder = 10;
 
-        /// <summary>
-        /// When passed a gameObject, this function will scrape the game object for all valid components that we will
-        /// interact with by enabling/disabling as the state changes
-        /// </summary>
-        /// <param name="gameObject">The game object to scrape the various components from</param>
-        public void Attach(GameObject gameObject)
+        private enum ControllerStates
         {
-            m_GO = gameObject;
-            if (m_GO != null)
-            {
-                m_XRController = m_GO.GetComponent<XRController>();
-                m_LineRenderer = m_GO.GetComponent<XRInteractorLineVisual>();
-                m_Interactor = m_GO.GetComponent<XRBaseInteractor>();
+            /// <summary>
+            /// The Interaction state is used to interact with interactables.
+            /// </summary>
+            Interaction = 0,
 
-                Leave();               
-            }
+            /// <summary>
+            /// The Teleport state is used to interact with teleport interactors and queue teleportations.
+            /// </summary>
+            Teleport = 1,
+
+            /// <summary>
+            /// The UI state is used to interact with Unity.UI elements.
+            /// </summary>
+            UI = 2,
+
+            /// <summary>
+            /// Maximum sentinel.
+            /// </summary>
+            Max = 3
         }
 
         /// <summary>
-        /// Enter this state, performs a set of changes to the associated components to enable things
+        /// A simple state machine which manages the three pieces of content that are used to represent a
+        /// controller state within the XR Interaction Toolkit.
         /// </summary>
-        public void Enter()
+        private struct InteractorController
         {
-            if (m_LineRenderer)
-            {
-                m_LineRenderer.enabled = true;
-            }
-            if (m_XRController)
-            {
-                m_XRController.enableInputActions = true;
-            }
-            if (m_Interactor)
-            {
-                m_Interactor.enabled = true;
-            }
-        }
+            /// <summary>
+            /// The game object that this state controls
+            /// </summary>
+            private GameObject target;
 
-        /// <summary>
-        /// Leaves this state, performs a set of changes to the associate components to disable things.
-        /// </summary>
-        public void Leave()
-        {
-            if (m_LineRenderer)
+            /// <summary>
+            /// The XR Controller instance that is associated with this state
+            /// </summary>
+            private XRController controller;
+
+            /// <summary>
+            /// The Line renderer that is associated with this state
+            /// </summary>
+            private XRInteractorLineVisual lineRenderer;
+
+            /// <summary>
+            /// The interactor instance that is associated with this state
+            /// </summary>
+            private XRBaseInteractor interactor;
+
+            /// <summary>
+            /// When passed a gameObject, this function will scrape the game object for all valid components that we will
+            /// interact with by enabling/disabling as the state changes
+            /// </summary>
+            /// <param name="gameObject">The game object to scrape the various components from</param>
+            public void Attach(GameObject gameObject)
             {
-                m_LineRenderer.enabled = false;
-            }
-            if (m_XRController)
-            {
-                m_XRController.enableInputActions = false;
-            }
-            if(m_Interactor)
-            {
-                m_Interactor.enabled = false;
-            }
-        }
-    }
+                target = gameObject;
 
-    /// <summary>
-    /// The states that we are currently modeling. 
-    /// If you want to add more states, add them here!
-    /// </summary>
-    public enum ControllerStates
-    {
-        /// <summary>
-        /// the Select state is the "normal" interaction state for selecting and interacting with objects
-        /// </summary>
-        Select = 0,
-        /// <summary>
-        /// the Teleport state is used to interact with teleport interactors and queue teleportations.
-        /// </summary>
-        Teleport = 1,        
-        /// <summary>
-        /// Maximum sentinel
-        /// </summary>
-        MAX = 2,
-    }
-
-    /// <summary>
-    /// Current status of a controller. there will be two instances of this (for left/right). and this allows
-    /// the system to change between different states on each controller independently.
-    /// </summary>
-    struct ControllerState
-    {
-        ControllerStates m_State;
-        InteractorController[] m_Interactors;
-
-        /// <summary>
-        /// Sets up the controller
-        /// </summary>
-        public void Initialize()
-        {
-            m_State = ControllerStates.MAX;
-            m_Interactors = new InteractorController[(int)ControllerStates.MAX];
-        }
-
-        /// <summary>
-        /// Exits from all states that are in the list, basically a reset.
-        /// </summary>
-        public void ClearAll()
-        {
-            if(m_Interactors == null)
-                return;
-
-            for(int i = 0; i < (int)ControllerStates.MAX; ++i)
-            {
-                m_Interactors[i].Leave();
-            }
-        }
-
-        /// <summary>
-        /// Attaches a game object that represents an interactor for a state, to a state.
-        /// </summary>
-        /// <param name="state">The state that we're attaching the game object to</param>
-        /// <param name="parentGamObject">The game object that represents the interactor for that state.</param>
-        public void SetGameObject(ControllerStates state, GameObject parentGamObject)
-        {
-            if ((state == ControllerStates.MAX) || (m_Interactors == null))
-                return;
-
-            m_Interactors[(int)state].Attach(parentGamObject);
-        }
-
-        /// <summary>
-        /// Attempts to set the current state of a controller.
-        /// </summary>
-        /// <param name="nextState">The state that we wish to transition to</param>
-        public void SetState(ControllerStates nextState)
-        {
-            if (nextState == m_State || nextState == ControllerStates.MAX)
-            {
-                return;
-            }
-            else
-            {
-                if (m_State != ControllerStates.MAX)
+                if (target != null)
                 {
-                    m_Interactors[(int)m_State].Leave();                    
+                    controller = target.GetComponent<XRController>();
+                    lineRenderer = target.GetComponent<XRInteractorLineVisual>();
+                    interactor = target.GetComponent<XRBaseInteractor>();
+
+                    Leave();
+                }
+            }
+
+            /// <summary>
+            /// Enter this state, performs a set of changes to the associated components to enable things
+            /// </summary>
+            public void Enter()
+            {
+                if (lineRenderer != null)
+                {
+                    lineRenderer.enabled = true;
                 }
 
-                m_State = nextState;           
-                m_Interactors[(int)m_State].Enter();           
-            }
-        }
-    }
+                if (controller != null)
+                {
+                    controller.enableInputActions = true;
+                }
 
-    ControllerState m_RightControllerState;
-    ControllerState m_LeftControllerState;
-
-
-    void OnEnable()
-    {
-        m_LeftTeleportDeactivated = false;
-        m_RightTeleportDeactivated = false;
-
-        m_RightControllerState.Initialize();
-        m_LeftControllerState.Initialize();
-
-        m_RightControllerState.SetGameObject(ControllerStates.Select, m_RightBaseController);
-        m_RightControllerState.SetGameObject(ControllerStates.Teleport, m_RightTeleportController);
-
-        m_LeftControllerState.SetGameObject(ControllerStates.Select, m_LeftBaseController);
-        m_LeftControllerState.SetGameObject(ControllerStates.Teleport, m_LeftTeleportController);
-
-        m_LeftControllerState.ClearAll();
-        m_RightControllerState.ClearAll();
-
-        InputDevices.deviceConnected += RegisterDevices;
-        List<InputDevice> devices = new List<InputDevice>();
-        InputDevices.GetDevices(devices);
-        for (int i = 0; i < devices.Count; i++)
-            RegisterDevices(devices[i]);
-    }
-
-    void OnDisable()
-    {
-        InputDevices.deviceConnected -= RegisterDevices;
-    }
-
-    void RegisterDevices(InputDevice connectedDevice)
-    {
-        if (connectedDevice.isValid)
-        {
-#if UNITY_2019_3_OR_NEWER
-            if((connectedDevice.characteristics & InputDeviceCharacteristics.Left) != 0)
-#else
-            if (connectedDevice.role == InputDeviceRole.LeftHanded)
-#endif
-            {
-                m_LeftController = connectedDevice;
-                m_LeftControllerState.ClearAll();
-                m_LeftControllerState.SetState(ControllerStates.Select);
-            }
-#if UNITY_2019_3_OR_NEWER
-            else if ((connectedDevice.characteristics & InputDeviceCharacteristics.Right) != 0)
-#else
-            else if (connectedDevice.role == InputDeviceRole.RightHanded)
-#endif
-            {
-                m_RightController = connectedDevice;          
-                m_RightControllerState.ClearAll();
-                m_RightControllerState.SetState(ControllerStates.Select);                                
-            }
-        }
-    }
-
-    void Update()
-    {
-        if (m_LeftController.isValid)
-        {
-            bool activated = false;
-            for(int i = 0; i < m_ActivationButtons.Count; i++)
-            {
-                m_LeftController.IsPressed(m_ActivationButtons[i], out bool value);
-                activated |= value;
+                if (interactor != null)
+                {
+                    interactor.enabled = true;
+                }
             }
 
-            bool deactivated = false;
-            for (int i = 0; i < m_DeactivationButtons.Count; i++)
+            /// <summary>
+            /// Leaves this state, performs a set of changes to the associate components to disable things.
+            /// </summary>
+            public void Leave()
             {
-                m_LeftController.IsPressed(m_DeactivationButtons[i], out bool value);
-                deactivated |= value;
+                if (lineRenderer != null)
+                {
+                    lineRenderer.enabled = false;
+                }
+
+                if (controller != null)
+                {
+                    controller.enableInputActions = false;
+                }
+
+                if (interactor != null)
+                {
+                    interactor.enabled = false;
+                }
             }
 
-            if (deactivated)
-                m_LeftTeleportDeactivated = true;
-
-            // if we're pressing the activation buttons, we transition to Teleport
-            if (activated && !m_LeftTeleportDeactivated)
+            /// <summary>
+            /// True if the interactor is either touching or grabbing an interactable.
+            /// </summary>
+            /// <returns></returns>
+            public bool IsInteractorInteracting()
             {
-                m_LeftControllerState.SetState(ControllerStates.Teleport);
-            }
-            // otherwise we're in normal state. 
-            else
-            {
-                m_LeftControllerState.SetState(ControllerStates.Select);
+                if (interactor == null)
+                {
+                    return false;
+                }
 
-                if(!activated)
-                    m_LeftTeleportDeactivated = false;
+                List<XRBaseInteractable> hoverTargets = new List<XRBaseInteractable>();
+                interactor.GetHoverTargets(hoverTargets);
+
+                return hoverTargets.Any() || interactor.selectTarget != null;
             }
         }
 
-        if (m_RightController.isValid)
+        /// <summary>
+        /// Current status of a controller. there will be two instances of this (for left/right). and this allows
+        /// the system to change between different states on each controller independently.
+        /// </summary>
+        private struct ControllerState
         {
-            bool activated = false;
-            for (int i = 0; i < m_ActivationButtons.Count; i++)
+            private ControllerStates currentState;
+            private InteractorController[] interactors;
+
+            /// <summary>
+            /// Sets up the controller
+            /// </summary>
+            public void Initialize()
             {
-                m_RightController.IsPressed(m_ActivationButtons[i], out bool value);
-                activated |= value;
+                currentState = ControllerStates.Max;
+                interactors = new InteractorController[(int) ControllerStates.Max];
             }
 
-            bool deactivated = false;
-            for (int i = 0; i < m_DeactivationButtons.Count; i++)
+            /// <summary>
+            /// Exits from all states that are in the list, basically a reset.
+            /// </summary>
+            public void ClearAll()
             {
-                m_RightController.IsPressed(m_DeactivationButtons[i], out bool value);
-                deactivated |= value;
+                if (interactors == null)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < (int) ControllerStates.Max; ++i)
+                {
+                    interactors[i].Leave();
+                }
             }
 
-            if (deactivated)
-                m_RightTeleportDeactivated = true;
-
-            if (activated && !m_RightTeleportDeactivated)
+            /// <summary>
+            /// Attaches a game object that represents an interactor for a state, to a state.
+            /// </summary>
+            /// <param name="state">The state that we're attaching the game object to</param>
+            /// <param name="parentGamObject">The game object that represents the interactor for that state.</param>
+            public void SetGameObject(ControllerStates state, GameObject parentGamObject)
             {
-                m_RightControllerState.SetState(ControllerStates.Teleport);
-            }
-            else
-            {
-                m_RightControllerState.SetState(ControllerStates.Select);
+                if (state == ControllerStates.Max || interactors == null)
+                {
+                    return;
+                }
 
-                if (!activated)
-                    m_RightTeleportDeactivated = false;
+                interactors[(int) state].Attach(parentGamObject);
             }
+
+            /// <summary>
+            /// Attempts to set the current state of a controller.
+            /// </summary>
+            /// <param name="nextState">The state that we wish to transition to</param>
+            public void SetState(ControllerStates nextState)
+            {
+                if (nextState == currentState || nextState == ControllerStates.Max)
+                {
+                    return;
+                }
+
+                if (currentState != ControllerStates.Max)
+                {
+                    interactors[(int) currentState].Leave();
+                }
+
+                currentState = nextState;
+                interactors[(int) currentState].Enter();
+            }
+
+            /// <summary>
+            /// True if the interactor from given <paramref name="controller"/> is either touching or grabbing an interactable.
+            /// </summary>
+            /// <returns></returns>
+            public bool IsControllerInteracting(ControllerStates controller)
+            {
+                if (controller == ControllerStates.Max)
+                {
+                    return false;
+                }
+
+                return interactors[(int) controller].IsInteractorInteracting();
+            }
+        }
+
+        [Header("XR Interaction Controllers")]
+        [SerializeField]
+        [Tooltip("The Game Object which represents the right hand for normal interaction purposes.")]
+        private GameObject rightBaseController;
+
+        [SerializeField] [Tooltip("The Game Object which represents the left hand for normal interaction purposes.")]
+        private GameObject leftBaseController;
+
+        [Header("Teleportation Controllers")]
+        [SerializeField]
+        [Tooltip("The Game Object which represents the right hand when teleporting.")]
+        private GameObject rightTeleportController;
+
+        [SerializeField] [Tooltip("The Game Object which represents the left hand when teleporting.")]
+        private GameObject leftTeleportController;
+
+        [SerializeField]
+        [Tooltip("The buttons on the controller that will trigger a transition to the Teleport Controller.")]
+        private Button teleportButton;
+
+        [SerializeField]
+        [Tooltip("The buttons on the controller that will force a deactivation of the teleport option.")]
+        private Button cancelTeleportButton;
+
+        [Header("UI Interaction Controllers")]
+        [SerializeField]
+        [Tooltip("The Game Object which represents the right hand when teleporting.")]
+        private GameObject rightUIController;
+
+        [SerializeField] [Tooltip("The Game Object which represents the left hand when teleporting.")]
+        private GameObject leftUIController;
+
+        [SerializeField]
+        [Tooltip("The buttons on the controller that will force a deactivation of the teleport option.")]
+        private Button UIButton;
+
+
+        /// <summary>
+        /// The buttons on the controller that will trigger a transition to the Teleport Controller.
+        /// </summary>
+        public Button TeleportButton
+        {
+            get => teleportButton;
+            set => teleportButton = value;
+        }
+
+        /// <summary>
+        /// The buttons on the controller that will trigger a transition to the Teleport Controller.
+        /// </summary>
+        public Button CancelTeleportButton
+        {
+            get => cancelTeleportButton;
+            set => cancelTeleportButton = value;
+        }
+
+        /// <summary>
+        /// The Game Object which represents the left hand for normal interaction purposes.
+        /// </summary>
+        public GameObject LeftBaseController
+        {
+            get => leftBaseController;
+            set => leftBaseController = value;
+        }
+
+        /// <summary>
+        /// The Game Object which represents the left hand when teleporting.
+        /// </summary>
+        public GameObject LeftTeleportController
+        {
+            get => leftTeleportController;
+            set => leftTeleportController = value;
+        }
+
+        /// <summary>
+        /// The Game Object which represents the right hand for normal interaction purposes.
+        /// </summary>
+        public GameObject RightBaseController
+        {
+            get => rightBaseController;
+            set => rightBaseController = value;
+        }
+
+        /// <summary>
+        /// The Game Object which represents the right hand when teleporting.
+        /// </summary>
+        public GameObject RightTeleportController
+        {
+            get => rightTeleportController;
+            set => rightTeleportController = value;
+        }
+
+        private InputDevice rightController;
+        private InputDevice leftController;
+        private ControllerState rightControllerState;
+        private ControllerState leftControllerState;
+        private readonly Button menuButton = Button.MenuButton;
+
+        private void OnEnable()
+        {
+            rightControllerState.Initialize();
+            leftControllerState.Initialize();
+
+            rightControllerState.SetGameObject(ControllerStates.Interaction, rightBaseController);
+            rightControllerState.SetGameObject(ControllerStates.Teleport, rightTeleportController);
+            rightControllerState.SetGameObject(ControllerStates.UI, rightUIController);
+
+            leftControllerState.SetGameObject(ControllerStates.Interaction, leftBaseController);
+            leftControllerState.SetGameObject(ControllerStates.Teleport, leftTeleportController);
+            leftControllerState.SetGameObject(ControllerStates.UI, leftUIController);
+
+            leftControllerState.ClearAll();
+            rightControllerState.ClearAll();
+
+            InputDevices.deviceConnected += RegisterDevices;
+            List<InputDevice> devices = new List<InputDevice>();
+            InputDevices.GetDevices(devices);
+
+            foreach (InputDevice device in devices)
+            {
+                RegisterDevices(device);
+            }
+        }
+
+        private void OnDisable()
+        {
+            InputDevices.deviceConnected -= RegisterDevices;
+        }
+
+        private void Update()
+        {
+            ProcessController(leftController, ref leftControllerState);
+            ProcessController(rightController, ref rightControllerState);
+        }
+
+        private void RegisterDevices(InputDevice connectedDevice)
+        {
+            if (connectedDevice.isValid)
+            {
+                if ((connectedDevice.characteristics & InputDeviceCharacteristics.Left) != 0)
+                {
+                    leftController = connectedDevice;
+                    leftControllerState.ClearAll();
+                    leftControllerState.SetState(ControllerStates.Interaction);
+                }
+                else if ((connectedDevice.characteristics & InputDeviceCharacteristics.Right) != 0)
+                {
+                    rightController = connectedDevice;
+                    rightControllerState.ClearAll();
+                    rightControllerState.SetState(ControllerStates.Interaction);
+                }
+            }
+        }
+
+        private void ProcessController(InputDevice controller, ref ControllerState controllerState)
+        {
+            if (controller.isValid == false || controllerState.IsControllerInteracting(ControllerStates.Interaction))
+            {
+                return;
+            }
+
+            controller.IsPressed(teleportButton, out bool activateTeleportationMode);
+            controller.IsPressed(cancelTeleportButton, out bool cancelTeleportationMode);
+            controller.IsPressed(UIButton, out bool activateUIMode);
+            ControllerStates nextState = ControllerStates.Interaction;
+
+            if (activateUIMode)
+            {
+                nextState = ControllerStates.UI;
+            }
+            else if (activateTeleportationMode && cancelTeleportationMode == false)
+            {
+                nextState = ControllerStates.Teleport;
+            }
+
+            controllerState.SetState(nextState);
         }
     }
 }

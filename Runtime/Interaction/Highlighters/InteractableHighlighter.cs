@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -77,13 +78,11 @@ namespace Innoactive.Creator.XRInteraction
 
         private void OnEnable()
         {
-            interactableObject = gameObject.GetComponent<InteractableObject>();
-
             if (interactableObject == false)
             {
-                interactableObject = gameObject.AddComponent<InteractableObject>();
+                interactableObject =  gameObject.GetOrAddComponent<InteractableObject>();
             }
-            
+
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
             interactableObject.onSelectExit.AddListener(OnReleased);
@@ -277,7 +276,7 @@ namespace Innoactive.Creator.XRInteraction
                     highlightMaterial = colorGrabMaterial;
                 }
                 
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightGrabbing));
             }
         }
 
@@ -301,7 +300,7 @@ namespace Innoactive.Creator.XRInteraction
                     highlightMaterial = colorUseMaterial;
                 }
                 
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightUsing));
             }
         }
 
@@ -371,6 +370,20 @@ namespace Innoactive.Creator.XRInteraction
         {
             Material material = CreateHighlightMaterial();
             material.color = highlightColor;
+
+            // In case the color has some level of transparency,
+            // we set the Material's Rendering Mode to Transparent. 
+            if (Mathf.Approximately(highlightColor.a, 1f) == false)
+            {
+                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                material.SetInt("_ZWrite", 0);
+                material.DisableKeyword("_ALPHATEST_ON");
+                material.DisableKeyword("_ALPHABLEND_ON");
+                material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                material.renderQueue = 3000;
+            }
+            
             return material;
         }
 

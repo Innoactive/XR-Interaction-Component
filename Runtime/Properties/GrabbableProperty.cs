@@ -2,7 +2,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Creator.Unity;
 using Innoactive.Creator.Core.Properties;
 using Innoactive.Creator.BasicInteraction.Properties;
 
@@ -39,17 +38,17 @@ namespace Innoactive.Creator.XRInteraction.Properties
             
             if (Interactable == false)
             {
-                Interactable = gameObject.GetOrAddComponent<InteractableObject>();
+                Interactable = gameObject.GetComponent<InteractableObject>();
             }
-
+        
             Interactable.onSelectEnter.AddListener(HandleXRGrabbed);
             Interactable.onSelectExit.AddListener(HandleXRUngrabbed);
         }
-
+        
         protected override void OnDisable()
         {
             base.OnDisable();
-
+        
             Interactable.onSelectEnter.RemoveListener(HandleXRGrabbed);
             Interactable.onSelectExit.RemoveListener(HandleXRUngrabbed);
         }

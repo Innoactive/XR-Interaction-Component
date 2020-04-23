@@ -8,7 +8,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// Drawer for configuration settings for <see cref="InteractableHighlighter"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableHighlighter)), CanEditMultipleObjects]
-    public class InteractableHighlighterEditor : Editor
+    internal class InteractableHighlighterEditor : Editor
     {
         /// <summary>
         /// Keeps references for different interaction highlight cases.
