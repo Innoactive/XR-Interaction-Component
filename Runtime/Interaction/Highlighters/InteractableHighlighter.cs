@@ -277,7 +277,7 @@ namespace Innoactive.Creator.XRInteraction
                     highlightMaterial = colorGrabMaterial;
                 }
                 
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightGrabbing));
             }
         }
 
@@ -301,7 +301,7 @@ namespace Innoactive.Creator.XRInteraction
                     highlightMaterial = colorUseMaterial;
                 }
                 
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
+                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightUsing));
             }
         }
 
