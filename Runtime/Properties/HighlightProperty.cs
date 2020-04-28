@@ -9,7 +9,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
     [RequireComponent(typeof(InteractableObject))]
     public class HighlightProperty : BaseHighlightProperty
     {
-        private InteractableHighlighter Highlighter;
+        protected InteractableHighlighter Highlighter;
 
         protected override void OnEnable()
         {

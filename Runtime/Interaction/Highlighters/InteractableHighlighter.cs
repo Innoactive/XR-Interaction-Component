@@ -122,13 +122,13 @@ namespace Innoactive.Creator.XRInteraction
         /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightMaterial"/>.
         /// </summary>
         /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
-        public void StartHighlighting(string highlightID, Material highlightMaterial)
+        public void StartHighlighting(string highlightID, Material highlightMaterial, bool useOverlay = false)
         {
             if (externalHighlights.ContainsKey(highlightID) == false)
             {
                 bool shouldContinueHighlighting = true;
                 externalHighlights.Add(highlightID, shouldContinueHighlighting);
-                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
+                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID, useOverlay));
             }
         }
 
@@ -198,33 +198,41 @@ namespace Innoactive.Creator.XRInteraction
             OnGrabHighlight();
         }
 
-        private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
+        private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "", bool useOverlay = false)
         {
             if (cachedSkinnedRenderers.Length == 0 && cachedMeshRenderers.Length == 0)
             {
                 RefreshCachedRenderers();
             }
 
+            float scaleFactor = useOverlay ? 1.025f : 1f;
+
             while (shouldContinueHighlighting())
             {
-                DisableRenders(cachedSkinnedRenderers);
-                DisableRenders(cachedMeshRenderers);
+                if (useOverlay == false)
+                {
+                    DisableRenders(cachedSkinnedRenderers);
+                    DisableRenders(cachedMeshRenderers);
+                }
 
                 foreach (SkinnedMeshRenderer skinnedRenderer in cachedSkinnedRenderers)
                 {
-                    DrawHighlightedObject(skinnedRenderer.sharedMesh, skinnedRenderer, highlightMaterial);
+                    DrawHighlightedObject(skinnedRenderer.sharedMesh, skinnedRenderer, highlightMaterial, scaleFactor);
                 }
 
                 foreach (MeshFilter meshFilter in cachedMeshFilters)
                 {
-                    DrawHighlightedObject(meshFilter.sharedMesh, meshFilter, highlightMaterial);
+                    DrawHighlightedObject(meshFilter.sharedMesh, meshFilter, highlightMaterial, scaleFactor);
                 }
 
                 yield return null;
             }
 
-            ReenableRenderers(cachedSkinnedRenderers);
-            ReenableRenderers(cachedMeshRenderers);
+            if (useOverlay == false)
+            {
+                ReenableRenderers(cachedSkinnedRenderers);
+                ReenableRenderers(cachedMeshRenderers);
+            }
 
             if (string.IsNullOrEmpty(highlightID) == false && externalHighlights.ContainsKey(highlightID))
             {
@@ -333,11 +341,11 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
 
-        private void DrawHighlightedObject(Mesh mesh, Component renderer, Material material)
+        private void DrawHighlightedObject(Mesh mesh, Component renderer, Material material, float scale = 1f)
         {
             LayerMask layerMask = renderer.gameObject.layer;
             Transform rendersTransform = renderer.transform;
-            Matrix4x4 matrix = Matrix4x4.TRS(rendersTransform.position, rendersTransform.rotation, rendersTransform.lossyScale);
+            Matrix4x4 matrix = Matrix4x4.TRS(rendersTransform.position, rendersTransform.rotation, rendersTransform.lossyScale * scale);
 
             Graphics.DrawMesh(mesh, matrix, material, layerMask);
         }
