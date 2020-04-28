@@ -143,7 +143,10 @@ namespace Innoactive.Creator.XRInteraction
         /// <remarks>Adds the <see cref="DrawHighlightMesh"/> method as a process.</remarks>
         public override void ProcessInteractor(XRInteractionUpdateOrder.UpdatePhase updatePhase)
         {
-            base.ProcessInteractor(updatePhase);
+            if (selectTarget == null)
+            {
+                base.ProcessInteractor(updatePhase);
+            }
 
             if (updatePhase == XRInteractionUpdateOrder.UpdatePhase.Dynamic && ShowHighlightObject && selectTarget == null && m_HoverTargets.Count == 0)
             {

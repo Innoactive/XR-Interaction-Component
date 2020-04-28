@@ -166,6 +166,7 @@ namespace Innoactive.Creator.XRInteraction
         private IEnumerator StopInteractingForOneFrame()
         {
             List<XRBaseInteractor> interactors = new List<XRBaseInteractor>(hoveringInteractors);
+            bool isInSocket = false;
             
             if (interactors.Contains(selectingInteractor) == false)
             {
@@ -174,14 +175,25 @@ namespace Innoactive.Creator.XRInteraction
             
             foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
             {
-                interactor.enableInteractions = false;
+                if (interactor.GetComponent<XRController>() != null)
+                {
+                    interactor.enableInteractions = false;
+                }
+
+                if (interactor.GetComponent<XRSocketInteractor>() != null)
+                {
+                    isInSocket = true;
+                }
             }
             
-            yield return new WaitUntil(() => isHovered == false && isSelected == false);
+            yield return new WaitUntil(() => isHovered == false && (isSelected == false || isInSocket));
             
-            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
+            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null && interactor.GetComponent<XRController>() != null))
             {
-                interactor.enableInteractions = true;
+                if (interactor.GetComponent<XRController>() != null)
+                {
+                    interactor.enableInteractions = true;
+                }
             }
         }
     }
