@@ -174,14 +174,20 @@ namespace Innoactive.Creator.XRInteraction
             
             foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
             {
-                interactor.enableInteractions = false;
+                if (interactor.GetComponent<XRController>() != null)
+                {
+                    interactor.enableInteractions = false;
+                }
             }
             
-            yield return new WaitUntil(() => isHovered == false && isSelected == false);
+            yield return new WaitUntil(() => isHovered == false && (isSelected == false || IsInSocket));
             
             foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
             {
-                interactor.enableInteractions = true;
+                if (interactor.GetComponent<XRController>() != null)
+                {
+                    interactor.enableInteractions = true;
+                }
             }
         }
     }
