@@ -80,7 +80,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (interactableObject == false)
             {
-                interactableObject =  gameObject.GetOrAddComponent<InteractableObject>();
+                interactableObject = gameObject.GetOrAddComponent<InteractableObject>();
             }
 
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);

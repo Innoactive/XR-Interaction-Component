@@ -16,8 +16,8 @@ namespace Innoactive.Creator.XRInteraction
     {
         [SerializeField]
         private bool isTouchable = true;
-        [SerializeField]
         
+        [SerializeField]
         private bool isGrabbable = true;
         
         [SerializeField]
