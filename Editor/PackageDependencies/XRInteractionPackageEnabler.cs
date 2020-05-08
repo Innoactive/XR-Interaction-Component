@@ -8,7 +8,7 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
     /// <summary>
     /// Adds Unity's XR-Interaction-Toolkit package as a dependency and sets specified symbol for script compilation.
     /// </summary>
-    public class XRInteractionPackageEnabler : Dependency
+    public class XRInteractionPackageEnabler : Dependency, IDisposable 
     {
         private const string CreatorXRInteractionSymbol = "CREATOR_XR_INTERACTION";
         
@@ -26,7 +26,7 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
             OnPackageEnabled += PostProcess;
         }
         
-        ~XRInteractionPackageEnabler()
+        public void Dispose()
         {
             OnPackageEnabled -= PostProcess;
         }
