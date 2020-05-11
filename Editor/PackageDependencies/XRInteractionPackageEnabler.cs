@@ -8,19 +8,27 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
     /// <summary>
     /// Adds Unity's XR-Interaction-Toolkit package as a dependency and sets specified symbol for script compilation.
     /// </summary>
-    public class XRInteractionPackageEnabler : Dependency
+    public class XRInteractionPackageEnabler : Dependency, IDisposable 
     {
+        private const string CreatorXRInteractionSymbol = "CREATOR_XR_INTERACTION";
+        
         /// <inheritdoc/>
         public override string Package { get; } = "com.unity.xr.interaction.toolkit";
 
         /// <inheritdoc/>
         public override int Priority { get; } = 4;
         
-        private const string CreatorXRInteractionSymbol = "CREATOR_XR_INTERACTION";
+        /// <inheritdoc/>
+        protected override string[] Layers { get; } = {"XR Teleport"};
 
         public XRInteractionPackageEnabler()
         {
             OnPackageEnabled += PostProcess;
+        }
+        
+        public void Dispose()
+        {
+            OnPackageEnabled -= PostProcess;
         }
 
         private void PostProcess(object sender, EventArgs e)

@@ -38,6 +38,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
         SerializedProperty m_OnDeactivate;
         SerializedProperty m_Colliders;
         SerializedProperty m_InteractionLayerMask;
+        SerializedProperty m_isTouchable;
+        SerializedProperty m_isGrabbable;
+        SerializedProperty m_isUsable;
 
         bool m_showInteractableEvents = false;
 
@@ -64,6 +67,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public static readonly GUIContent colliders = new GUIContent("Colliders", "Colliders to include when selecting/interacting with an interactable");
             public static readonly GUIContent interactionLayerMask = new GUIContent("InteractionLayerMask", "Only Interactors with this LayerMask will interact with this Interactable.");
             public static readonly GUIContent retainTransformParent = new GUIContent("RetainTransformParent", "If enabled, this Interactable have its parent retained after it is released from an interactor.");
+            public static readonly GUIContent isTouchable = new GUIContent("Is Touchable", "Determines if this Interactable Object can be touched.");
+            public static readonly GUIContent isGrabbable = new GUIContent("Is Grabbable", "Determines if this Interactable Object can be grabbed.");
+            public static readonly GUIContent isUsable = new GUIContent("Is Usable", "Determines if this Interactable Object can be used.");
         }
 
         void OnEnable()
@@ -96,6 +102,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
             m_OnDeactivate = serializedObject.FindProperty("m_OnDeactivate");
             m_Colliders = serializedObject.FindProperty("m_Colliders");
             m_InteractionLayerMask = serializedObject.FindProperty("m_InteractionLayerMask");
+            m_isTouchable = serializedObject.FindProperty("isTouchable");
+            m_isGrabbable = serializedObject.FindProperty("isGrabbable");
+            m_isUsable = serializedObject.FindProperty("isUsable");
         }
 
         public override void OnInspectorGUI()
@@ -105,6 +114,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
             GUI.enabled = true;
 
             serializedObject.Update();
+            
+            EditorGUILayout.PropertyField(m_isTouchable, Tooltips.isTouchable);
+            EditorGUILayout.PropertyField(m_isGrabbable, Tooltips.isGrabbable);
+            EditorGUILayout.PropertyField(m_isUsable, Tooltips.isUsable);
 
             EditorGUILayout.PropertyField(m_AttachTransform, Tooltips.attachTransform);
             EditorGUILayout.PropertyField(m_AttachEaseInTime, Tooltips.attachEaseInTime);
