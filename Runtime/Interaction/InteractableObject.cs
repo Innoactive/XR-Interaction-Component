@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -74,16 +73,6 @@ namespace Innoactive.Creator.XRInteraction
             
             // Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
             interactionLayerMask = 1;
-        }
-
-        /// <summary>
-        /// This function is called when the script is loaded or a value is changed in the Inspector (Called in the editor only).
-        /// </summary>
-        private void OnValidate()
-        {
-            // Makes sure InteractableHighlighter is added.
-            // Unity's RequireComponent will create a circular dependency.
-            gameObject.GetOrAddComponent<InteractableHighlighter>();
         }
 
         /// <summary>

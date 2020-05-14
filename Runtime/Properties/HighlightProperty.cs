@@ -6,7 +6,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
     /// <summary>
     /// Highlight property which enables an attached <see cref="InteractableObject"/>.
     /// </summary>
-    [RequireComponent(typeof(InteractableObject))]
+    [RequireComponent(typeof(InteractableHighlighter))]
     public class HighlightProperty : BaseHighlightProperty
     {
         /// <summary>
@@ -15,13 +15,19 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// </summary>
         public Color? CurrentHighlightColor { get; protected set; }
             
-        private InteractableHighlighter Highlighter;
+        /// <summary>
+        /// The <see cref="InteractableHighlighter"/> which is used to highlight the <see cref="Core.SceneObjects.TrainingSceneObject"/>.
+        /// </summary>
+        protected InteractableHighlighter Highlighter;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            
-            Highlighter = gameObject.GetComponent<InteractableHighlighter>();
+
+            if (Highlighter == null)
+            {
+                Highlighter = gameObject.GetComponent<InteractableHighlighter>();
+            }
         }
 
         /// <inheritdoc/>
