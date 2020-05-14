@@ -1,6 +1,5 @@
 ﻿using Innoactive.Creator.XRInteraction;
 using UnityEditor;
-using UnityEditor.AnimatedValues;
 using UnityEngine;
 
 namespace Innoactive.CreatorEditor.XRInteraction
