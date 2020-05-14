@@ -14,17 +14,14 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// Returns null, otherwise.
         /// </summary>
         public Color? CurrentHighlightColor { get; protected set; }
-        
+            
         private InteractableHighlighter Highlighter;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-
-            if (Highlighter == null)
-            {
-                Highlighter = gameObject.GetComponent<InteractableHighlighter>();
-            }
+            
+            Highlighter = gameObject.GetComponent<InteractableHighlighter>();
         }
 
         /// <inheritdoc/>

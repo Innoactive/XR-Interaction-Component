@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -11,7 +13,6 @@ namespace Innoactive.Creator.XRInteraction
     /// Can attach to selecting interactor and follow it around while obeying physics (and inherit velocity when released).
     /// </summary>
     /// <remarks>Adds extra control over applicable interactions.</remarks>
-    [RequireComponent(typeof(InteractableHighlighter))]
     public class InteractableObject : XRGrabInteractable
     {
         [SerializeField]
@@ -65,12 +66,24 @@ namespace Innoactive.Creator.XRInteraction
         public XRSocketInteractor SelectingSocket => selectingSocket;
         
         /// <summary>
-        /// Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
+        /// Reset to default values.
         /// </summary>
         protected override void Reset()
         {
             base.Reset();
+            
+            // Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
             interactionLayerMask = 1;
+        }
+
+        /// <summary>
+        /// This function is called when the script is loaded or a value is changed in the Inspector (Called in the editor only).
+        /// </summary>
+        private void OnValidate()
+        {
+            // Makes sure InteractableHighlighter is added.
+            // Unity's RequireComponent will create a circular dependency.
+            gameObject.GetOrAddComponent<InteractableHighlighter>();
         }
 
         /// <summary>

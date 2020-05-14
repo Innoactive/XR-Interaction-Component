@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using Innoactive.Creator.Unity;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -12,6 +11,7 @@ namespace Innoactive.Creator.XRInteraction
     /// <summary>
     /// Handles highlighting for attached <see cref="InteractableObject"/>.
     /// </summary>
+    [RequireComponent(typeof(InteractableObject))]
     public sealed class InteractableHighlighter : MonoBehaviour
     {
         /// <summary>
@@ -77,48 +77,27 @@ namespace Innoactive.Creator.XRInteraction
         private MeshRenderer[] cachedMeshRenderers = {};
         private MeshFilter[] cachedMeshFilters = {};
 
-        private IEnumerator Start()
-        {
-            interactableObject = GetComponent<InteractableObject>();
-            yield return null;
-            
-            if (interactableObject != null)
-            {
-               OnEnable();
-            }
-            else
-            {
-                throw new NullReferenceException(string.Format("Every {0} requires a {1}", GetType().Name, nameof(InteractableObject)));
-            }
-        }
-
         private void OnEnable()
         {
-            if (interactableObject != null)
+            if (interactableObject == false)
             {
-                interactableObject.onFirstHoverEnter.AddListener(OnTouched);
-                interactableObject.onSelectEnter.AddListener(OnGrabbed);
-                interactableObject.onSelectExit.AddListener(OnReleased);
-                interactableObject.onActivate.AddListener(OnUsed);
-                interactableObject.onDeactivate.AddListener(OnUnused);
+                interactableObject = gameObject.GetComponent<InteractableObject>();
             }
+
+            interactableObject.onFirstHoverEnter.AddListener(OnTouched);
+            interactableObject.onSelectEnter.AddListener(OnGrabbed);
+            interactableObject.onSelectExit.AddListener(OnReleased);
+            interactableObject.onActivate.AddListener(OnUsed);
+            interactableObject.onDeactivate.AddListener(OnUnused);
         }
 
         private void OnDisable()
         {
-            if (interactableObject != null)
-            {
-                interactableObject.onFirstHoverEnter.RemoveListener(OnTouched);
-                interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
-                interactableObject.onSelectExit.RemoveListener(OnReleased);
-                interactableObject.onActivate.RemoveListener(OnUsed);
-                interactableObject.onDeactivate.RemoveListener(OnUnused);
-            }
-        }
-
-        private void RegisterDelegates()
-        {
-            
+            interactableObject.onFirstHoverEnter.RemoveListener(OnTouched);
+            interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
+            interactableObject.onSelectExit.RemoveListener(OnReleased);
+            interactableObject.onActivate.RemoveListener(OnUsed);
+            interactableObject.onDeactivate.RemoveListener(OnUnused);
         }
 
         private void OnValidate()
