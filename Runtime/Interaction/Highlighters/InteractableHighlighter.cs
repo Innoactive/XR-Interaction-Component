@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -11,6 +10,7 @@ namespace Innoactive.Creator.XRInteraction
     /// <summary>
     /// Handles highlighting for attached <see cref="InteractableObject"/>.
     /// </summary>
+    [RequireComponent(typeof(InteractableObject))]
     public sealed class InteractableHighlighter : MonoBehaviour
     {
         /// <summary>
@@ -80,7 +80,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (interactableObject == false)
             {
-                interactableObject = gameObject.GetOrAddComponent<InteractableObject>();
+                interactableObject = gameObject.GetComponent<InteractableObject>();
             }
 
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,6 @@ namespace Innoactive.Creator.XRInteraction
     /// Can attach to selecting interactor and follow it around while obeying physics (and inherit velocity when released).
     /// </summary>
     /// <remarks>Adds extra control over applicable interactions.</remarks>
-    [RequireComponent(typeof(InteractableHighlighter))]
     public class InteractableObject : XRGrabInteractable
     {
         [SerializeField]
@@ -65,11 +65,13 @@ namespace Innoactive.Creator.XRInteraction
         public XRSocketInteractor SelectingSocket => selectingSocket;
         
         /// <summary>
-        /// Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
+        /// Reset to default values.
         /// </summary>
         protected override void Reset()
         {
             base.Reset();
+            
+            // Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
             interactionLayerMask = 1;
         }
 
