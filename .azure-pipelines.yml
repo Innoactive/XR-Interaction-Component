@@ -4,7 +4,7 @@ resources:
     type: github
     endpoint: Innoactive
     name: Innoactive/Creator
-    ref: develop-2019
+    ref: develop
   - repository: BehaviorsAndConditions
     type: github
     endpoint: Innoactive
