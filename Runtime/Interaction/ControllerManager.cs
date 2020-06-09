@@ -246,39 +246,38 @@ namespace Innoactive.Creator.XRInteraction
         [Header("XR Interaction Controllers")]
         [SerializeField]
         [Tooltip("The Game Object which represents the right hand for normal interaction purposes.")]
-        private GameObject rightBaseController;
+        private GameObject rightBaseController = null;
 
         [SerializeField] [Tooltip("The Game Object which represents the left hand for normal interaction purposes.")]
-        private GameObject leftBaseController;
+        private GameObject leftBaseController = null;
 
         [Header("Teleportation Controllers")]
         [SerializeField]
         [Tooltip("The Game Object which represents the right hand when teleporting.")]
-        private GameObject rightTeleportController;
+        private GameObject rightTeleportController = null;
 
         [SerializeField] [Tooltip("The Game Object which represents the left hand when teleporting.")]
-        private GameObject leftTeleportController;
+        private GameObject leftTeleportController = null;
 
         [SerializeField]
         [Tooltip("The buttons on the controller that will trigger a transition to the Teleport Controller.")]
-        private Button teleportButton;
+        private Button teleportButton = default;
 
         [SerializeField]
         [Tooltip("The buttons on the controller that will force a deactivation of the teleport option.")]
-        private Button cancelTeleportButton;
+        private Button cancelTeleportButton = default;
 
         [Header("UI Interaction Controllers")]
         [SerializeField]
         [Tooltip("The Game Object which represents the right hand when teleporting.")]
-        private GameObject rightUIController;
+        private GameObject rightUIController = null;
 
         [SerializeField] [Tooltip("The Game Object which represents the left hand when teleporting.")]
-        private GameObject leftUIController;
+        private GameObject leftUIController = null;
 
         [SerializeField]
         [Tooltip("The buttons on the controller that will force a deactivation of the teleport option.")]
-        private Button UIButton;
-
+        private Button UIButton = default;
 
         /// <summary>
         /// The buttons on the controller that will trigger a transition to the Teleport Controller.
@@ -338,7 +337,6 @@ namespace Innoactive.Creator.XRInteraction
         private InputDevice leftController;
         private ControllerState rightControllerState;
         private ControllerState leftControllerState;
-        private readonly Button menuButton = Button.MenuButton;
 
         private void OnEnable()
         {

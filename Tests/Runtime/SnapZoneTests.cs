@@ -21,11 +21,11 @@ namespace Innoactive.Creator.XRInteraction.Tests
             {
                 SnappedZone = snapZone;
             }
-
-            public new void EmitSnapped(SnapZoneProperty snapZone)
+            
+            public void EmitSnapped(SnapZoneProperty snapZone)
             {
                 snapZone.SnapZone.ForceSelect(gameObject.GetComponent<XRBaseInteractable>());
-                base.EmitSnapped();
+                EmitSnapped();
             }
         }
         

@@ -18,13 +18,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Returns true if the GameObject is touched.
         /// </summary>
-        public virtual bool IsBeingTouched
-        {
-            get
-            {
-                return Interactable != null && Interactable.isHovered;
-            }
-        }
+        public virtual bool IsBeingTouched => Interactable != null && Interactable.isHovered;
 
         /// <summary>
         /// Reference to attached <see cref="InteractableObject"/>.
