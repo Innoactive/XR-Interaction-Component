@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Creator.Unity;
 using Innoactive.Creator.Core.Properties;
 using Innoactive.Creator.Core.Configuration.Modes;
 using Innoactive.Creator.BasicInteraction.Properties;
@@ -49,16 +48,24 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Returns the SnapZone component.
         /// </summary>
-        public SnapZone SnapZone { get; protected set; }
+        public SnapZone SnapZone 
+        {
+            get
+            {
+                if (snapZone == null)
+                {
+                    snapZone = GetComponent<SnapZone>();
+                }
+
+                return snapZone;
+            }
+        }
+
+        private SnapZone snapZone;
         
         protected override void OnEnable()
         {
             base.OnEnable();
-            
-            if (SnapZone == false)
-            {
-                SnapZone = gameObject.GetOrAddComponent<SnapZone>();
-            }
 
             SnapZone.onSelectEnter.AddListener(HandleObjectSnapped);
             SnapZone.onSelectExit.AddListener(HandleObjectUnsnapped);
@@ -96,11 +103,6 @@ namespace Innoactive.Creator.XRInteraction.Properties
         
         private void InitializeModeParameters()
         {
-            if (SnapZone == null)
-            {
-                SnapZone = GetComponent<SnapZone>();
-            }
-
             if (IsShowingHoverMeshes == null)
             {
                 IsShowingHoverMeshes = new ModeParameter<bool>("ShowSnapzoneHoverMeshes", SnapZone.showInteractableHoverMeshes);
