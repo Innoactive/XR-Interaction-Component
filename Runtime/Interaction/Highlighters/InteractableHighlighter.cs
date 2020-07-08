@@ -47,25 +47,31 @@ namespace Innoactive.Creator.XRInteraction
 
         [SerializeField]
         private bool allowOnTouchHighlight = true;
+        
         [SerializeField]
-        private bool allowOnGrabHighlight;
+        private bool allowOnGrabHighlight = false;
+        
         [SerializeField]
-        private bool allowOnUseHighlight;
+        private bool allowOnUseHighlight = false;
 
         [SerializeField]
-        private Material touchHighlightMaterial;
+        private Material touchHighlightMaterial = null;
+        
         [SerializeField]
-        private Material grabHighlightMaterial;
+        private Material grabHighlightMaterial = null;
+        
         [SerializeField]
-        private Material useHighlightMaterial;
+        private Material useHighlightMaterial = null;
 
         [SerializeField]
         private Color touchHighlightColor = new Color32(64, 200, 255, 50);
+        
         [SerializeField]
         private Color grabHighlightColor = new Color32(255, 0, 0, 50);
+        
         [SerializeField]
         private Color useHighlightColor = new Color32(0, 255, 0, 50);
-        
+
         private Material colorTouchMaterial;
         private Material colorGrabMaterial;
         private Material colorUseMaterial;

@@ -21,8 +21,6 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
     {
         internal class DummyHighlightProperty : HighlightProperty
         {
-            public bool IsHighlighted { get; private set; }
-
             /// <inheritdoc/>
             public override void Highlight(Color highlightColor)
             {
