@@ -23,16 +23,24 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Reference to attached <see cref="InteractableObject"/>.
         /// </summary>
-        protected InteractableObject Interactable;
+        protected InteractableObject Interactable
+        {
+            get
+            {
+                if (interactable == false)
+                {
+                    interactable = GetComponent<InteractableObject>();
+                }
+
+                return interactable;
+            }
+        }
+
+        private InteractableObject interactable;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-
-            if (Interactable == false)
-            {
-                Interactable = gameObject.GetComponent<InteractableObject>();
-            }
 
             Interactable.onFirstHoverEnter.AddListener(HandleXRTouched);
             Interactable.onLastHoverExit.AddListener(HandleXRUntouched);
