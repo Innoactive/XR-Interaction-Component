@@ -11,7 +11,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
     /// XR implementation of <see cref="ISnappableProperty"/>.
     /// </summary>
     [RequireComponent(typeof(GrabbableProperty))]
-    public class SnappableProperty : TrainingSceneObjectProperty, ISnappableProperty
+    public class SnappableProperty : LockableProperty, ISnappableProperty
     {
         public event EventHandler<EventArgs> Snapped;
         public event EventHandler<EventArgs> Unsnapped;
@@ -44,20 +44,28 @@ namespace Innoactive.Creator.XRInteraction.Properties
                 lockObjectOnSnap = value;
             }
         }
-        
+
         /// <summary>
         /// Reference to attached <see cref="InteractableObject"/>.
         /// </summary>
-        public XRBaseInteractable Interactable { get; protected set; }
+        public XRBaseInteractable Interactable
+        {
+            get
+            {
+                if (interactable == null)
+                {
+                    interactable = GetComponent<InteractableObject>();
+                }
+
+                return interactable;
+            }
+        }
+
+        private XRBaseInteractable interactable;
         
-        protected override void OnEnable()
+        protected new virtual void OnEnable()
         {
             base.OnEnable();
-
-            if (Interactable == false)
-            {
-                Interactable = gameObject.GetOrAddComponent<InteractableObject>();
-            }
 
             Interactable.onSelectEnter.AddListener(HandleSnappedToDropZone);
             Interactable.onSelectExit.AddListener(HandleUnsnappedFromDropZone);
@@ -91,6 +99,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             SnappedZone = null;
             EmitUnsnapped();
+        }
+        
+        /// <inheritdoc />
+        protected override void InternalSetLocked(bool lockState)
+        {
+
         }
         
         /// <summary>
