@@ -1,0 +1,19 @@
+{
+    "name": "Innoactive.Creator.XRInteraction",
+    "references": [
+        "GUID:c8561f9de838ac04d8feeda695bc572d",
+        "GUID:474da18fc7b8c9c4c9db09e343483375",
+        "GUID:fe685ec1767f73d42b749ea8045bfe43"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "CREATOR_XR_INTERACTION"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
