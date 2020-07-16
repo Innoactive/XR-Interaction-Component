@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Creator.Unity;
 using Innoactive.Creator.Core.Properties;
 using Innoactive.Creator.BasicInteraction.Properties;
 
@@ -19,30 +18,22 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Returns true if the snappable object is snapped.
         /// </summary>
-        public bool IsSnapped 
-        { 
-            get { return SnappedZone != null; }
-        }
-        
+        public bool IsSnapped => SnappedZone != null;
+
         /// <summary>
         /// Will return the <see cref="SnapZoneProperty"/> of the <see cref="SnapZone"/> which snapped this object.
         /// </summary>
         public ISnapZoneProperty SnappedZone { get; set; }
 
         [SerializeField]
-        private bool lockObjectOnSnap = false;
+        [Tooltip("Will object be locked when it has been snapped.")]
+        private bool lockObjectOnSnap;
 
         /// <inheritdoc />
         public bool LockObjectOnSnap
         {
-            get
-            {
-                return lockObjectOnSnap;
-            }
-            set
-            {
-                lockObjectOnSnap = value;
-            }
+            get => lockObjectOnSnap;
+            set => lockObjectOnSnap = value;
         }
 
         /// <summary>
@@ -79,7 +70,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         
         private void HandleSnappedToDropZone(XRBaseInteractor interactor)
         {
-            SnappedZone = interactor.gameObject.GetComponent<SnapZoneProperty>();
+            SnappedZone = interactor.GetComponent<SnapZoneProperty>();
 
             if (SnappedZone == null)
             {
