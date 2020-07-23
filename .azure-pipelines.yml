@@ -82,6 +82,7 @@ stages:
             env:
               GH_TOKEN: "$(GITHUB_TOKEN)"
 
+
           - task: PowerShell@2
             displayName: Fetch version from git
             condition: ne(variables['Build.SourceBranchName'], 'master')
