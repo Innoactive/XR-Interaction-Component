@@ -20,6 +20,11 @@ resources:
     endpoint: Innoactive
     name: Innoactive/Empty-Unity-Project-2019
     ref: develop
+  - repository: Templates
+    type: github
+    endpoint: Innoactive
+    name: Innoactive/Creator-Azure-Templates
+    ref: develop
 
 parameters:
   - name: Version
