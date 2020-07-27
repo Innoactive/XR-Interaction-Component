@@ -118,13 +118,15 @@ stages:
           - template: copy-project-files.yml@Templates
 
           - template: setup-unity-project.yml@Templates
+            parameters:
+              CheckoutUnityProject: false
 
           - template: run-tests.yml@Templates
 
           - template: archive-logs.yml@Templates
             parameters:
               LogName: "Build & Test"
-              
+
           - task: PublishTestResults@2
             inputs:
                 testResultsFormat: "NUnit"
