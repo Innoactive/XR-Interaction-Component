@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -17,7 +18,7 @@ namespace Innoactive.Creator.XRInteraction
     {
         [SerializeField]
         private GameObject shownHighlightObject = null;
-        
+
         /// <summary>
         /// The 'GameObject' whose mesh is drawn to emphasize the position of the snap zone.
         /// If none is supplied, no highlight object is shown.
@@ -34,7 +35,7 @@ namespace Innoactive.Creator.XRInteraction
         
         [SerializeField]
         private Color shownHighlightObjectColor = new Color(0.8f, 0.0f, 1.0f, 0.6f);
-
+        
         /// <summary>
         /// The color of the material used to draw the <see cref="ShownHighlightObject"/>.
         /// Use the alpha value to specify the degree of transparency.
@@ -53,11 +54,45 @@ namespace Innoactive.Creator.XRInteraction
         /// Gets or sets whether <see cref="ShownHighlightObject"/> is shown or not.
         /// </summary>
         public bool ShowHighlightObject { get; set; }
+        
+        private Material highlightMeshMaterial;
 
         /// <summary>
         /// The material used for drawing the mesh of the <see cref="ShownHighlightObject"/>. 
         /// </summary>
-        public Material HighlightMeshMaterial { get; set; }
+        public Material HighlightMeshMaterial
+        {
+            get
+            {
+                if (highlightMeshMaterial == null)
+                {
+                    highlightMeshMaterial = CreateTransparentMaterial();
+                }
+
+                return highlightMeshMaterial;
+            }
+            set { highlightMeshMaterial = value; }
+        }
+
+        [SerializeField]
+        private Material validationMaterial;
+
+        /// <summary>
+        /// The material used for drawing when an <see cref="InteractableObject"/> is hovering this <see cref="SnapZone"/>.
+        /// </summary>
+        public Material ValidationMaterial
+        {
+            get
+            {
+                if (validationMaterial == null)
+                {
+                    validationMaterial = CreateTransparentMaterial();
+                }
+
+                return validationMaterial;
+            }
+            set { validationMaterial = value; }
+        }
 
         /// <summary>
         /// Forces the socket interactor to unselect the given target, if it is not null.
@@ -68,11 +103,9 @@ namespace Innoactive.Creator.XRInteraction
         /// Forces the socket interactor to select the given target, if it is not null.
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
-        
-        /// <summary>
-        /// MeshFilter cache of <see cref="ShownHighlightObject"/>.
-        /// </summary>
-        private MeshFilter[] HighlightMeshFilterCache { get; set; }
+
+        private Material previewMaterial;
+        private Mesh previewMesh;
 
         protected override void Awake()
         {
@@ -86,11 +119,41 @@ namespace Innoactive.Creator.XRInteraction
             }
 
             ShowHighlightObject = ShownHighlightObject != null;
-            HighlightMeshMaterial = CreateTransparentMaterial();
-            
+
             if (ShownHighlightObject != null)
             {
                 UpdateHighlightMeshFilterCache();
+            }
+        }
+        
+        private void OnDrawGizmos()
+        {
+            Collider collider = GetComponent<Collider>();
+
+            if (collider == null)
+            {
+                return;
+            }
+
+            Gizmos.color = shownHighlightObjectColor;
+            Gizmos.matrix = transform.localToWorldMatrix;
+
+            switch (collider)
+            {
+                case BoxCollider boxCollider:
+                    Gizmos.DrawCube(boxCollider.center, boxCollider.size);
+                    break;
+                case SphereCollider sphereCollider:
+                    Gizmos.DrawSphere(sphereCollider.center, sphereCollider.radius);
+                    break;
+            }
+        }
+
+        protected virtual void Update()
+        {
+            if (socketActive && selectTarget == null)
+            {
+                DrawHighlightMesh();
             }
         }
 
@@ -124,13 +187,36 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (ShownHighlightObject == null)
             {
-                HighlightMeshFilterCache = null;
+                previewMesh = null;
                 return;
             }
             
-            HighlightMeshFilterCache = ShownHighlightObject.GetComponentsInChildren<MeshFilter>();
+            List<CombineInstance> meshes = new List<CombineInstance>();
 
-            if (HighlightMeshFilterCache == null)
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                CombineInstance combineInstance = new CombineInstance();
+                combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
+                combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
+                
+                meshes.Add(combineInstance);
+            }
+            
+            foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
+            {
+                CombineInstance combineInstance = new CombineInstance();
+                combineInstance.mesh = meshFilter.sharedMesh;
+                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
+                
+                meshes.Add(combineInstance);
+            }
+
+            if (meshes.Any())
+            {
+                previewMesh = new Mesh();
+                previewMesh.CombineMeshes(meshes.ToArray());
+            }
+            else
             {
                 Debug.LogErrorFormat(ShownHighlightObject, "Shown Highlight Object '{0}' has no MeshFilter. It cannot be drawn.", ShownHighlightObject);
             }
@@ -140,45 +226,35 @@ namespace Innoactive.Creator.XRInteraction
         /// This method is called by the interaction manager to update the interactor. 
         /// Please see the interaction manager documentation for more details on update order.
         /// </summary>
-        /// <remarks>Adds the <see cref="DrawHighlightMesh"/> method as a process.</remarks>
         public override void ProcessInteractor(XRInteractionUpdateOrder.UpdatePhase updatePhase)
         {
-            if (selectTarget == null)
+            if (updatePhase != XRInteractionUpdateOrder.UpdatePhase.Dynamic)
             {
                 base.ProcessInteractor(updatePhase);
             }
 
-            if (updatePhase == XRInteractionUpdateOrder.UpdatePhase.Dynamic && ShowHighlightObject && selectTarget == null && m_HoverTargets.Count == 0)
+            if (socketActive)
             {
-                DrawHighlightMesh();
+                if (m_HoverTargets.Count == 0 && ShowHighlightObject)
+                {
+                    previewMaterial = HighlightMeshMaterial;
+                } 
+                else if (m_HoverTargets.Count > 0 && showInteractableHoverMeshes)
+                {
+                    previewMaterial = ValidationMaterial;
+                }
             }
         }
 
         /// <summary>
-        /// Draws the highlight mesh when <see cref="HighlightMeshFilterCache"/> is not null or empty.
+        /// Draws a highlight mesh.
         /// </summary>
         protected virtual void DrawHighlightMesh()
         {
-            if (HighlightMeshFilterCache != null && HighlightMeshFilterCache.Length > 0)
+            if (previewMesh != null)
             {
-                foreach (MeshFilter meshFilter in HighlightMeshFilterCache)
-                {
-                    if (meshFilter != null && (Camera.main.cullingMask & (1 << meshFilter.gameObject.layer)) != 0)
-                    {
-                        Vector3 scale = Vector3.Scale(meshFilter.transform.lossyScale * Mathf.Max(0.0f, interactableHoverScale), ShownHighlightObject.transform.lossyScale);
-                        Matrix4x4 matrix = Matrix4x4.TRS(attachTransform.position, attachTransform.rotation, scale);
-                        for (int j = 0; j < meshFilter.sharedMesh.subMeshCount; j++)
-                        {
-                            Graphics.DrawMesh(
-                                mesh: meshFilter.sharedMesh,
-                                material: HighlightMeshMaterial,
-                                matrix: matrix,
-                                submeshIndex: j,
-                                layer: gameObject.layer,
-                                camera: Camera.main);
-                        }
-                    }
-                }
+                Matrix4x4 matrix = Matrix4x4.TRS(attachTransform.position, transform.rotation, transform.localScale);
+                Graphics.DrawMesh(previewMesh, matrix, previewMaterial, gameObject.layer);
             }
         }
 

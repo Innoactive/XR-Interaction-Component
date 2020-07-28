@@ -6,6 +6,7 @@ using Innoactive.Creator.Core.Configuration;
 using Innoactive.Creator.Core.Configuration.Modes;
 using Innoactive.Creator.Tests.Utils;
 using Innoactive.Creator.XRInteraction.Properties;
+using Innoactive.CreatorEditor.XRInteraction;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -431,6 +432,36 @@ namespace Innoactive.Creator.XRInteraction.Tests
             Assert.IsFalse(snapZoneProperty.IsObjectSnapped);
         }
 
+        [Test]
+        public void SetSnapZoneWithSnapZoneSettings()
+        {
+            // Given a snap zone
+            SnapZoneSettings settings = SnapZoneSettings.Settings;
+            SnapZoneProperty snapZoneProperty = CreateSnapZoneProperty();
+            SnapZone snapZone = snapZoneProperty.SnapZone;
+            
+            // When the snap zone settings are modified and the changes applied to the snap zone
+            LayerMask testLayerMask = 0;
+            Color testHighlightColor = Color.magenta;
+            Color testValidationColor = Color.blue;
+
+            Assert.NotNull(settings);
+            Assert.That(snapZone.InteractionLayerMask != testLayerMask);
+            Assert.That(snapZone.ShownHighlightObjectColor != testHighlightColor);
+            Assert.That(snapZone.ValidationMaterial.color != testValidationColor);
+
+            settings.InteractionLayerMask = testLayerMask;
+            settings.HighlightColor = testHighlightColor;
+            settings.ValidationColor = testValidationColor;
+
+            settings.ApplySettingsToSnapZone(snapZone);
+            
+            // Then the snap zone is updated.
+            Assert.That(snapZone.InteractionLayerMask == testLayerMask);
+            Assert.That(snapZone.ShownHighlightObjectColor == testHighlightColor);
+            Assert.That(snapZone.ValidationMaterial.color == testValidationColor);
+        }
+
         private SnappablePropertyMock CreateSnappablePropertyMock()
         {
             GameObject snappable = new GameObject("Target");
@@ -442,7 +473,7 @@ namespace Innoactive.Creator.XRInteraction.Tests
 
         private SnapZoneProperty CreateSnapZoneProperty()
         {
-            GameObject snapzone = new GameObject("SnapZone Gus");
+            GameObject snapzone = new GameObject("SnapZone");
             snapzone.AddComponent<SphereCollider>().isTrigger = true;
             SnapZoneProperty property = snapzone.AddComponent<SnapZoneProperty>();
             return property;
