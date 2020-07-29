@@ -48,7 +48,6 @@ pool: Unity
 
 variables:
     - group: basic-unity
-    - group: basic-ci
 
 stages:
   - stage: Lint
