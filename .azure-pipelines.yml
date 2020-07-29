@@ -20,7 +20,21 @@ resources:
     endpoint: Innoactive
     name: Innoactive/Empty-Unity-Project-2019
     ref: develop
+  - repository: Templates
+    type: github
+    endpoint: Innoactive
+    name: Innoactive/Creator-Azure-Templates
+    ref: develop
 
+parameters:
+  - name: Version
+    displayName: Version
+    type: string
+    default: ""
+  - name: CleanBuild
+    displayName: Clean Up Builds
+    type: boolean
+    default: true
 
 trigger:
     - master
@@ -102,58 +116,17 @@ stages:
                 echo "##vso[task.setvariable variable=Version;isOutput=true]v$(Version)"
             name: ExportedVariables
 
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: 'Empty-Unity-Project-2019/'
-              Contents: '**'
-              TargetFolder: '$(Path.Project)'
-            displayName: Copy base Project
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: 'Creator/'
-              Contents: '**'
-              TargetFolder: '$(Path.Creator)/Core'
-            displayName: Copy Creator Core
-          - task: CopyFiles@2
-            inputs:
-                SourceFolder: "Basic-Conditions-And-Behaviors/"
-                Contents: "**"
-                TargetFolder: "$(Path.Creator)/Components/Basic-Conditions-And-Behaviors"
-            displayName: Copy Basic Conditions and Behaviors
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: 'Basic-Interaction-Component/'
-              Contents: '**'
-              TargetFolder: '$(Path.Creator)/Components/Basic-Interaction'
-            displayName: Copy Basic Interaction Component
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: 'XR-Interaction-Component/'
-              Contents: '**'
-              TargetFolder: '$(Path.Creator)/Components/XR-Interaction'
-            displayName: Copy XR Interaction Component
+          - template: copy-project-files.yml@Templates
 
-          - task: DeleteFiles@1
-            inputs:
-              Contents: '!(Project)'
-            displayName: Clean Up
+          - template: setup-unity-project.yml@Templates
+            parameters:
+              CheckoutUnityProject: false
 
-          - task: PowerShell@2
-            displayName: Build Project
-            inputs:
-              targetType: 'inline'
-              script: |
-                u3d available -f
-                u3d install $(UnityVersion)
-                u3d run -u $(UnityVersion) -- -projectPath '$(Path.Project)' -logFile $(Build.ArtifactStagingDirectory)/logs/editor-build.log -nographics -quit -batchmode -buildWindows64Player Build\\TestBuild\\TestBuild.exe
-        
-          - task: PowerShell@2
-            displayName: Run Tests
-            inputs:
-              targetType: 'inline'
-              script: |
-                u3d run -u $(UnityVersion) -- -projectPath '$(Path.Project)' -logFile $(Build.ArtifactStagingDirectory)/logs/editor_editmode_tests.log -batchmode -runTests -testPlatform editmode -testResults $(System.DefaultWorkingDirectory)\TEST-EditMode.xml
-                u3d run -u $(UnityVersion) -- -projectPath '$(Path.Project)' -logFile $(Build.ArtifactStagingDirectory)/logs/editor_playmode_tests.log -batchmode -runTests -testPlatform playmode -testResults $(System.DefaultWorkingDirectory)\TEST-PlayMode.xml
+          - template: run-tests.yml@Templates
+
+          - template: archive-logs.yml@Templates
+            parameters:
+              LogName: "Build & Test"
 
           - task: PublishTestResults@2
             inputs:
@@ -184,6 +157,9 @@ stages:
               targetPath: "$(Build.ArtifactStagingDirectory)/logs/"
               artifact: "creator-xr-interaction-logs"
               publishLocation: "pipeline"
+
+          - ${{ if eq(parameters.CleanBuild, true) }}:
+            - template: clean-up.yml@Templates
 
   - stage: Release
     displayName: Release
