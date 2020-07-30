@@ -19,13 +19,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Returns true if the Interactable of this property is grabbed.
         /// </summary>
-        public virtual bool IsGrabbed
-        {
-            get
-            {
-                return Interactable != null && Interactable.isSelected;
-            }
-        }
+        public virtual bool IsGrabbed => Interactable != null && Interactable.isSelected;
 
         /// <summary>
         /// Reference to attached <see cref="InteractableObject"/>.

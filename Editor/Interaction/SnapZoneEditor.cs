@@ -1,103 +1,90 @@
 ﻿using Innoactive.Creator.XRInteraction;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
-    /// Copy of 'XRSocketInteractorEditor' adapted to edit <see cref="SnapZone"/>.
+    /// Drawer for configuration settings for <see cref="SnapZone"/>.
     /// </summary>
-    /// <remarks>Added highlight object and color properties.</remarks>
     [CustomEditor(typeof(SnapZone))]
     internal class SnapZoneEditor : Editor
     {
-        SerializedProperty m_shownHighlightObject;
-        SerializedProperty m_shownHighlightObjectColor;
+        private SerializedProperty shownHighlightObject;
+        private SerializedProperty shownHighlightObjectColor;
         
-        SerializedProperty m_InteractionManager;
-        SerializedProperty m_InteractionLayerMask;
-        SerializedProperty m_AttachTransform;
-        SerializedProperty m_StartingSelectedInteractable;
+        private SerializedProperty interactionManager;
+        private SerializedProperty interactionLayerMask;
+        private SerializedProperty attachTransform;
+        private SerializedProperty startingSelectedInteractable;
 
-        SerializedProperty m_ShowInteractableHoverMeshes;
-        SerializedProperty m_InteractableHoverMeshMaterial;
-        SerializedProperty m_SocketActive;
-        SerializedProperty m_InteractableHoverScale;
-
-        SerializedProperty m_OnHoverEnter;
-        SerializedProperty m_OnHoverExit;
-        SerializedProperty m_OnSelectEnter;
-        SerializedProperty m_OnSelectExit;
-        bool m_ShowInteractorEvents;
-
+        private SerializedProperty interactableHoverMeshMaterial;
+        
+        private SerializedProperty onHoverEnter;
+        private SerializedProperty onHoverExit;
+        private SerializedProperty onSelectEnter;
+        private SerializedProperty onSelectExit;
+        private bool showInteractorEvents;
         private static class Tooltips
         {
-            public static readonly GUIContent shownHighlightObject = new GUIContent("Shown Highlight Object", "The game object whose mesh is drawn to emphasize the position of the snap zone. If none is supplied, no highlight object is shown.");
-            public static readonly GUIContent shownHighlightObjectColor = new GUIContent("Shown Highlight Object Color", "The color of the material used to draw the \"Shown Highlight Object\". Use the alpha value to specify the degree of transparency.");
             public static readonly GUIContent interactionManager = new GUIContent("Interaction Manager", "Manager to handle all interaction management (will find one if empty).");
             public static readonly GUIContent interactionLayerMask = new GUIContent("Interaction Layer Mask", "Only interactables with this Layer Mask will respond to this interactor.");
             public static readonly GUIContent attachTransform = new GUIContent("Attach Transform", "Attach Transform to use for this Interactor.  Will create empty GameObject if none set.");
             public static readonly GUIContent startingSelectedInteractable = new GUIContent("Starting Selected Interactable", "Interactable that will be selected upon start.");
-            public static readonly GUIContent toggleSelect = new GUIContent("Toggle Select", "Toggle select on button press instead of hold.");
-
-            public static readonly GUIContent showInteractableHoverMeshes = new GUIContent("Show Interactable Hover Meshes", "Show interactable's meshes at socket's attach point on hover.");
-            public static readonly GUIContent interactableHoverMeshMaterial = new GUIContent("Interactable Hover Mesh Material", "Material used for rendering interactable meshes on hover (a default material will be created if none is supplied).");
-            public static readonly GUIContent socketActive = new GUIContent("Socket Active", "Turn socket interaction on/off");
-            public static readonly GUIContent interactableHoverScale = new GUIContent("Interactable Hover Scale", "Scale at which to render hovered interactable.");
+            
+            public static readonly GUIContent shownHighlightObject = new GUIContent("Shown Highlight Object", "The game object whose mesh is drawn to emphasize the position of the snap zone. If none is supplied, no highlight object is shown.");
+            public static readonly GUIContent shownHighlightObjectColor = new GUIContent("Shown Highlight Object Color", "The color of the material used to draw the \"Shown Highlight Object\". Use the alpha value to specify the degree of transparency.");
+            public static readonly GUIContent interactableHoverMeshMaterial = new GUIContent("Validation Hover Material", "Material used for rendering interactable meshes on hover (a default material will be created if none is supplied).");
         }
 
         private void OnEnable()
         {
-            m_shownHighlightObject = serializedObject.FindProperty("shownHighlightObject");
-            m_shownHighlightObjectColor = serializedObject.FindProperty("shownHighlightObjectColor");
+            shownHighlightObject = serializedObject.FindProperty("shownHighlightObject");
+            shownHighlightObjectColor = serializedObject.FindProperty("shownHighlightObjectColor");
             
-            m_InteractionManager = serializedObject.FindProperty("m_InteractionManager");
-            m_InteractionLayerMask = serializedObject.FindProperty("m_InteractionLayerMask");
-            m_AttachTransform = serializedObject.FindProperty("m_AttachTransform");
-            m_StartingSelectedInteractable = serializedObject.FindProperty("m_StartingSelectedInteractable");
+            interactionManager = serializedObject.FindProperty("m_InteractionManager");
+            interactionLayerMask = serializedObject.FindProperty("m_InteractionLayerMask");
+            attachTransform = serializedObject.FindProperty("m_AttachTransform");
+            startingSelectedInteractable = serializedObject.FindProperty("m_StartingSelectedInteractable");
 
-            m_ShowInteractableHoverMeshes = serializedObject.FindProperty("m_ShowInteractableHoverMeshes");
-            m_InteractableHoverMeshMaterial = serializedObject.FindProperty("m_InteractableHoverMeshMaterial");
-            m_SocketActive = serializedObject.FindProperty("m_SocketActive");
-            m_InteractableHoverScale = serializedObject.FindProperty("m_InteractableHoverScale");
-
-            m_OnHoverEnter = serializedObject.FindProperty("m_OnHoverEnter");
-            m_OnHoverExit = serializedObject.FindProperty("m_OnHoverExit");
-            m_OnSelectEnter = serializedObject.FindProperty("m_OnSelectEnter");
-            m_OnSelectExit = serializedObject.FindProperty("m_OnSelectExit");
+            interactableHoverMeshMaterial = serializedObject.FindProperty("validationMaterial");
+            
+            onHoverEnter = serializedObject.FindProperty("m_OnHoverEnter");
+            onHoverExit = serializedObject.FindProperty("m_OnHoverExit");
+            onSelectEnter = serializedObject.FindProperty("m_OnSelectEnter");
+            onSelectExit = serializedObject.FindProperty("m_OnSelectExit");
         }
 
         public override void OnInspectorGUI()
         {
-
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((XRSocketInteractor)target), typeof(XRSocketInteractor), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((SnapZone)target), typeof(SnapZone), false);
             GUI.enabled = true;
 
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(m_InteractionManager, Tooltips.interactionManager);
-            EditorGUILayout.PropertyField(m_InteractionLayerMask, Tooltips.interactionLayerMask);
-            EditorGUILayout.PropertyField(m_AttachTransform, Tooltips.attachTransform);
-            EditorGUILayout.PropertyField(m_StartingSelectedInteractable, Tooltips.startingSelectedInteractable);
-
-            EditorGUILayout.PropertyField(m_ShowInteractableHoverMeshes, Tooltips.showInteractableHoverMeshes);
-            EditorGUILayout.PropertyField(m_InteractableHoverMeshMaterial, Tooltips.interactableHoverMeshMaterial);
-            EditorGUILayout.PropertyField(m_shownHighlightObject, Tooltips.shownHighlightObject);
-            EditorGUILayout.PropertyField(m_shownHighlightObjectColor, Tooltips.shownHighlightObjectColor);
-            EditorGUILayout.PropertyField(m_SocketActive, Tooltips.socketActive);
-            EditorGUILayout.PropertyField(m_InteractableHoverScale, Tooltips.interactableHoverScale);
-
-            m_ShowInteractorEvents = EditorGUILayout.Toggle("Show Interactor Events", m_ShowInteractorEvents);
-            if (m_ShowInteractorEvents)
+            EditorGUILayout.PropertyField(interactionManager, Tooltips.interactionManager);
+            EditorGUILayout.PropertyField(interactionLayerMask, Tooltips.interactionLayerMask);
+            EditorGUILayout.PropertyField(attachTransform, Tooltips.attachTransform);
+            EditorGUILayout.PropertyField(startingSelectedInteractable, Tooltips.startingSelectedInteractable);
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Snap Zone", EditorStyles.boldLabel); 
+            
+            EditorGUILayout.PropertyField(shownHighlightObject, Tooltips.shownHighlightObject);
+            EditorGUILayout.PropertyField(shownHighlightObjectColor, Tooltips.shownHighlightObjectColor);
+            EditorGUILayout.PropertyField(interactableHoverMeshMaterial, Tooltips.interactableHoverMeshMaterial);
+            
+            showInteractorEvents = EditorGUILayout.Toggle("Show Interactor Events", showInteractorEvents);
+            if (showInteractorEvents)
             {
                 // UnityEvents have not yet supported Tooltips
-                EditorGUILayout.PropertyField(m_OnHoverEnter);
-                EditorGUILayout.PropertyField(m_OnHoverExit);
-                EditorGUILayout.PropertyField(m_OnSelectEnter);
-                EditorGUILayout.PropertyField(m_OnSelectExit);
+                EditorGUILayout.PropertyField(onHoverEnter);
+                EditorGUILayout.PropertyField(onHoverExit);
+                EditorGUILayout.PropertyField(onSelectEnter);
+                EditorGUILayout.PropertyField(onSelectExit);
             }
+            
             serializedObject.ApplyModifiedProperties();
         }
     }
