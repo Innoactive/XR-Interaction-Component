@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using Innoactive.Creator.XRInteraction;
 using Innoactive.Creator.XRInteraction.Properties;
@@ -63,7 +64,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private GameObject DuplicateObject(GameObject originalObject, Transform parent = null)
         {
-            GameObject cloneObject = new GameObject($"{originalObject.name}_Clone");
+            GameObject cloneObject = new GameObject($"{originalObject.name}Highlight.prefab");
             
             if (parent != null)
             {
@@ -144,8 +145,31 @@ namespace Innoactive.CreatorEditor.XRInteraction
             snapZoneBlueprint.transform.position = Vector3.zero;
             snapZoneBlueprint.transform.rotation = Quaternion.identity;
 
-            string prefabName = snapZoneBlueprint.name.Replace("_Clone", "Highlight.prefab");
-            return PrefabUtility.SaveAsPrefabAsset(snapZoneBlueprint, $"{PrefabPath}/{prefabName}");
+            string prefabName = NamePrefab(snapZoneBlueprint.name);
+            string prefabPath = $"{PrefabPath}/{prefabName}";
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(snapZoneBlueprint, prefabPath);
+
+            if (prefab != null)
+            {
+                Debug.LogWarningFormat("A new Snap Zone prefab was saved at {0}", prefabPath);
+            }
+            
+            return prefab;
+        }
+
+        private string NamePrefab(string originalName)
+        {
+            int invalidCharacterIndex;
+            StringBuilder prefabName = new StringBuilder(originalName);
+
+            // Unity replaces invalid characters with '_' when creating new prefabs in the editor.
+            // We try to simulate that behavior.
+            while ((invalidCharacterIndex = prefabName.ToString().IndexOfAny(Path.GetInvalidFileNameChars())) >= 0)
+            {
+                prefabName.Replace(prefabName[invalidCharacterIndex], '_');
+            }
+            
+            return prefabName.ToString().Replace('\\', '_');
         }
     }
 }
