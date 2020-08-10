@@ -38,8 +38,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             
             SetHighlightMaterial(snapZoneBlueprint, settings.HighlightMaterial);
             GameObject snapZonePrefab = SaveSnapZonePrefab(snapZoneBlueprint);
-
-            GameObject snapObject = new GameObject($"{snappable.name}SnapZone");
+            
+            GameObject snapObject = new GameObject($"{CleanName(snappable.name)}_SnapZone");
             Undo.RegisterCreatedObjectUndo(snapObject, $"Create {snapObject.name}");
             EditorUtility.CopySerialized(snappable.transform, snapObject.transform);
             
@@ -64,7 +64,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private GameObject DuplicateObject(GameObject originalObject, Transform parent = null)
         {
-            GameObject cloneObject = new GameObject($"{originalObject.name}Highlight.prefab");
+            GameObject cloneObject = new GameObject($"{CleanName(originalObject.name)}_Highlight.prefab");
             
             if (parent != null)
             {
@@ -145,8 +145,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             snapZoneBlueprint.transform.position = Vector3.zero;
             snapZoneBlueprint.transform.rotation = Quaternion.identity;
 
-            string prefabName = NamePrefab(snapZoneBlueprint.name);
-            string prefabPath = $"{PrefabPath}/{prefabName}";
+            string prefabPath = $"{PrefabPath}/{snapZoneBlueprint.name}";
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(snapZoneBlueprint, prefabPath);
 
             if (prefab != null)
@@ -157,19 +156,17 @@ namespace Innoactive.CreatorEditor.XRInteraction
             return prefab;
         }
 
-        private string NamePrefab(string originalName)
+        private string CleanName(string originalName)
         {
-            int invalidCharacterIndex;
-            StringBuilder prefabName = new StringBuilder(originalName);
-
             // Unity replaces invalid characters with '_' when creating new prefabs in the editor.
             // We try to simulate that behavior.
-            while ((invalidCharacterIndex = prefabName.ToString().IndexOfAny(Path.GetInvalidFileNameChars())) >= 0)
+            foreach (char invalidCharacter in Path.GetInvalidFileNameChars())
             {
-                prefabName.Replace(prefabName[invalidCharacterIndex], '_');
+                originalName = originalName.Replace(invalidCharacter, '_');
             }
-            
-            return prefabName.ToString().Replace('\\', '_');
+
+            // Non windows systems consider '\' as a valid file name. 
+            return originalName.Replace('\\', '_');
         }
     }
 }
