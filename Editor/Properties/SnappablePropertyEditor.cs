@@ -150,7 +150,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             if (prefab != null)
             {
-                Debug.LogWarningFormat("A new Snap Zone prefab was saved at {0}", prefabPath);
+                Debug.LogWarningFormat("A new highlight prefab was saved at {0}", prefabPath);
             }
             
             return prefab;
