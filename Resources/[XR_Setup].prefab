@@ -1006,7 +1006,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f391ac734d94ea34697b6cde3269f11a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uniqueName: Main Camera
+  uniqueName: Trainee
 --- !u!1 &7485168110108878041
 GameObject:
   m_ObjectHideFlags: 0
@@ -1058,7 +1058,7 @@ MonoBehaviour:
   m_RigBaseGameObject: {fileID: 7485168110108878041}
   m_CameraFloorOffsetObject: {fileID: 7978014070532965571}
   m_CameraGameObject: {fileID: 6603483820383241204}
-  m_TrackingOriginMode: 1
+  m_TrackingOriginMode: 2
   m_TrackingSpace: 3
   m_CameraYOffset: 1.36144
 --- !u!114 &7978014070406150753
@@ -1525,7 +1525,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7978014070532965571}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 1.36144, z: -1.438}
+  m_LocalPosition: {x: -0, y: 0, z: -1.438}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7469053385970781433}
