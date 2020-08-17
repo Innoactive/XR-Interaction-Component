@@ -33,20 +33,30 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private void CreateSnapZone(SnappableProperty snappable)
         {
+            // Retrieves a SnapZoneSettings and creates a clone for the snappable object
             SnapZoneSettings settings = SnapZoneSettings.Settings;
             GameObject snapZoneBlueprint = DuplicateObject(snappable.gameObject);
             
+            // Sets the highlight materials to the cloned object and saves it as highlight prefab.
             SetHighlightMaterial(snapZoneBlueprint, settings.HighlightMaterial);
             GameObject snapZonePrefab = SaveSnapZonePrefab(snapZoneBlueprint);
-            
+
+            // Creates a new object for the SnapZone.
             GameObject snapObject = new GameObject($"{CleanName(snappable.name)}_SnapZone");
             Undo.RegisterCreatedObjectUndo(snapObject, $"Create {snapObject.name}");
-            EditorUtility.CopySerialized(snappable.transform, snapObject.transform);
             
+            // Positions the Snap Zone at the same position, rotation and scale as the snappable object.
+            snapObject.transform.SetParent(snappable.transform);
+            snapObject.transform.SetPositionAndRotation(snappable.transform.position, snappable.transform.rotation);
+            snapObject.transform.localScale = Vector3.one;
+            snapObject.transform.SetParent(null);
+            
+            // Adds a Snap Zone component to our new object.
             SnapZone snapZone = snapObject.AddComponent<SnapZoneProperty>().SnapZone;
             snapZone.ShownHighlightObject = snapZonePrefab;
             settings.ApplySettingsToSnapZone(snapZone);
 
+            // Calculates the volume of the Snap Zone out of the snappable object.
             Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
 
             foreach (Renderer renderer in snapZoneBlueprint.GetComponentsInChildren<Renderer>())
@@ -54,11 +64,13 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 bounds.Encapsulate(renderer.bounds);
             }
             
+            // Adds a BoxCollider and sets it up.
             BoxCollider boxCollider = snapObject.AddComponent<BoxCollider>();
             boxCollider.center = bounds.center;
             boxCollider.size = bounds.size;
             boxCollider.isTrigger = true;
 
+            // Disposes the cloned object.
             DestroyImmediate(snapZoneBlueprint);
         }
         
