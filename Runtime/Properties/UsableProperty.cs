@@ -50,6 +50,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             Interactable.onActivate.AddListener(HandleXRUsageStarted);
             Interactable.onDeactivate.AddListener(HandleXRUsageStopped);
+
+            InternalSetLocked(IsLocked);
         }
 
         protected override void OnDisable()
@@ -58,6 +60,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             Interactable.onActivate.RemoveListener(HandleXRUsageStarted);
             Interactable.onDeactivate.RemoveListener(HandleXRUsageStopped);
+        }
+        
+        protected void Reset()
+        {
+            Interactable.IsUsable = true;
+            gameObject.GetComponent<Rigidbody>().isKinematic = false;
         }
 
         private void HandleXRUsageStarted(XRBaseInteractor interactor)
