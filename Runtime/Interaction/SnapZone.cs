@@ -253,7 +253,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (previewMesh != null)
             {
-                Matrix4x4 matrix = Matrix4x4.TRS(attachTransform.position, transform.rotation, transform.localScale);
+                Matrix4x4 matrix = Matrix4x4.TRS(attachTransform.position - previewMesh.bounds.center, attachTransform.rotation, ShownHighlightObject.transform.localScale);
                 Graphics.DrawMesh(previewMesh, matrix, previewMaterial, gameObject.layer);
             }
         }

@@ -47,8 +47,24 @@ namespace Innoactive.Creator.XRInteraction.Properties
             Interactable.onSelectExit.AddListener(HandleXRUngrabbed);
 
             InternalSetLocked(IsLocked);
+
+            SetAttachTransform();
         }
-        
+
+        private void SetAttachTransform()
+        {
+            if (interactable.attachTransform)
+            {
+                return;
+            }
+            
+            interactable.attachTransform = new GameObject("Attach Point").transform;
+            interactable.attachTransform.SetParent(interactable.transform);
+            interactable.attachTransform.localScale = Vector3.one;
+            interactable.attachTransform.localRotation = Quaternion.identity;
+            interactable.attachTransform.position = interactable.GetComponent<Rigidbody>().worldCenterOfMass;
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -61,6 +77,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             Interactable.IsGrabbable = true;
             gameObject.GetComponent<Rigidbody>().isKinematic = false;
+            SetAttachTransform();
         }
 
         private void HandleXRGrabbed(XRBaseInteractor interactor)

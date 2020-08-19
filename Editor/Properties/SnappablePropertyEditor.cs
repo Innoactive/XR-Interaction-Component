@@ -6,6 +6,7 @@ using Innoactive.Creator.XRInteraction;
 using Innoactive.Creator.XRInteraction.Properties;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.CreatorEditor.XRInteraction
 {
@@ -35,8 +36,17 @@ namespace Innoactive.CreatorEditor.XRInteraction
         {
             // Retrieves a SnapZoneSettings and creates a clone for the snappable object
             SnapZoneSettings settings = SnapZoneSettings.Settings;
-            GameObject snapZoneBlueprint = DuplicateObject(snappable.gameObject);
-            
+            GameObject snapZoneHighlight = DuplicateObject(snappable.gameObject);
+            GameObject snapZoneBlueprint = snapZoneHighlight;
+
+            if (snappable.Interactable is XRGrabInteractable interactable && interactable.attachTransform)
+            {
+                snapZoneBlueprint = new GameObject(snapZoneHighlight.name);
+                snapZoneHighlight.transform.SetParent(snapZoneBlueprint.transform);
+                snapZoneHighlight.transform.localPosition = -interactable.attachTransform.localPosition;
+                snapZoneHighlight.transform.localRotation = Quaternion.Inverse(interactable.attachTransform.localRotation);
+            }
+
             // Sets the highlight materials to the cloned object and saves it as highlight prefab.
             SetHighlightMaterial(snapZoneBlueprint, settings.HighlightMaterial);
             GameObject snapZonePrefab = SaveSnapZonePrefab(snapZoneBlueprint);
@@ -46,15 +56,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             Undo.RegisterCreatedObjectUndo(snapObject, $"Create {snapObject.name}");
             
             // Positions the Snap Zone at the same position, rotation and scale as the snappable object.
-            snapObject.transform.SetParent(snappable.transform);
-            snapObject.transform.SetPositionAndRotation(snappable.transform.position, snappable.transform.rotation);
+            snapObject.transform.SetPositionAndRotation(snappable.transform.position  - snappable.transform.rotation * snapZoneHighlight.transform.localPosition, snappable.transform.rotation);
             snapObject.transform.localScale = Vector3.one;
-            snapObject.transform.SetParent(null);
-            
-            // Adds a Snap Zone component to our new object.
-            SnapZone snapZone = snapObject.AddComponent<SnapZoneProperty>().SnapZone;
-            snapZone.ShownHighlightObject = snapZonePrefab;
-            settings.ApplySettingsToSnapZone(snapZone);
 
             // Calculates the volume of the Snap Zone out of the snappable object.
             Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
@@ -70,13 +73,19 @@ namespace Innoactive.CreatorEditor.XRInteraction
             boxCollider.size = bounds.size;
             boxCollider.isTrigger = true;
 
+            // Adds a Snap Zone component to our new object.
+            SnapZone snapZone = snapObject.AddComponent<SnapZoneProperty>().SnapZone;
+            snapZone.ShownHighlightObject = snapZonePrefab;
+            settings.ApplySettingsToSnapZone(snapZone);
+            
             // Disposes the cloned object.
             DestroyImmediate(snapZoneBlueprint);
         }
-        
+
         private GameObject DuplicateObject(GameObject originalObject, Transform parent = null)
         {
             GameObject cloneObject = new GameObject($"{CleanName(originalObject.name)}_Highlight.prefab");
+            cloneObject.SetActive(originalObject.activeSelf);
             
             if (parent != null)
             {
@@ -96,6 +105,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
                     meshRenderer.sharedMaterials = skinnedMeshRenderer.sharedMaterials;
                     meshFilter.sharedMesh = skinnedMeshRenderer.sharedMesh;
+
+                    meshRenderer.enabled = skinnedMeshRenderer.enabled;
                 }
                 else
                 {
@@ -105,7 +116,12 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
             
             EditorUtility.CopySerialized(originalObject.transform, cloneObject.transform);
-
+            
+            if (parent == null)
+            {
+                cloneObject.transform.localScale = originalObject.transform.lossyScale;
+            }
+            
             foreach (Transform child in originalObject.transform)
             {
                 DuplicateObject(child.gameObject, cloneObject.transform);
@@ -153,7 +169,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 Directory.CreateDirectory(PrefabPath);
             }
             
-            snapZoneBlueprint.transform.localScale = Vector3.one;
             snapZoneBlueprint.transform.position = Vector3.zero;
             snapZoneBlueprint.transform.rotation = Quaternion.identity;
 
