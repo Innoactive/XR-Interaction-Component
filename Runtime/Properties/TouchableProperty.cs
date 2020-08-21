@@ -44,6 +44,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             Interactable.onFirstHoverEnter.AddListener(HandleXRTouched);
             Interactable.onLastHoverExit.AddListener(HandleXRUntouched);
+
+            InternalSetLocked(IsLocked);
         }
 
         protected override void OnDisable()
@@ -52,6 +54,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             Interactable.onFirstHoverEnter.RemoveListener(HandleXRTouched);
             Interactable.onLastHoverExit.RemoveListener(HandleXRUntouched);
+        }
+        
+        protected void Reset()
+        {
+            Interactable.IsTouchable = true;
+            gameObject.GetComponent<Rigidbody>().isKinematic = false;
         }
 
         private void HandleXRTouched(XRBaseInteractor interactor)

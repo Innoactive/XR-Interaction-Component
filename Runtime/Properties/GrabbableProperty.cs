@@ -45,6 +45,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             Interactable.onSelectEnter.AddListener(HandleXRGrabbed);
             Interactable.onSelectExit.AddListener(HandleXRUngrabbed);
+
+            InternalSetLocked(IsLocked);
         }
         
         protected override void OnDisable()
@@ -53,6 +55,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
         
             Interactable.onSelectEnter.RemoveListener(HandleXRGrabbed);
             Interactable.onSelectExit.RemoveListener(HandleXRUngrabbed);
+        }
+        
+        protected void Reset()
+        {
+            Interactable.IsGrabbable = true;
+            gameObject.GetComponent<Rigidbody>().isKinematic = false;
         }
 
         private void HandleXRGrabbed(XRBaseInteractor interactor)

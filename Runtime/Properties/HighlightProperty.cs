@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using Innoactive.Creator.Core.Properties;
+using Innoactive.Creator.Unity;
 
 namespace Innoactive.Creator.XRInteraction.Properties
 {
     /// <summary>
     /// Highlight property which enables an attached <see cref="InteractableObject"/>.
     /// </summary>
-    [RequireComponent(typeof(InteractableHighlighter))]
     public class HighlightProperty : BaseHighlightProperty
     {
         /// <summary>
@@ -28,6 +28,28 @@ namespace Innoactive.Creator.XRInteraction.Properties
             {
                 Highlighter = GetComponent<InteractableHighlighter>();
             }
+        }
+        
+        protected void Reset()
+        {
+            InteractableObject ownInteractableObject = gameObject.GetComponent<InteractableObject>();
+
+            // If gameObject was not interactable before, disable interactable functionality.
+            if (ownInteractableObject == null)
+            {
+                Rigidbody ownRigidbody = gameObject.GetComponent<Rigidbody>();
+                ownInteractableObject = gameObject.GetOrAddComponent<InteractableObject>();
+                ownInteractableObject.IsGrabbable = false;
+                ownInteractableObject.IsTouchable = false;
+                ownInteractableObject.IsUsable = false;
+                // If the gameObject had no rigidbody and thus was unaffected by physics, make it kinematic.
+                if (ownRigidbody == null)
+                {
+                    gameObject.GetOrAddComponent<Rigidbody>().isKinematic = true;
+                }
+            }
+
+            Highlighter = gameObject.GetOrAddComponent<InteractableHighlighter>();
         }
 
         /// <inheritdoc/>
