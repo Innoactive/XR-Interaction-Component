@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using Innoactive.Creator.XRInteraction.Properties;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -19,6 +21,8 @@ namespace Innoactive.Creator.XRInteraction
         [SerializeField]
         private GameObject shownHighlightObject = null;
 
+        private GameObject highlightInstance = null;
+
         /// <summary>
         /// The 'GameObject' whose mesh is drawn to emphasize the position of the snap zone.
         /// If none is supplied, no highlight object is shown.
@@ -29,13 +33,17 @@ namespace Innoactive.Creator.XRInteraction
             set
             {
                 shownHighlightObject = value;
-                UpdateHighlightMeshFilterCache();
+                if (highlightInstance)
+                {
+                    Destroy(highlightInstance);
+                    highlightInstance = null;
+                }
             }
         }
-        
+
         [SerializeField]
         private Color shownHighlightObjectColor = new Color(0.8f, 0.0f, 1.0f, 0.6f);
-        
+
         /// <summary>
         /// The color of the material used to draw the <see cref="ShownHighlightObject"/>.
         /// Use the alpha value to specify the degree of transparency.
@@ -43,18 +51,14 @@ namespace Innoactive.Creator.XRInteraction
         public Color ShownHighlightObjectColor
         {
             get { return shownHighlightObjectColor; }
-            set
-            {
-                shownHighlightObjectColor = value;
-                UpdateHighlightMeshFilterCache();
-            }
+            set { shownHighlightObjectColor = value; }
         }
 
         /// <summary>
         /// Gets or sets whether <see cref="ShownHighlightObject"/> is shown or not.
         /// </summary>
         public bool ShowHighlightObject { get; set; }
-        
+
         private Material highlightMeshMaterial;
 
         /// <summary>
@@ -98,14 +102,13 @@ namespace Innoactive.Creator.XRInteraction
         /// Forces the socket interactor to unselect the given target, if it is not null.
         /// </summary>
         protected XRBaseInteractable ForceUnselectTarget { get; set; }
-        
+
         /// <summary>
         /// Forces the socket interactor to select the given target, if it is not null.
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
 
         private Material previewMaterial;
-        private Mesh previewMesh;
 
         protected override void Awake()
         {
@@ -119,13 +122,8 @@ namespace Innoactive.Creator.XRInteraction
             }
 
             ShowHighlightObject = ShownHighlightObject != null;
-
-            if (ShownHighlightObject != null)
-            {
-                UpdateHighlightMeshFilterCache();
-            }
         }
-        
+
         private void OnDrawGizmos()
         {
             Collider collider = GetComponent<Collider>();
@@ -151,9 +149,49 @@ namespace Innoactive.Creator.XRInteraction
 
         protected virtual void Update()
         {
-            if (socketActive && selectTarget == null)
+            if (showInteractableHoverMeshes)
             {
-                DrawHighlightMesh();
+                showInteractableHoverMeshes = false;
+            }
+
+            if (ShowHighlightObject == false || shownHighlightObject == false && highlightInstance)
+            {
+                Destroy(highlightInstance);
+                highlightInstance = null;
+            }
+
+            if (highlightInstance == false && shownHighlightObject)
+            {
+                highlightInstance = Instantiate(shownHighlightObject, attachTransform, true);
+
+                highlightInstance.transform.localPosition = Vector3.zero;
+
+                Transform centerOfMass = highlightInstance.transform.Find("Center Of Mass");
+
+                if (centerOfMass)
+                {
+                    highlightInstance.transform.localPosition = -centerOfMass.localPosition;
+                }
+
+                highlightInstance.transform.rotation = transform.rotation;
+
+                foreach (Renderer highlightRenderer in highlightInstance.GetComponentsInChildren<Renderer>())
+                {
+                    for (int i = 0; i < highlightRenderer.sharedMaterials.Length; i++)
+                    {
+                        highlightRenderer.sharedMaterials[i] = previewMaterial;
+                    }
+                }
+            }
+
+            if (highlightInstance == false || highlightInstance == null)
+            {
+                return;
+            }
+
+            if ((socketActive && selectTarget == null) != highlightInstance.activeSelf)
+            {
+                highlightInstance.SetActive(highlightInstance.activeSelf == false);
             }
         }
 
@@ -183,45 +221,11 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>
         /// Updates the <see cref="HighlightMeshFilterCache"/> property using the current <see cref="ShownHighlightObject"/>.
         /// </summary>
+        [Obsolete("Not used anymore.")]
         protected virtual void UpdateHighlightMeshFilterCache()
         {
-            if (ShownHighlightObject == null)
-            {
-                previewMesh = null;
-                return;
-            }
-            
-            List<CombineInstance> meshes = new List<CombineInstance>();
-
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
-            {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
-                combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
-                
-                meshes.Add(combineInstance);
-            }
-            
-            foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
-            {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = meshFilter.sharedMesh;
-                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
-                
-                meshes.Add(combineInstance);
-            }
-
-            if (meshes.Any())
-            {
-                previewMesh = new Mesh();
-                previewMesh.CombineMeshes(meshes.ToArray());
-            }
-            else
-            {
-                Debug.LogErrorFormat(ShownHighlightObject, "Shown Highlight Object '{0}' has no MeshFilter. It cannot be drawn.", ShownHighlightObject);
-            }
         }
-        
+
         /// <summary>
         /// This method is called by the interaction manager to update the interactor. 
         /// Please see the interaction manager documentation for more details on update order.
@@ -238,7 +242,7 @@ namespace Innoactive.Creator.XRInteraction
                 if (m_HoverTargets.Count == 0 && ShowHighlightObject)
                 {
                     previewMaterial = HighlightMeshMaterial;
-                } 
+                }
                 else if (m_HoverTargets.Count > 0 && showInteractableHoverMeshes)
                 {
                     previewMaterial = ValidationMaterial;
@@ -249,13 +253,9 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>
         /// Draws a highlight mesh.
         /// </summary>
+        [Obsolete("Not used anymore.")]
         protected virtual void DrawHighlightMesh()
         {
-            if (previewMesh != null)
-            {
-                Matrix4x4 matrix = Matrix4x4.TRS(attachTransform.position, transform.rotation, transform.localScale);
-                Graphics.DrawMesh(previewMesh, matrix, previewMaterial, gameObject.layer);
-            }
         }
 
         /// <summary>
@@ -284,10 +284,10 @@ namespace Innoactive.Creator.XRInteraction
             }
             else
             {
-                Debug.LogWarningFormat(interactable.gameObject, 
+                Debug.LogWarningFormat(interactable.gameObject,
                     "Interactable '{0}' is not selectable by Snap Zone '{1}'. "
-                    + "(Maybe the Interaction Layer Masks settings are not correct or the interactable object is locked?)", 
-                    interactable.gameObject.name, 
+                    + "(Maybe the Interaction Layer Masks settings are not correct or the interactable object is locked?)",
+                    interactable.gameObject.name,
                     gameObject.name);
             }
         }
@@ -304,7 +304,7 @@ namespace Innoactive.Creator.XRInteraction
                 ForceUnselectTarget = null;
                 return false;
             }
-            
+
             // If one specific target should be selected,
             if (ForceSelectTarget != null)
             {
