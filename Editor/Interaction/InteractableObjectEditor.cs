@@ -1,11 +1,11 @@
-﻿using Innoactive.Creator.XRInteraction;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
+using Innoactive.Creator.XRInteraction;
 
 namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
-    /// Copy of 'XRGrabInteractableEditor' adapted to edit <see cref="InteractableObject"/>.
+    /// Drawer class for <see cref="InteractableObject"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableObject))]
     internal class InteractableObjectEditor : Editor
@@ -47,7 +47,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private bool showHighlightOptions;
         private InteractableObject interactableObject;
 
-        static class Tooltips
+        private static class Tooltips
         {
             public static readonly GUIContent AttachTransform = new GUIContent("Attach Transform", "Attach point to use on this Interactable (will use RigidBody center if none set).");
             public static readonly GUIContent AttachEaseInTime = new GUIContent("Attach Ease In Time", "Time it takes to ease in the attach (time of 0.0 indicates no easing).");

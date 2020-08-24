@@ -23,8 +23,25 @@ namespace Innoactive.Creator.XRInteraction
         [SerializeField]
         private bool isUsable = true;
 
+        private Rigidbody rigidbody;
         private XRSocketInteractor selectingSocket;
-        
+
+        /// <summary>
+        /// This interactable's rigidbody.
+        /// </summary>
+        public Rigidbody Rigidbody
+        {
+            get
+            {
+                if (rigidbody == null)
+                {
+                    rigidbody = GetComponent<Rigidbody>();
+                }
+                
+                return rigidbody;
+            }
+        }
+
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> can be touched.
         /// </summary>
@@ -130,7 +147,7 @@ namespace Innoactive.Creator.XRInteraction
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
-
+            
             if (IsInSocket == false)
             {
                 XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();

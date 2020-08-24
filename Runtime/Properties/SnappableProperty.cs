@@ -60,9 +60,11 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             Interactable.onSelectEnter.AddListener(HandleSnappedToDropZone);
             Interactable.onSelectExit.AddListener(HandleUnsnappedFromDropZone);
+
+            InternalSetLocked(IsLocked);
         }
         
-        protected virtual void OnDisable()
+        protected new virtual void OnDisable()
         {
             Interactable.onSelectEnter.RemoveListener(HandleSnappedToDropZone);
             Interactable.onSelectEnter.RemoveListener(HandleUnsnappedFromDropZone);

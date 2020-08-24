@@ -5,7 +5,7 @@ using Innoactive.Creator.XRInteraction;
 namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
-    /// Drawer for configuration settings for <see cref="InteractableHighlighter"/>.
+    /// Drawer class for <see cref="InteractableHighlighter"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableHighlighter)), CanEditMultipleObjects]
     internal class InteractableHighlighterEditor : Editor

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using Innoactive.Creator.XRInteraction;
 using Innoactive.Creator.XRInteraction.Properties;
@@ -32,20 +33,30 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private void CreateSnapZone(SnappableProperty snappable)
         {
+            // Retrieves a SnapZoneSettings and creates a clone for the snappable object
             SnapZoneSettings settings = SnapZoneSettings.Settings;
             GameObject snapZoneBlueprint = DuplicateObject(snappable.gameObject);
             
+            // Sets the highlight materials to the cloned object and saves it as highlight prefab.
             SetHighlightMaterial(snapZoneBlueprint, settings.HighlightMaterial);
             GameObject snapZonePrefab = SaveSnapZonePrefab(snapZoneBlueprint);
 
-            GameObject snapObject = new GameObject($"{snappable.name}SnapZone");
+            // Creates a new object for the SnapZone.
+            GameObject snapObject = new GameObject($"{CleanName(snappable.name)}_SnapZone");
             Undo.RegisterCreatedObjectUndo(snapObject, $"Create {snapObject.name}");
-            EditorUtility.CopySerialized(snappable.transform, snapObject.transform);
             
+            // Positions the Snap Zone at the same position, rotation and scale as the snappable object.
+            snapObject.transform.SetParent(snappable.transform);
+            snapObject.transform.SetPositionAndRotation(snappable.transform.position, snappable.transform.rotation);
+            snapObject.transform.localScale = Vector3.one;
+            snapObject.transform.SetParent(null);
+            
+            // Adds a Snap Zone component to our new object.
             SnapZone snapZone = snapObject.AddComponent<SnapZoneProperty>().SnapZone;
             snapZone.ShownHighlightObject = snapZonePrefab;
             settings.ApplySettingsToSnapZone(snapZone);
 
+            // Calculates the volume of the Snap Zone out of the snappable object.
             Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
 
             foreach (Renderer renderer in snapZoneBlueprint.GetComponentsInChildren<Renderer>())
@@ -53,17 +64,19 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 bounds.Encapsulate(renderer.bounds);
             }
             
+            // Adds a BoxCollider and sets it up.
             BoxCollider boxCollider = snapObject.AddComponent<BoxCollider>();
             boxCollider.center = bounds.center;
             boxCollider.size = bounds.size;
             boxCollider.isTrigger = true;
 
+            // Disposes the cloned object.
             DestroyImmediate(snapZoneBlueprint);
         }
         
         private GameObject DuplicateObject(GameObject originalObject, Transform parent = null)
         {
-            GameObject cloneObject = new GameObject($"{originalObject.name}_Clone");
+            GameObject cloneObject = new GameObject($"{CleanName(originalObject.name)}_Highlight.prefab");
             
             if (parent != null)
             {
@@ -144,8 +157,28 @@ namespace Innoactive.CreatorEditor.XRInteraction
             snapZoneBlueprint.transform.position = Vector3.zero;
             snapZoneBlueprint.transform.rotation = Quaternion.identity;
 
-            string prefabName = snapZoneBlueprint.name.Replace("_Clone", "Highlight.prefab");
-            return PrefabUtility.SaveAsPrefabAsset(snapZoneBlueprint, $"{PrefabPath}/{prefabName}");
+            string prefabPath = $"{PrefabPath}/{snapZoneBlueprint.name}";
+            GameObject prefab = PrefabUtility.SaveAsPrefabAsset(snapZoneBlueprint, prefabPath);
+
+            if (prefab != null)
+            {
+                Debug.LogWarningFormat("A new highlight prefab was saved at {0}", prefabPath);
+            }
+            
+            return prefab;
+        }
+
+        private string CleanName(string originalName)
+        {
+            // Unity replaces invalid characters with '_' when creating new prefabs in the editor.
+            // We try to simulate that behavior.
+            foreach (char invalidCharacter in Path.GetInvalidFileNameChars())
+            {
+                originalName = originalName.Replace(invalidCharacter, '_');
+            }
+
+            // Non windows systems consider '\' as a valid file name. 
+            return originalName.Replace('\\', '_');
         }
     }
 }
