@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Creator.Core.Properties;
@@ -15,18 +17,17 @@ namespace Innoactive.Creator.XRInteraction.Properties
     {
         public event EventHandler<EventArgs> ObjectSnapped;
         public event EventHandler<EventArgs> ObjectUnsnapped;
-        
+
+        [Obsolete("XRSocketInteractor hover meshes are now always disabled.")]
         public ModeParameter<bool> IsShowingHoverMeshes { get; private set; }
+
         public ModeParameter<bool> IsShowingHighlightObject { get; private set; }
         public ModeParameter<Color> HighlightColor { get; private set; }
 
         /// <inheritdoc />
         public bool IsObjectSnapped
         {
-            get
-            {
-                return SnappedObject != null;
-            }
+            get { return SnappedObject != null; }
         }
 
         /// <inheritdoc />
@@ -41,6 +42,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
                 {
                     return SnapZone.gameObject;
                 }
+
                 return null;
             }
         }
@@ -48,7 +50,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Returns the SnapZone component.
         /// </summary>
-        public SnapZone SnapZone 
+        public SnapZone SnapZone
         {
             get
             {
@@ -62,15 +64,52 @@ namespace Innoactive.Creator.XRInteraction.Properties
         }
 
         private SnapZone snapZone;
-        
+
+        protected virtual void Reset()
+        {
+            if (SnapZone.attachTransform)
+            {
+                return;
+            }
+
+            GameObject attach = new GameObject("Attach Point");
+            attach.transform.SetParent(transform, false);
+            attach.transform.localRotation = Quaternion.identity;
+            attach.transform.localPosition = Vector3.zero;
+            attach.transform.localScale = Vector3.one;
+
+            FieldInfo attachField = typeof(XRBaseInteractor).GetField("m_AttachTransform", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            if (attachField != null)
+            {
+                attachField.SetValue(SnapZone, attach.transform);
+            }
+            else
+            {
+                DestroyImmediate(attach);
+
+                // It seems that the Unity team has renamed that field. Check the SnapZone script. 
+                Debug.LogError("We failed to add an attach point for this snap zone property. Please, drop us a word if you see this message.");
+            }
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
 
             SnapZone.onSelectEnter.AddListener(HandleObjectSnapped);
             SnapZone.onSelectExit.AddListener(HandleObjectUnsnapped);
+
+            Collider[] colliders = GetComponents<Collider>();
+            Bounds snapZoneBounds = colliders[0].bounds;
+            foreach (Collider snapZoneCollider in colliders.Where(snapZoneCollider => snapZoneCollider.enabled))
+            {
+                snapZoneBounds.Encapsulate(snapZoneCollider.bounds);
+            }
+
+            SnapZone.attachTransform.position = snapZoneBounds.center;
         }
-        
+
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -78,20 +117,52 @@ namespace Innoactive.Creator.XRInteraction.Properties
             SnapZone.onSelectEnter.RemoveListener(HandleObjectSnapped);
             SnapZone.onSelectExit.RemoveListener(HandleObjectUnsnapped);
         }
-        
+
         private void HandleObjectSnapped(XRBaseInteractable interactable)
         {
-            SnappedObject = interactable.gameObject.GetComponent<SnappableProperty>();
+            SnappableProperty snappedObject = interactable.gameObject.GetComponent<SnappableProperty>();
+            SnappedObject = snappedObject;
             if (SnappedObject == null)
             {
                 Debug.LogWarningFormat("SnapZone '{0}' received snap from object '{1}' without XR_SnappableProperty", SceneObject.UniqueName, interactable.gameObject.name);
             }
             else
             {
+                if (interactable is XRGrabInteractable grabInteractable && grabInteractable.attachTransform)
+                {
+                    Destroy(grabInteractable.attachTransform.gameObject);
+                    grabInteractable.attachTransform = null;
+                    Debug.LogWarning("Snap zone's attach style is set to auto, but the snapped object has an attach transform. This is not allowed. We deleted the attach transform.");
+                }
+
+                SetAttachTransform(snappedObject);
+
                 EmitSnapped();
             }
         }
-        
+
+        private void SetAttachTransform(SnappableProperty snappedObject)
+        {
+            Transform snappedAttachTransform = snappedObject.GetComponent<XRGrabInteractable>()?.attachTransform;
+            Rigidbody snappedRigidbody = snappedObject.GetComponent<Rigidbody>();
+            Vector3 snappedCenterOffset = Vector3.zero;
+
+            if (snappedAttachTransform && snappedAttachTransform != null)
+            {
+                snappedCenterOffset = snappedRigidbody.worldCenterOfMass - snappedAttachTransform.position;
+            }
+
+            Collider[] colliders = GetComponents<Collider>();
+            Bounds snapZoneBounds = colliders[0].bounds;
+            foreach (Collider snapZoneCollider in colliders.Where(snappedCollider => snappedCollider.enabled))
+            {
+                snapZoneBounds.Encapsulate(snapZoneCollider.bounds);
+            }
+
+            SnapZone.attachTransform.position = snapZoneBounds.center + transform.rotation * Quaternion.Inverse(snappedObject.Interactable.transform.rotation) * (snappedCenterOffset);
+            SnapZone.attachTransform.localRotation = Quaternion.identity;
+        }
+
         private void HandleObjectUnsnapped(XRBaseInteractable interactable)
         {
             if (SnappedObject != null)
@@ -100,18 +171,9 @@ namespace Innoactive.Creator.XRInteraction.Properties
                 EmitUnsnapped();
             }
         }
-        
+
         private void InitializeModeParameters()
         {
-            if (IsShowingHoverMeshes == null)
-            {
-                IsShowingHoverMeshes = new ModeParameter<bool>("ShowSnapzoneHoverMeshes", SnapZone.showInteractableHoverMeshes);
-                IsShowingHoverMeshes.ParameterModified += (sender, args) =>
-                {
-                    SnapZone.showInteractableHoverMeshes = IsShowingHoverMeshes.Value;
-                };
-            }
-
             if (IsShowingHighlightObject == null)
             {
                 IsShowingHighlightObject = new ModeParameter<bool>("ShowSnapzoneHighlightObject", SnapZone.ShowHighlightObject);
@@ -130,7 +192,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
                 };
             }
         }
-        
+
         /// <summary>
         /// Configure snap zone properties according to the provided mode.
         /// </summary>
@@ -139,11 +201,10 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             InitializeModeParameters();
 
-            IsShowingHoverMeshes.Configure(mode);
             IsShowingHighlightObject.Configure(mode);
             HighlightColor.Configure(mode);
         }
-        
+
         /// <summary>
         /// Invokes the <see cref="EmitSnapped"/> event.
         /// </summary>
