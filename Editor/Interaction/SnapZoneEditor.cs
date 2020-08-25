@@ -15,7 +15,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private SerializedProperty interactionManager;
         private SerializedProperty interactionLayerMask;
-        private SerializedProperty attachTransform;
         private SerializedProperty startingSelectedInteractable;
 
         private SerializedProperty interactableHoverMeshMaterial;
@@ -45,7 +44,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             
             interactionManager = serializedObject.FindProperty("m_InteractionManager");
             interactionLayerMask = serializedObject.FindProperty("m_InteractionLayerMask");
-            attachTransform = serializedObject.FindProperty("m_AttachTransform");
             startingSelectedInteractable = serializedObject.FindProperty("m_StartingSelectedInteractable");
 
             interactableHoverMeshMaterial = serializedObject.FindProperty("validationMaterial");
@@ -66,7 +64,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             EditorGUILayout.PropertyField(interactionManager, Tooltips.InteractionManager);
             EditorGUILayout.PropertyField(interactionLayerMask, Tooltips.InteractionLayerMask);
-            EditorGUILayout.PropertyField(attachTransform, Tooltips.AttachTransform);
             EditorGUILayout.PropertyField(startingSelectedInteractable, Tooltips.StartingSelectedInteractable);
             
             EditorGUILayout.Space();

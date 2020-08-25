@@ -48,7 +48,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             InternalSetLocked(IsLocked);
         }
-        
+
         protected override void OnDisable()
         {
             base.OnDisable();
