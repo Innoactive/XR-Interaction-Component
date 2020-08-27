@@ -147,7 +147,6 @@ namespace Innoactive.Creator.XRInteraction
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
-            
             if (IsInSocket == false)
             {
                 XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();

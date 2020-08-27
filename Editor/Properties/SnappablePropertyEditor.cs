@@ -1,7 +1,8 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Collections.Generic;
+using Innoactive.Creator.BasicInteraction.Validation;
+using Innoactive.Creator.Core.SceneObjects;
 using Innoactive.Creator.XRInteraction;
 using Innoactive.Creator.XRInteraction.Properties;
 using UnityEditor;
@@ -54,7 +55,23 @@ namespace Innoactive.CreatorEditor.XRInteraction
             // Adds a Snap Zone component to our new object.
             SnapZone snapZone = snapObject.AddComponent<SnapZoneProperty>().SnapZone;
             snapZone.ShownHighlightObject = snapZonePrefab;
+            IsTrainingSceneObjectValidation validation = snapZone.gameObject.AddComponent<IsTrainingSceneObjectValidation>();
+            validation.AddTrainingSceneObject(snappable.GetComponent<TrainingSceneObject>());
+
             settings.ApplySettingsToSnapZone(snapZone);
+
+            GameObject snapPoint = new GameObject("SnapPoint");
+            snapPoint.transform.SetParent(snapZone.transform);
+            snapPoint.transform.localPosition = Vector3.zero;
+            snapPoint.transform.localScale = Vector3.one;
+            snapPoint.transform.localRotation = Quaternion.identity;
+            SnapZonePreviewDrawer drawer = snapPoint.AddComponent<SnapZonePreviewDrawer>();
+            drawer.Parent = snapZone;
+            
+            SerializedObject snapZoneSerialization = new SerializedObject(snapZone);
+            SerializedProperty property = snapZoneSerialization.FindProperty("m_AttachTransform");
+            property.objectReferenceValue = snapPoint.transform;
+            snapZoneSerialization.ApplyModifiedPropertiesWithoutUndo();
 
             // Calculates the volume of the Snap Zone out of the snappable object.
             Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
@@ -72,6 +89,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             // Disposes the cloned object.
             DestroyImmediate(snapZoneBlueprint);
+
+            Selection.activeGameObject = snapZone.gameObject;
         }
         
         private GameObject DuplicateObject(GameObject originalObject, Transform parent = null)
