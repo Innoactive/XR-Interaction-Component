@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using Innoactive.Creator.BasicInteraction.Validation;
 using Innoactive.Creator.Core.SceneObjects;
 using Innoactive.Creator.XRInteraction;
@@ -36,10 +37,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
         {
             // Retrieves a SnapZoneSettings and creates a clone for the snappable object
             SnapZoneSettings settings = SnapZoneSettings.Settings;
-            GameObject snapZoneBlueprint = DuplicateObject(snappable.gameObject);
+            GameObject snapZoneBlueprint = DuplicateObject(snappable.gameObject, settings.HighlightMaterial);
             
-            // Sets the highlight materials to the cloned object and saves it as highlight prefab.
-            SetHighlightMaterial(snapZoneBlueprint, settings.HighlightMaterial);
+            // Saves it as highlight prefab.
             GameObject snapZonePrefab = SaveSnapZonePrefab(snapZoneBlueprint);
 
             // Creates a new object for the SnapZone.
@@ -93,7 +93,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             Selection.activeGameObject = snapZone.gameObject;
         }
         
-        private GameObject DuplicateObject(GameObject originalObject, Transform parent = null)
+        private GameObject DuplicateObject(GameObject originalObject, Material sharedMaterial, Transform parent = null)
         {
             GameObject cloneObject = new GameObject($"{CleanName(originalObject.name)}_Highlight.prefab");
             
@@ -101,67 +101,58 @@ namespace Innoactive.CreatorEditor.XRInteraction
             {
                 cloneObject.transform.SetParent(parent);
             }
-
-            foreach (Component component in GetRenderersFrom(originalObject))
-            {
-                Type componentType = component.GetType();
-
-                if (componentType == typeof(SkinnedMeshRenderer))
-                {
-                    SkinnedMeshRenderer skinnedMeshRenderer = component as SkinnedMeshRenderer;
-                    
-                    MeshRenderer meshRenderer = cloneObject.AddComponent<MeshRenderer>();
-                    MeshFilter meshFilter = cloneObject.AddComponent<MeshFilter>();
-
-                    meshRenderer.sharedMaterials = skinnedMeshRenderer.sharedMaterials;
-                    meshFilter.sharedMesh = skinnedMeshRenderer.sharedMesh;
-                }
-                else
-                {
-                    Component targetComponent = cloneObject.AddComponent(componentType);
-                    EditorUtility.CopySerialized(component, targetComponent);
-                }
-            }
+            
+            ProcessRenderer(originalObject, cloneObject, sharedMaterial);
             
             EditorUtility.CopySerialized(originalObject.transform, cloneObject.transform);
 
             foreach (Transform child in originalObject.transform)
             {
-                DuplicateObject(child.gameObject, cloneObject.transform);
+                DuplicateObject(child.gameObject, sharedMaterial, cloneObject.transform);
             }
 
             return cloneObject;
         }
-        
-        private IEnumerable<Component> GetRenderersFrom(GameObject sourceObject)
-        {
-            List<Component> components = new List<Component>();
 
-            SkinnedMeshRenderer skinnedMeshRenderer = sourceObject.GetComponent<SkinnedMeshRenderer>();
+        private void ProcessRenderer(GameObject originalObject, GameObject cloneObject, Material sharedMaterial)
+        {
+            Renderer renderer = originalObject.GetComponent<Renderer>();
             
-            if (skinnedMeshRenderer != null)
+            Type renderType = renderer.GetType();
+
+            if (renderType == typeof(SkinnedMeshRenderer))
             {
-                components.Add(skinnedMeshRenderer);
+                SkinnedMeshRenderer skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
+                    
+                MeshRenderer meshRenderer = cloneObject.AddComponent<MeshRenderer>();
+                MeshFilter meshFilter = cloneObject.AddComponent<MeshFilter>();
+                List<Material> sharedMaterials = new List<Material>();
+                    
+                for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
+                {
+                    sharedMaterials.Add(sharedMaterial);
+                }
+
+                meshRenderer.sharedMaterials = sharedMaterials.ToArray();
+                meshFilter.sharedMesh = skinnedMeshRenderer.sharedMesh;
             }
             
-            MeshRenderer meshRenderer = sourceObject.GetComponent<MeshRenderer>();
-
-            if (meshRenderer != null)
+            if (renderType == typeof(MeshRenderer))
             {
-                MeshFilter meshFilter = sourceObject.GetComponent<MeshFilter>();
+                MeshRenderer originalMeshRenderer = renderer as MeshRenderer;
+                MeshFilter originalMeshFilter = originalObject.GetComponent<MeshFilter>();
                 
-                components.Add(meshRenderer);
-                components.Add(meshFilter);
-            }
-
-            return components;
-        }
-        
-        private void SetHighlightMaterial(GameObject snapZonePrefab, Material highlightMaterial)
-        {
-            foreach (Renderer renderer in snapZonePrefab.GetComponentsInChildren<Renderer>())
-            {
-                renderer.sharedMaterials = new[] { highlightMaterial };
+                MeshRenderer meshRenderer = cloneObject.AddComponent<MeshRenderer>();
+                MeshFilter meshFilter = cloneObject.AddComponent<MeshFilter>();
+                List<Material> sharedMaterials = new List<Material>();
+                    
+                for (int i = 0; i < originalMeshFilter.sharedMesh.subMeshCount; i++)
+                {
+                    sharedMaterials.Add(sharedMaterial);
+                }
+                
+                meshRenderer.sharedMaterials = sharedMaterials.ToArray();
+                meshFilter.sharedMesh = originalMeshFilter.sharedMesh;
             }
         }
 
