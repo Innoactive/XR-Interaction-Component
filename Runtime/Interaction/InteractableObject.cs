@@ -22,7 +22,7 @@ namespace Innoactive.Creator.XRInteraction
         
         [SerializeField]
         private bool isUsable = true;
-
+        
         private Rigidbody internalRigidbody;
         private XRSocketInteractor selectingSocket;
 
