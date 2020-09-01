@@ -12,53 +12,62 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>
         /// The parent SnapZone.
         /// </summary>
-        public SnapZone Parent { get; set; }
+        [SerializeField]
+        [HideInInspector]
+        private SnapZone parent;
+
+        private MeshFilter filter;
+        private MeshRenderer meshRenderer;
         
-        private void Awake()
+        private void Start()
         {
             if (Application.isPlaying)
             {
                 DestroyPreview();
                 DestroyImmediate(this);
+                return;
             }
+            
+            filter = gameObject.GetComponent<MeshFilter>();
+            if (filter == null)
+            {
+                filter = gameObject.AddComponent<MeshFilter>();
+            }
+
+            meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer == null)
+            {
+                meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            }
+            
+            if (parent == null)
+            {
+                parent = transform.parent.GetComponent<SnapZone>();
+                if (parent == null)
+                {
+                    DestroyPreview();
+                    return;
+                }
+            }
+
+            filter.sharedMesh = parent.PreviewMesh;
+            meshRenderer.material = parent.HighlightMeshMaterial;
         }
 
         private void Update()
         {
-            if (Parent == null)
-            {
-                Parent = transform.parent.GetComponent<SnapZone>();
-                if (Parent == null)
-                {
-                    DestroyPreview();
-                }
-            }
-            
-            bool isPreviewing = gameObject.GetComponent<MeshFilter>() != null;
-            
-            if (Parent.ShowHighlightInEditor && Parent.PreviewMesh && isPreviewing == false)
-            {
-                MeshFilter meshFilter =  gameObject.AddComponent<MeshFilter>();
-                meshFilter.sharedMesh = Parent.PreviewMesh;
-                
-                MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-                meshRenderer.material = Parent.HighlightMeshMaterial;
-            }
-            else if (Parent.ShowHighlightInEditor == false && isPreviewing)
-            {
-                DestroyPreview();
-            }
+            meshRenderer.enabled = parent.ShowHighlightInEditor;
         }
 
         private void DestroyPreview()
         {
-            MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+            meshRenderer = gameObject.GetComponent<MeshRenderer>();
             if (meshRenderer != null)
             {
                 DestroyImmediate(meshRenderer);
             }
             
-            MeshFilter filter = GetComponent<MeshFilter>();
+            filter = gameObject.GetComponent<MeshFilter>();
             if (filter != null)
             {
                 DestroyImmediate(filter);

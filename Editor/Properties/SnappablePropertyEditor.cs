@@ -65,9 +65,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             snapPoint.transform.localPosition = Vector3.zero;
             snapPoint.transform.localScale = Vector3.one;
             snapPoint.transform.localRotation = Quaternion.identity;
-            SnapZonePreviewDrawer drawer = snapPoint.AddComponent<SnapZonePreviewDrawer>();
-            drawer.Parent = snapZone;
-            
+            snapPoint.AddComponent<SnapZonePreviewDrawer>();
+
             SerializedObject snapZoneSerialization = new SerializedObject(snapZone);
             SerializedProperty property = snapZoneSerialization.FindProperty("m_AttachTransform");
             property.objectReferenceValue = snapPoint.transform;
