@@ -23,7 +23,7 @@ namespace Innoactive.Creator.XRInteraction
         [SerializeField]
         private bool isUsable = true;
         
-        private new Rigidbody rigidbody;
+        private Rigidbody internalRigidbody;
         private XRSocketInteractor selectingSocket;
 
         /// <summary>
@@ -33,12 +33,12 @@ namespace Innoactive.Creator.XRInteraction
         {
             get
             {
-                if (rigidbody == null)
+                if (internalRigidbody == null)
                 {
-                    rigidbody = GetComponent<Rigidbody>();
+                    internalRigidbody = GetComponent<Rigidbody>();
                 }
                 
-                return rigidbody;
+                return internalRigidbody;
             }
         }
 
@@ -147,7 +147,6 @@ namespace Innoactive.Creator.XRInteraction
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
-            
             if (IsInSocket == false)
             {
                 XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();
