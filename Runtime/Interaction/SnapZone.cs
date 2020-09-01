@@ -131,18 +131,18 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
         
-        private Mesh previewMesh;
+        private Mesh[] previewMeshes;
         
-        internal Mesh PreviewMesh 
+        internal Mesh[] PreviewMeshes 
         {
             get
             {
-                if (previewMesh == null && shownHighlightObject != null)
+                if (previewMeshes == null && shownHighlightObject != null)
                 {
                     UpdateHighlightMeshFilterCache();
                 }
 
-                return previewMesh;
+                return previewMeshes;
             }
         }
         
@@ -247,33 +247,17 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (ShownHighlightObject == null)
             {
-                previewMesh = null;
+                previewMeshes = null;
                 return;
             }
             
-            List<CombineInstance> meshes = new List<CombineInstance>();
-
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
-            {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
-                combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
-                
-                meshes.Add(combineInstance);
-            }
-            
-            foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
-            {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = meshFilter.sharedMesh;
-                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
-                meshes.Add(combineInstance);
-            }
+            List<Mesh> meshes = new List<Mesh>();
+            meshes.AddRange(ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>().Select(skinnedMeshRenderer => skinnedMeshRenderer.sharedMesh));
+            meshes.AddRange(ShownHighlightObject.GetComponentsInChildren<MeshFilter>().Select(meshFilter => meshFilter.sharedMesh));
 
             if (meshes.Any())
             {
-                previewMesh = new Mesh();
-                previewMesh.CombineMeshes(meshes.ToArray());
+                previewMeshes = meshes.ToArray();
             }
             else
             {
@@ -317,11 +301,14 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected virtual void DrawHighlightMesh()
         {
-            if (PreviewMesh != null)
+            if (previewMeshes != null)
             {
-                for (int i = 0; i < PreviewMesh.subMeshCount; i++)
+                foreach (Mesh previewMesh in previewMeshes)
                 {
-                    Graphics.DrawMesh(PreviewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null, i);
+                    for (int i = 0; i < previewMesh.subMeshCount; i++)
+                    {
+                        Graphics.DrawMesh(previewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null, i);
+                    }
                 }
             }
         }

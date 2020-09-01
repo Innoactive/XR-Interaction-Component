@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Innoactive.Creator.XRInteraction
 {
@@ -16,64 +15,32 @@ namespace Innoactive.Creator.XRInteraction
         [HideInInspector]
         private SnapZone parent;
 
-        private MeshFilter filter;
-        private MeshRenderer meshRenderer;
-        
         private void Start()
         {
             if (Application.isPlaying)
             {
-                DestroyPreview();
                 DestroyImmediate(this);
                 return;
-            }
-            
-            filter = gameObject.GetComponent<MeshFilter>();
-            if (filter == null)
-            {
-                filter = gameObject.AddComponent<MeshFilter>();
-            }
-
-            meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer == null)
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
             }
             
             if (parent == null)
             {
                 parent = transform.parent.GetComponent<SnapZone>();
-                if (parent == null)
-                {
-                    DestroyPreview();
-                    return;
-                }
             }
-
-            filter.sharedMesh = parent.PreviewMesh;
-            meshRenderer.material = parent.HighlightMeshMaterial;
         }
 
         private void Update()
         {
-            meshRenderer.enabled = parent.ShowHighlightInEditor;
-        }
-
-        private void DestroyPreview()
-        {
-            meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer != null)
+            if (parent.ShowHighlightInEditor)
             {
-                DestroyImmediate(meshRenderer);
+                foreach (Mesh previewMesh in parent.PreviewMeshes)
+                {
+                    for (int i = 0; i < previewMesh.subMeshCount; i++)
+                    {
+                        Graphics.DrawMesh(previewMesh, transform.localToWorldMatrix, parent.HighlightMeshMaterial, parent.gameObject.layer, null, i);
+                    }
+                }
             }
-            
-            filter = gameObject.GetComponent<MeshFilter>();
-            if (filter != null)
-            {
-                DestroyImmediate(filter);
-            }
-            
-            DestroyImmediate(this);
         }
     }
 }
