@@ -131,9 +131,9 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
         
-        private Mesh[] previewMeshes;
+        private CombineInstance[] previewMeshes;
         
-        internal Mesh[] PreviewMeshes 
+        internal CombineInstance[] PreviewMeshes 
         {
             get
             {
@@ -251,9 +251,25 @@ namespace Innoactive.Creator.XRInteraction
                 return;
             }
             
-            List<Mesh> meshes = new List<Mesh>();
-            meshes.AddRange(ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>().Select(skinnedMeshRenderer => skinnedMeshRenderer.sharedMesh));
-            meshes.AddRange(ShownHighlightObject.GetComponentsInChildren<MeshFilter>().Select(meshFilter => meshFilter.sharedMesh));
+            List<CombineInstance> meshes = new List<CombineInstance>();
+
+            foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                CombineInstance combineInstance = new CombineInstance();
+                combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
+                combineInstance.transform = skinnedMeshRenderer.localToWorldMatrix;
+                
+                meshes.Add(combineInstance);
+            }
+            
+            foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
+            {
+                CombineInstance combineInstance = new CombineInstance();
+                combineInstance.mesh = meshFilter.sharedMesh;
+                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
+                
+                meshes.Add(combineInstance);
+            }
 
             if (meshes.Any())
             {
@@ -303,11 +319,13 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (previewMeshes != null)
             {
-                foreach (Mesh previewMesh in previewMeshes)
+                foreach (CombineInstance previewMesh in previewMeshes)
                 {
-                    for (int i = 0; i < previewMesh.subMeshCount; i++)
+                    Mesh mesh = previewMesh.mesh;
+                    for (int i = 0; i < mesh.subMeshCount; i++)
                     {
-                        Graphics.DrawMesh(previewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null, i);
+                        Matrix4x4 locationMatrix = previewMesh.transform * attachTransform.localToWorldMatrix;
+                        Graphics.DrawMesh(mesh, locationMatrix, activeMaterial, gameObject.layer, null, i);
                     }
                 }
             }

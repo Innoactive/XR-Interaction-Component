@@ -33,11 +33,13 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (parent.ShowHighlightInEditor)
             {
-                foreach (Mesh previewMesh in parent.PreviewMeshes)
+                foreach (CombineInstance previewMesh in parent.PreviewMeshes)
                 {
-                    for (int i = 0; i < previewMesh.subMeshCount; i++)
+                    Mesh mesh = previewMesh.mesh;
+                    for (int i = 0; i < mesh.subMeshCount; i++)
                     {
-                        Graphics.DrawMesh(previewMesh, transform.localToWorldMatrix, parent.HighlightMeshMaterial, parent.gameObject.layer, null, i);
+                        Matrix4x4 locationMatrix = previewMesh.transform * transform.localToWorldMatrix;
+                        Graphics.DrawMesh(mesh, locationMatrix, parent.HighlightMeshMaterial, parent.gameObject.layer, null, i);
                     }
                 }
             }
