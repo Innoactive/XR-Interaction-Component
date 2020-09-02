@@ -31,14 +31,24 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private Material highlightMaterial;
 
         /// <summary>
-        /// This color is used when an <see cref="InteractableObject"/> is hovering a <see cref="SnapZone"/>.
+        /// This color is used when a valid <see cref="InteractableObject"/> is hovering a <see cref="SnapZone"/>.
         /// </summary>
         [Tooltip("This color is used when a valid object is hovering the snap zone.")]
         public Color ValidationColor = new Color32(0, 255, 0, 50);
+        
+        /// <summary>
+        /// This color is used when an invalid <see cref="InteractableObject"/> is hovering a <see cref="SnapZone"/>.
+        /// </summary>
+        [Tooltip("This color is used when an invalid object is hovering the snap zone.")]
+        public Color InvalidColor = new Color32(255, 0, 0, 50);
 
         [SerializeField]
         [Tooltip("The material shown when a valid object is hovering the snap zone. Should be transparent.\n\n[This field overrides 'ValidHighlightColor']")]
         private Material validationMaterial;
+
+        [SerializeField]
+        [Tooltip("The material shown when an invalid object is hovering the snap zone. Should be transparent.\n\n[This field overrides 'InvalidHighlightColor']")]
+        private Material invalidMaterial;
 
         /// <summary>
         /// The material used for drawing when an <see cref="InteractableObject"/> is hovering a <see cref="SnapZone"/>. Should be transparent.
@@ -46,9 +56,14 @@ namespace Innoactive.CreatorEditor.XRInteraction
         public Material HighlightMaterial => SetupHighlightMaterial();
 
         /// <summary>
-        /// The material used for the highlight object. Should be transparent.
+        /// The material used for the highlight object, when a valid object is hovering. Should be transparent.
         /// </summary>
         public Material ValidationMaterial => SetupValidationMaterial();
+        
+        /// <summary>
+        /// The material used for the highlight object, when an invalid object is hovering. Should be transparent.
+        /// </summary>
+        public Material InvalidMaterial => SetupInvalidMaterial();
 
         /// <summary>
         /// Loads the first existing <see cref="SnapZoneSettings"/> found in the project.
@@ -64,6 +79,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             snapZone.InteractionLayerMask = InteractionLayerMask;
             snapZone.ShownHighlightObjectColor = HighlightColor;
             snapZone.ValidationMaterial = ValidationMaterial;
+            snapZone.InvalidMaterial = InvalidMaterial;
         }
         
         private static SnapZoneSettings RetrieveSnapZoneSettings()
@@ -119,6 +135,26 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 
             highlightMaterial.color = HighlightColor;
             return highlightMaterial;
+        }
+        
+        private Material SetupInvalidMaterial()
+        {
+            if (invalidMaterial == null)
+            {
+                invalidMaterial = CreateMaterial();
+                invalidMaterial.name = "SnapZoneInvalidMaterial";
+
+                if (Directory.Exists(MaterialsPath) == false)
+                {
+                    Directory.CreateDirectory(MaterialsPath);
+                }
+
+                AssetDatabase.CreateAsset(invalidMaterial, $"{MaterialsPath}/{invalidMaterial.name}.mat");
+                AssetDatabase.Refresh();
+            }
+                
+            invalidMaterial.color = InvalidColor;
+            return invalidMaterial;
         }
         
         private Material SetupValidationMaterial()
