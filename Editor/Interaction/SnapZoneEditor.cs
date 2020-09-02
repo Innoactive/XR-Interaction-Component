@@ -76,8 +76,12 @@ namespace Innoactive.CreatorEditor.XRInteraction
             EditorGUILayout.LabelField("Snap Zone", EditorStyles.boldLabel); 
             
             EditorGUILayout.PropertyField(showHighlightInEditor, Tooltips.ShowHighlightInEditor);
+            
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(shownHighlightObject, Tooltips.ShownHighlightObject);
             EditorGUILayout.PropertyField(shownHighlightObjectColor, Tooltips.ShownHighlightObjectColor);
+            bool isPreviewMeshChanged = EditorGUI.EndChangeCheck();
+            
             EditorGUILayout.PropertyField(interactableHoverMeshMaterial, Tooltips.InteractableHoverMeshMaterial);
             
             showInteractorEvents = EditorGUILayout.Toggle("Show Interactor Events", showInteractorEvents);
@@ -92,6 +96,19 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
             
             serializedObject.ApplyModifiedProperties();
+
+            if (isPreviewMeshChanged)
+            {
+                SnapZone snapZone = (SnapZone) target;
+                snapZone.PreviewMesh = null;
+                
+                SnapZonePreviewDrawer preview = snapZone.attachTransform.gameObject.GetComponent<SnapZonePreviewDrawer>();
+                
+                if (preview != null)
+                {
+                    preview.UpdateMesh();
+                }
+            }
         }
     }
 }

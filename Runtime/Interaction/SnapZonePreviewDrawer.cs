@@ -79,5 +79,14 @@ namespace Innoactive.Creator.XRInteraction
             
             DestroyImmediate(this);
         }
+
+        /// <summary>
+        /// Forces an update of the mesh.
+        /// </summary>
+        public void UpdateMesh()
+        {
+            filter.sharedMesh = parent.PreviewMesh;
+            meshRenderer.material = parent.HighlightMeshMaterial;
+        }
     }
 }

@@ -146,6 +146,11 @@ namespace Innoactive.Creator.XRInteraction
 
                 return previewMesh;
             }
+            
+            set
+            {
+                previewMesh = value;
+            }
         }
         
         private Material activeMaterial;
