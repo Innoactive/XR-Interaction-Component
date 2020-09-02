@@ -132,7 +132,10 @@ namespace Innoactive.Creator.XRInteraction
         
         private Mesh previewMesh;
         
-        internal Mesh PreviewMesh 
+        /// <summary>
+        /// Returns the preview mesh used for this SnapZone.
+        /// </summary>
+        public Mesh PreviewMesh 
         {
             get
             {
