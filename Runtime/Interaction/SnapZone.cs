@@ -76,7 +76,6 @@ namespace Innoactive.Creator.XRInteraction
 
                 return highlightMeshMaterial;
             }
-            set { highlightMeshMaterial = value; }
         }
 
         [SerializeField]
@@ -131,9 +130,9 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
         
-        private CombineInstance[] previewMeshes;
+        private Mesh previewMeshes;
         
-        internal CombineInstance[] PreviewMeshes 
+        internal Mesh PreviewMeshes 
         {
             get
             {
@@ -144,6 +143,7 @@ namespace Innoactive.Creator.XRInteraction
 
                 return previewMeshes;
             }
+            set { previewMeshes = value; }
         }
         
         private Material activeMaterial;
@@ -251,7 +251,7 @@ namespace Innoactive.Creator.XRInteraction
                 return;
             }
             
-            List<CombineInstance> meshes = new List<CombineInstance>();
+            List<CombineInstance> combineInstances = new List<CombineInstance>();
 
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
             {
@@ -259,21 +259,27 @@ namespace Innoactive.Creator.XRInteraction
                 combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
                 combineInstance.transform = skinnedMeshRenderer.localToWorldMatrix;
                 
-                meshes.Add(combineInstance);
+                combineInstances.Add(combineInstance);
             }
             
             foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
             {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = meshFilter.sharedMesh;
-                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
-                
-                meshes.Add(combineInstance);
+                for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
+                {
+                    CombineInstance combineInstance = new CombineInstance();
+                    
+                    combineInstance.subMeshIndex = i;
+                    combineInstance.mesh = meshFilter.sharedMesh;
+                    combineInstance.transform = meshFilter.transform.localToWorldMatrix;
+                    
+                    combineInstances.Add(combineInstance);
+                }
             }
 
-            if (meshes.Any())
+            if (combineInstances.Any())
             {
-                previewMeshes = meshes.ToArray();
+                previewMeshes = new Mesh();
+                previewMeshes.CombineMeshes(combineInstances.ToArray());
             }
             else
             {
@@ -319,14 +325,9 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (previewMeshes != null)
             {
-                foreach (CombineInstance previewMesh in previewMeshes)
+                for (int i = 0; i < previewMeshes.subMeshCount; i++)
                 {
-                    Mesh mesh = previewMesh.mesh;
-                    for (int i = 0; i < mesh.subMeshCount; i++)
-                    {
-                        Matrix4x4 locationMatrix = previewMesh.transform * attachTransform.localToWorldMatrix;
-                        Graphics.DrawMesh(mesh, locationMatrix, activeMaterial, gameObject.layer, null, i);
-                    }
+                    Graphics.DrawMesh(previewMeshes, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null, i);
                 }
             }
         }
