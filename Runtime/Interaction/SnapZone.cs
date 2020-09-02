@@ -347,8 +347,9 @@ namespace Innoactive.Creator.XRInteraction
 
             if (interactable.IsSelectableBy(this))
             {
-                OnTriggerEnter(interactable.GetComponent<Collider>());
+                OnSelectEnter(interactable);
                 interactable.transform.position = attachTransform.position;
+                interactable.transform.rotation = attachTransform.rotation;
                 ForceSelectTarget = interactable;
             }
             else
