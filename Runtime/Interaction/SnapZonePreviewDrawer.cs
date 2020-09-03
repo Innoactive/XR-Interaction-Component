@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 
 namespace Innoactive.Creator.XRInteraction
@@ -50,8 +51,11 @@ namespace Innoactive.Creator.XRInteraction
                 }
             }
 
-            filter.sharedMesh = parent.PreviewMesh;
-            meshRenderer.material = parent.HighlightMeshMaterial;
+            if (filter.sharedMesh == null)
+            {
+                filter.sharedMesh = parent.PreviewMesh;
+                meshRenderer.material = parent.HighlightMeshMaterial;
+            }
         }
 
         private void Update()
@@ -74,6 +78,15 @@ namespace Innoactive.Creator.XRInteraction
             }
             
             DestroyImmediate(this);
+        }
+
+        /// <summary>
+        /// Forces an update of the mesh.
+        /// </summary>
+        public void UpdateMesh()
+        {
+            filter.sharedMesh = parent.PreviewMesh;
+            meshRenderer.material = parent.HighlightMeshMaterial;
         }
     }
 }
