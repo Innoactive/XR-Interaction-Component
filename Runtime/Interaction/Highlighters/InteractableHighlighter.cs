@@ -317,8 +317,8 @@ namespace Innoactive.Creator.XRInteraction
                 return;
             }
 
-            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>(true).Where(meshRenderer => meshRenderer.gameObject.activeSelf && meshRenderer.enabled).ToArray();
-            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>(true).Where(meshRenderer => meshRenderer.gameObject.activeSelf && meshRenderer.enabled).ToArray();
+            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>().Where(meshRenderer => meshRenderer.enabled).ToArray();
+            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>().Where(meshRenderer => meshRenderer.enabled).ToArray();
             cachedMeshFilters = cachedMeshRenderers.Select(meshRenderer => meshRenderer.GetComponent<MeshFilter>()).ToArray();
         }
 

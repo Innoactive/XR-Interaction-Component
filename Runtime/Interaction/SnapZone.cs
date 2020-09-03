@@ -76,7 +76,6 @@ namespace Innoactive.Creator.XRInteraction
 
                 return highlightMeshMaterial;
             }
-            set { highlightMeshMaterial = value; }
         }
 
         [SerializeField]
@@ -133,7 +132,10 @@ namespace Innoactive.Creator.XRInteraction
         
         private Mesh previewMesh;
         
-        internal Mesh PreviewMesh 
+        /// <summary>
+        /// Returns the preview mesh used for this SnapZone.
+        /// </summary>
+        public Mesh PreviewMesh 
         {
             get
             {
@@ -143,6 +145,11 @@ namespace Innoactive.Creator.XRInteraction
                 }
 
                 return previewMesh;
+            }
+            
+            set
+            {
+                previewMesh = value;
             }
         }
         
@@ -255,19 +262,28 @@ namespace Innoactive.Creator.XRInteraction
 
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
             {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
-                combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
-                
-                meshes.Add(combineInstance);
+                for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
+                {
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
+                    combineInstance.subMeshIndex = i;
+                    combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
+
+                    meshes.Add(combineInstance);
+                }
             }
             
             foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
             {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = meshFilter.sharedMesh;
-                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
-                meshes.Add(combineInstance);
+                for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
+                {
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = meshFilter.sharedMesh;
+                    combineInstance.subMeshIndex = i;
+                    combineInstance.transform = meshFilter.transform.localToWorldMatrix;
+                
+                    meshes.Add(combineInstance);
+                }
             }
 
             if (meshes.Any())
