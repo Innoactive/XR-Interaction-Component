@@ -262,6 +262,11 @@ namespace Innoactive.Creator.XRInteraction
 
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
             {
+                if (skinnedMeshRenderer.sharedMesh == null)
+                {
+                    continue;
+                }
+                
                 for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
                 {
                     CombineInstance combineInstance = new CombineInstance();
@@ -275,6 +280,11 @@ namespace Innoactive.Creator.XRInteraction
             
             foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
             {
+                if (meshFilter.sharedMesh == null)
+                {
+                    continue;
+                }
+
                 for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
                 {
                     CombineInstance combineInstance = new CombineInstance();
