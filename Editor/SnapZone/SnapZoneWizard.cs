@@ -13,7 +13,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private SnapZoneSettings settings;
         private Editor snapzoneEditor;
         private static SnapZoneWizard window;
-        private const string menuPath = "Innoactive/Creator/Windows/Snap Zone Settings";
+        private const string menuPath = "Innoactive/Settings/Snap Zone Settings";
 
         [MenuItem(menuPath, false, 60)]
         private static void ShowWizard()
