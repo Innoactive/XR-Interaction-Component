@@ -26,11 +26,16 @@ namespace Innoactive.Creator.XRInteraction.Properties
 
             if (Highlighter == null)
             {
-                Highlighter = GetComponent<InteractableHighlighter>();
+                Initialize();
             }
         }
         
         protected void Reset()
+        {
+            Initialize();
+        }
+
+        protected void Initialize()
         {
             InteractableObject ownInteractableObject = gameObject.GetComponent<InteractableObject>();
 
