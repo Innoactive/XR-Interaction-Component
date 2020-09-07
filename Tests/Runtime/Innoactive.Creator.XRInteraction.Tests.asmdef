@@ -21,9 +21,15 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
-        "CREATOR_XR_INTERACTION",
+        "XR_INTERACTION_TOOLKIT",
         "UNITY_INCLUDE_TESTS"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "",
+            "define": "XR_INTERACTION_TOOLKIT"
+        }
+    ],
     "noEngineReferences": false
 }

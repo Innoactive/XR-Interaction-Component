@@ -1690,6 +1690,7 @@ MonoBehaviour:
   m_PlayHapticsOnHoverExit: 1
   m_HapticHoverExitIntensity: 0.25
   m_HapticHoverExitDuration: 0.125
+  precisionGrab: 1
 --- !u!1 &7978014071796457453
 GameObject:
   m_ObjectHideFlags: 0
@@ -2154,6 +2155,7 @@ MonoBehaviour:
   m_PlayHapticsOnHoverExit: 1
   m_HapticHoverExitIntensity: 0.25
   m_HapticHoverExitDuration: 0.125
+  precisionGrab: 1
 --- !u!1 &8767993477320427908
 GameObject:
   m_ObjectHideFlags: 0

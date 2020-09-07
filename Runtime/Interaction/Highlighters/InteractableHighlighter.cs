@@ -317,8 +317,8 @@ namespace Innoactive.Creator.XRInteraction
                 return;
             }
 
-            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>(true).Where(meshRenderer => meshRenderer.gameObject.activeSelf && meshRenderer.enabled).ToArray();
-            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>(true).Where(meshRenderer => meshRenderer.gameObject.activeSelf && meshRenderer.enabled).ToArray();
+            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>().Where(meshRenderer => meshRenderer.enabled).ToArray();
+            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>().Where(meshRenderer => meshRenderer.enabled).ToArray();
             cachedMeshFilters = cachedMeshRenderers.Select(meshRenderer => meshRenderer.GetComponent<MeshFilter>()).ToArray();
         }
 
@@ -344,7 +344,10 @@ namespace Innoactive.Creator.XRInteraction
             Transform rendersTransform = renderer.transform;
             Matrix4x4 matrix = Matrix4x4.TRS(rendersTransform.position, rendersTransform.rotation, rendersTransform.lossyScale);
 
-            Graphics.DrawMesh(mesh, matrix, material, layerMask);
+            for (int i = 0; i < mesh.subMeshCount; i++)
+            {
+                Graphics.DrawMesh(mesh, matrix, material, layerMask, null, i);
+            }
         }
 
         private bool ShouldHighlightTouching()

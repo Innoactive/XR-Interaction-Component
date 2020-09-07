@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using Innoactive.Creator.BasicInteraction.Validation;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -16,6 +17,11 @@ namespace Innoactive.Creator.XRInteraction
     /// </remarks>
     public class SnapZone : XRSocketInteractor
     {
+        /// <summary>
+        /// Gets or sets whether <see cref="ShownHighlightObject"/> is shown or not.
+        /// </summary>
+        public bool ShowHighlightObject { get; set; }
+        
         [SerializeField]
         private GameObject shownHighlightObject = null;
 
@@ -35,7 +41,7 @@ namespace Innoactive.Creator.XRInteraction
         
         [SerializeField]
         private Color shownHighlightObjectColor = new Color(0.8f, 0.0f, 1.0f, 0.6f);
-        
+
         /// <summary>
         /// The color of the material used to draw the <see cref="ShownHighlightObject"/>.
         /// Use the alpha value to specify the degree of transparency.
@@ -49,14 +55,13 @@ namespace Innoactive.Creator.XRInteraction
                 UpdateHighlightMeshFilterCache();
             }
         }
-
-        /// <summary>
-        /// Gets or sets whether <see cref="ShownHighlightObject"/> is shown or not.
-        /// </summary>
-        public bool ShowHighlightObject { get; set; }
         
-        private Material highlightMeshMaterial;
+        /// <summary>
+        /// Shows the highlight 
+        /// </summary>
+        public bool ShowHighlightInEditor = true;
 
+        private Material highlightMeshMaterial;
         /// <summary>
         /// The material used for drawing the mesh of the <see cref="ShownHighlightObject"/>. 
         /// </summary>
@@ -71,10 +76,10 @@ namespace Innoactive.Creator.XRInteraction
 
                 return highlightMeshMaterial;
             }
-            set { highlightMeshMaterial = value; }
         }
 
         [SerializeField]
+        [Tooltip("Will be used when a valid object hovers the SnapZone")]
         private Material validationMaterial;
 
         /// <summary>
@@ -91,7 +96,28 @@ namespace Innoactive.Creator.XRInteraction
 
                 return validationMaterial;
             }
-            set { validationMaterial = value; }
+            set => validationMaterial = value;
+        }
+        
+        [SerializeField]
+        [Tooltip("Will be used when an invalid object hovers the SnapZone")]
+        private Material invalidMaterial;
+
+        /// <summary>
+        /// The material used for drawing when an invalid <see cref="InteractableObject"/> is hovering this <see cref="SnapZone"/>.
+        /// </summary>
+        public Material InvalidMaterial
+        {
+            get
+            {
+                if (invalidMaterial == null)
+                {
+                    invalidMaterial = CreateTransparentMaterial();
+                }
+
+                return invalidMaterial;
+            }
+            set => invalidMaterial = value;
         }
 
         /// <summary>
@@ -103,14 +129,42 @@ namespace Innoactive.Creator.XRInteraction
         /// Forces the socket interactor to select the given target, if it is not null.
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
-
-        private Material previewMaterial;
+        
         private Mesh previewMesh;
+        
+        /// <summary>
+        /// Returns the preview mesh used for this SnapZone.
+        /// </summary>
+        public Mesh PreviewMesh 
+        {
+            get
+            {
+                if (previewMesh == null && shownHighlightObject != null)
+                {
+                    UpdateHighlightMeshFilterCache();
+                }
+
+                return previewMesh;
+            }
+            
+            set
+            {
+                previewMesh = value;
+            }
+        }
+        
+        private Material activeMaterial;
+
+        private List<Validator> validators = new List<Validator>();
+
+        private Vector3 tmpCenterOfMass;
 
         protected override void Awake()
         {
             base.Awake();
 
+            validators = GetComponents<Validator>().ToList();
+            
             Collider triggerCollider = gameObject.GetComponentsInChildren<Collider>().FirstOrDefault(foundCollider => foundCollider.isTrigger);
             if (triggerCollider == null)
             {
@@ -120,33 +174,46 @@ namespace Innoactive.Creator.XRInteraction
 
             ShowHighlightObject = ShownHighlightObject != null;
 
+            activeMaterial = HighlightMeshMaterial;
+            
             if (ShownHighlightObject != null)
             {
                 UpdateHighlightMeshFilterCache();
             }
         }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            
+            onSelectEnter.AddListener(OnAttach);
+            onSelectExit.AddListener(OnDetach);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            
+            onSelectEnter.RemoveListener(OnAttach);
+            onSelectExit.RemoveListener(OnDetach);
+        }
+
+        private void OnAttach(XRBaseInteractable snappable)
+        {
+            Rigidbody rigid = snappable.gameObject.GetComponent<Rigidbody>();
+            tmpCenterOfMass = rigid.centerOfMass;
+            rigid.centerOfMass = Vector3.zero;
+        }
         
+        private void OnDetach(XRBaseInteractable snappable)
+        {
+            Rigidbody rigid = snappable.gameObject.GetComponent<Rigidbody>();
+            rigid.centerOfMass = tmpCenterOfMass;
+        }
+
         private void OnDrawGizmos()
         {
-            Collider collider = GetComponent<Collider>();
-
-            if (collider == null)
-            {
-                return;
-            }
-
-            Gizmos.color = shownHighlightObjectColor;
-            Gizmos.matrix = transform.localToWorldMatrix;
-
-            switch (collider)
-            {
-                case BoxCollider boxCollider:
-                    Gizmos.DrawCube(boxCollider.center, boxCollider.size);
-                    break;
-                case SphereCollider sphereCollider:
-                    Gizmos.DrawSphere(sphereCollider.center, sphereCollider.radius);
-                    break;
-            }
+            Gizmos.DrawIcon(transform.position, "Import", false);
         }
 
         protected virtual void Update()
@@ -195,20 +262,38 @@ namespace Innoactive.Creator.XRInteraction
 
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in ShownHighlightObject.GetComponentsInChildren<SkinnedMeshRenderer>())
             {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
-                combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
+                if (skinnedMeshRenderer.sharedMesh == null)
+                {
+                    continue;
+                }
                 
-                meshes.Add(combineInstance);
+                for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
+                {
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
+                    combineInstance.subMeshIndex = i;
+                    combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
+
+                    meshes.Add(combineInstance);
+                }
             }
             
             foreach (MeshFilter meshFilter in ShownHighlightObject.GetComponentsInChildren<MeshFilter>())
             {
-                CombineInstance combineInstance = new CombineInstance();
-                combineInstance.mesh = meshFilter.sharedMesh;
-                combineInstance.transform = meshFilter.transform.localToWorldMatrix;
+                if (meshFilter.sharedMesh == null)
+                {
+                    continue;
+                }
+
+                for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
+                {
+                    CombineInstance combineInstance = new CombineInstance();
+                    combineInstance.mesh = meshFilter.sharedMesh;
+                    combineInstance.subMeshIndex = i;
+                    combineInstance.transform = meshFilter.transform.localToWorldMatrix;
                 
-                meshes.Add(combineInstance);
+                    meshes.Add(combineInstance);
+                }
             }
 
             if (meshes.Any())
@@ -237,11 +322,18 @@ namespace Innoactive.Creator.XRInteraction
             {
                 if (m_HoverTargets.Count == 0 && ShowHighlightObject)
                 {
-                    previewMaterial = HighlightMeshMaterial;
+                    activeMaterial = HighlightMeshMaterial;
                 } 
                 else if (m_HoverTargets.Count > 0 && showInteractableHoverMeshes)
                 {
-                    previewMaterial = ValidationMaterial;
+                    if (m_HoverTargets.All(CanSelect))
+                    {
+                        activeMaterial = ValidationMaterial;
+                    }
+                    else
+                    {
+                        activeMaterial = InvalidMaterial;
+                    }
                 }
             }
         }
@@ -251,10 +343,12 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected virtual void DrawHighlightMesh()
         {
-            if (previewMesh != null)
+            if (PreviewMesh != null)
             {
-                Matrix4x4 matrix = Matrix4x4.TRS(attachTransform.position, transform.rotation, transform.localScale);
-                Graphics.DrawMesh(previewMesh, matrix, previewMaterial, gameObject.layer);
+                for (int i = 0; i < PreviewMesh.subMeshCount; i++)
+                {
+                    Graphics.DrawMesh(PreviewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null, i);
+                }
             }
         }
 
@@ -279,7 +373,9 @@ namespace Innoactive.Creator.XRInteraction
 
             if (interactable.IsSelectableBy(this))
             {
-                OnTriggerEnter(interactable.GetComponent<Collider>());
+                OnSelectEnter(interactable);
+                interactable.transform.position = attachTransform.position;
+                interactable.transform.rotation = attachTransform.rotation;
                 ForceSelectTarget = interactable;
             }
             else
@@ -317,8 +413,22 @@ namespace Innoactive.Creator.XRInteraction
                 return true;
             }
 
-            // Otherwise, normal routine.
-            return base.CanSelect(interactable);
+            // If this object cannot be selected, ignore it.
+            if (base.CanSelect(interactable) == false)
+            {
+                return false;
+            }
+            
+            // If one active validator does not allow this to be snapped, return false.
+            foreach (Validator validator in validators)
+            {
+                if (validator.isActiveAndEnabled && validator.Validate(interactable.gameObject) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

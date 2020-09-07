@@ -10,6 +10,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     [CustomEditor(typeof(SnapZone))]
     internal class SnapZoneEditor : Editor
     {
+        private SerializedProperty showHighlightInEditor;
         private SerializedProperty shownHighlightObject;
         private SerializedProperty shownHighlightObjectColor;
         
@@ -33,6 +34,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public static readonly GUIContent AttachTransform = new GUIContent("Attach Transform", "Attach Transform to use for this Interactor.  Will create empty GameObject if none set.");
             public static readonly GUIContent StartingSelectedInteractable = new GUIContent("Starting Selected Interactable", "Interactable that will be selected upon start.");
             
+            public static readonly GUIContent ShowHighlightInEditor = new GUIContent("Show Highlight in Editor", "Enable this to show how the object will be positioned later on.");
             public static readonly GUIContent ShownHighlightObject = new GUIContent("Shown Highlight Object", "The game object whose mesh is drawn to emphasize the position of the snap zone. If none is supplied, no highlight object is shown.");
             public static readonly GUIContent ShownHighlightObjectColor = new GUIContent("Shown Highlight Object Color", "The color of the material used to draw the \"Shown Highlight Object\". Use the alpha value to specify the degree of transparency.");
             public static readonly GUIContent InteractableHoverMeshMaterial = new GUIContent("Validation Hover Material", "Material used for rendering interactable meshes on hover (a default material will be created if none is supplied).");
@@ -40,6 +42,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         private void OnEnable()
         {
+            showHighlightInEditor = serializedObject.FindProperty("ShowHighlightInEditor");
             shownHighlightObject = serializedObject.FindProperty("shownHighlightObject");
             shownHighlightObjectColor = serializedObject.FindProperty("shownHighlightObjectColor");
             
@@ -72,8 +75,13 @@ namespace Innoactive.CreatorEditor.XRInteraction
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Snap Zone", EditorStyles.boldLabel); 
             
+            EditorGUILayout.PropertyField(showHighlightInEditor, Tooltips.ShowHighlightInEditor);
+            
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(shownHighlightObject, Tooltips.ShownHighlightObject);
             EditorGUILayout.PropertyField(shownHighlightObjectColor, Tooltips.ShownHighlightObjectColor);
+            bool isPreviewMeshChanged = EditorGUI.EndChangeCheck();
+            
             EditorGUILayout.PropertyField(interactableHoverMeshMaterial, Tooltips.InteractableHoverMeshMaterial);
             
             showInteractorEvents = EditorGUILayout.Toggle("Show Interactor Events", showInteractorEvents);
@@ -88,6 +96,19 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
             
             serializedObject.ApplyModifiedProperties();
+
+            if (isPreviewMeshChanged)
+            {
+                SnapZone snapZone = (SnapZone) target;
+                snapZone.PreviewMesh = null;
+                
+                SnapZonePreviewDrawer preview = snapZone.attachTransform.gameObject.GetComponent<SnapZonePreviewDrawer>();
+                
+                if (preview != null)
+                {
+                    preview.UpdateMesh();
+                }
+            }
         }
     }
 }
