@@ -152,24 +152,22 @@ namespace Innoactive.Creator.XRInteraction
                 previewMesh = value;
             }
         }
-        
+
+        private Transform initialParent;
         private Material activeMaterial;
-
-        private List<Validator> validators = new List<Validator>();
-
         private Vector3 tmpCenterOfMass;
-
+        private List<Validator> validators = new List<Validator>();
+        
         protected override void Awake()
         {
             base.Awake();
-
-            validators = GetComponents<Validator>().ToList();
             
-            Collider triggerCollider = gameObject.GetComponentsInChildren<Collider>().FirstOrDefault(foundCollider => foundCollider.isTrigger);
-            if (triggerCollider == null)
+            validators = GetComponents<Validator>().ToList();
+
+            if (GetComponentsInChildren<Collider>()?.Any(foundCollider => foundCollider.isTrigger) == false)
             {
-                Debug.LogErrorFormat(gameObject, "The Snap Zone '{0}' does not have any trigger collider. "
-                    + "Make sure you have at least one collider with the property `Is Trigger` enabled.", gameObject.name);
+                Debug.LogError($"The Snap Zone '{name}' does not have any trigger collider. "
+                    + "Make sure you have at least one collider with the property `Is Trigger` enabled.", gameObject);
             }
 
             ShowHighlightObject = ShownHighlightObject != null;
@@ -180,12 +178,19 @@ namespace Innoactive.Creator.XRInteraction
             {
                 UpdateHighlightMeshFilterCache();
             }
+
+            initialParent = transform.parent;
+
+            if (initialParent != null)
+            {
+                transform.SetParent(null);
+            }
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            
+
             onSelectEnter.AddListener(OnAttach);
             onSelectExit.AddListener(OnDetach);
         }
@@ -218,6 +223,12 @@ namespace Innoactive.Creator.XRInteraction
 
         protected virtual void Update()
         {
+            if (initialParent != null)
+            {
+                transform.SetParent(initialParent);
+                initialParent = null;
+            }
+            
             if (socketActive && selectTarget == null)
             {
                 DrawHighlightMesh();
