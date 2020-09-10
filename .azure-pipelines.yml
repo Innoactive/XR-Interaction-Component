@@ -24,7 +24,7 @@ resources:
     type: github
     endpoint: Innoactive
     name: Innoactive/Creator-Azure-Templates
-    ref: develop
+    ref: master
 
 parameters:
   - name: Version
