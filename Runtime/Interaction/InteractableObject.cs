@@ -195,6 +195,16 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
         
+        internal void SimulateHoverEnter(XRBaseInteractor interactor)
+        {
+            OnHoverEnter(interactor);
+        }
+        
+        internal void SimulateHoverExit(XRBaseInteractor interactor)
+        {
+            OnHoverExit(interactor);
+        }
+        
         private IEnumerator StopInteractingForOneFrame()
         {
             List<XRBaseInteractor> interactors = new List<XRBaseInteractor>(hoveringInteractors);

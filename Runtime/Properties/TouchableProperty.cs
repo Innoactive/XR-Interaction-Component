@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Creator.Core.Properties;
@@ -85,14 +86,6 @@ namespace Innoactive.Creator.XRInteraction.Properties
         protected override void InternalSetLocked(bool lockState)
         {
             Interactable.IsTouchable = lockState == false;
-            
-            if (IsBeingTouched)
-            {
-                if (lockState)
-                {
-                    Interactable.ForceStopInteracting();
-                }
-            }
         }
 
         /// <inheritdoc />
@@ -100,7 +93,17 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             if (IsBeingTouched)
             {
-                Interactable.ForceStopInteracting();
+                List<XRBaseInteractor> interactors = Interactable.hoveringInteractors;
+
+                foreach (XRBaseInteractor interactor in interactors)
+                {
+                    Interactable.SimulateHoverExit(interactor);
+                }
+                
+                foreach (XRBaseInteractor interactor in interactors)
+                {
+                    Interactable.SimulateHoverEnter(interactor);
+                }
             }
             else
             {
