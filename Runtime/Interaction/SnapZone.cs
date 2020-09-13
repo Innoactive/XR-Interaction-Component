@@ -391,11 +391,8 @@ namespace Innoactive.Creator.XRInteraction
             }
             else
             {
-                Debug.LogWarningFormat(interactable.gameObject, 
-                    "Interactable '{0}' is not selectable by Snap Zone '{1}'. "
-                    + "(Maybe the Interaction Layer Masks settings are not correct or the interactable object is locked?)", 
-                    interactable.gameObject.name, 
-                    gameObject.name);
+                Debug.LogWarning($"Interactable '{interactable.name}' is not selectable by Snap Zone '{name}'. "
+                    + $"(Maybe the Interaction Layer Masks settings are not correct or the interactable object is locked?)", interactable.gameObject);
             }
         }
 

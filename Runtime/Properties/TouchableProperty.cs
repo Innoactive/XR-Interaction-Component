@@ -93,17 +93,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             if (IsBeingTouched)
             {
-                List<XRBaseInteractor> interactors = Interactable.hoveringInteractors;
-
-                foreach (XRBaseInteractor interactor in interactors)
-                {
-                    Interactable.SimulateHoverExit(interactor);
-                }
-                
-                foreach (XRBaseInteractor interactor in interactors)
-                {
-                    Interactable.SimulateHoverEnter(interactor);
-                }
+                Interactable.ForceStopInteracting();
             }
             else
             {
