@@ -87,11 +87,29 @@ namespace Innoactive.Creator.XRInteraction
         protected override void Reset()
         {
             base.Reset();
-            
+
             // Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
             interactionLayerMask = 1;
         }
 
+        internal void OnTriggerEnter(Collider other)
+        {
+            SnapZone target = other.gameObject.GetComponent<SnapZone>();            
+            if (target != null && target.enabled && !IsInSocket)
+            {
+                target.AddHoveredInteractable(this);
+            }
+        }
+
+        internal void OnTriggerExit(Collider other)
+        {
+            SnapZone target = other.gameObject.GetComponent<SnapZone>();            
+            if (target != null && target.enabled)
+            {
+                target.RemoveHoveredInteractable(this);
+            }
+        }
+        
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> can be hovered by a given interactor.
         /// </summary>
