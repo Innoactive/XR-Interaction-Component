@@ -156,7 +156,10 @@ namespace Innoactive.Creator.XRInteraction
         private Transform initialParent;
         private Material activeMaterial;
         private Vector3 tmpCenterOfMass;
+        
         private List<Validator> validators = new List<Validator>();
+        
+        private List<XRBaseInteractable> hoverTargets = new List<XRBaseInteractable>();
         
         protected override void Awake()
         {
@@ -187,10 +190,25 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
 
+        internal void AddHoveredInteractable(XRBaseInteractable interactable)
+        {  
+            if (interactable != null)
+            {
+                hoverTargets.Add(interactable);
+            }
+        }
+
+        internal void RemoveHoveredInteractable(XRBaseInteractable interactable)
+        {
+            hoverTargets.Remove(interactable);
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
-
+            
+            hoverTargets.Clear();
+            
             onSelectEnter.AddListener(OnAttach);
             onSelectExit.AddListener(OnDetach);
         }
@@ -199,20 +217,22 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnDisable();
             
+            hoverTargets.Clear();
+            
             onSelectEnter.RemoveListener(OnAttach);
             onSelectExit.RemoveListener(OnDetach);
         }
 
-        private void OnAttach(XRBaseInteractable snappable)
+        private void OnAttach(XRBaseInteractable interactable)
         {
-            Rigidbody rigid = snappable.gameObject.GetComponent<Rigidbody>();
+            Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
             tmpCenterOfMass = rigid.centerOfMass;
             rigid.centerOfMass = Vector3.zero;
         }
         
-        private void OnDetach(XRBaseInteractable snappable)
+        private void OnDetach(XRBaseInteractable interactable)
         {
-            Rigidbody rigid = snappable.gameObject.GetComponent<Rigidbody>();
+            Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
             rigid.centerOfMass = tmpCenterOfMass;
         }
 
@@ -328,24 +348,43 @@ namespace Innoactive.Creator.XRInteraction
             {
                 base.ProcessInteractor(updatePhase);
             }
-
+            
             if (socketActive)
             {
-                if (m_HoverTargets.Count == 0 && ShowHighlightObject)
+                hoverTargets.RemoveAll(target => target == null || target.enabled == false);
+                
+                CheckForReleasedHoverTargets();
+                
+                ShowHighlight();
+            }
+        }
+
+        private void CheckForReleasedHoverTargets()
+        {
+            foreach (XRBaseInteractable target in hoverTargets)
+            {
+                if (m_HoverTargets.Contains(target) || target.isSelected || selectTarget != null)
                 {
-                    activeMaterial = HighlightMeshMaterial;
-                } 
-                else if (m_HoverTargets.Count > 0 && showInteractableHoverMeshes)
-                {
-                    if (m_HoverTargets.All(CanSelect))
-                    {
-                        activeMaterial = ValidationMaterial;
-                    }
-                    else
-                    {
-                        activeMaterial = InvalidMaterial;
-                    }
+                    continue;
                 }
+
+                if (CanSelect(target))
+                {
+                    ForceSelect(target);
+                    return;
+                }
+            }
+        }
+
+        private void ShowHighlight()
+        {
+            if (hoverTargets.Count == 0 && ShowHighlightObject)
+            {
+                activeMaterial = HighlightMeshMaterial;
+            }
+            else if (hoverTargets.Count > 0 && showInteractableHoverMeshes)
+            {
+                activeMaterial = hoverTargets.Any(CanSelect) ? ValidationMaterial : InvalidMaterial;
             }
         }
 

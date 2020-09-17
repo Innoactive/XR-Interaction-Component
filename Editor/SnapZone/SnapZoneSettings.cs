@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -121,16 +122,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         {
             if (highlightMaterial == null)
             {
-                highlightMaterial = CreateMaterial();
-                highlightMaterial.name = "SnapZoneHighlightMaterial";
-
-                if (Directory.Exists(MaterialsPath) == false)
-                {
-                    Directory.CreateDirectory(MaterialsPath);
-                }
-
-                AssetDatabase.CreateAsset(highlightMaterial, $"{MaterialsPath}/{highlightMaterial.name}.mat");
-                AssetDatabase.Refresh();
+                highlightMaterial = UseDefaultMaterial("SnapZoneHighlightMaterial");
             }
                 
             highlightMaterial.color = HighlightColor;
@@ -141,16 +133,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         {
             if (invalidMaterial == null)
             {
-                invalidMaterial = CreateMaterial();
-                invalidMaterial.name = "SnapZoneInvalidMaterial";
-
-                if (Directory.Exists(MaterialsPath) == false)
-                {
-                    Directory.CreateDirectory(MaterialsPath);
-                }
-
-                AssetDatabase.CreateAsset(invalidMaterial, $"{MaterialsPath}/{invalidMaterial.name}.mat");
-                AssetDatabase.Refresh();
+                invalidMaterial = UseDefaultMaterial("SnapZoneInvalidMaterial");
             }
                 
             invalidMaterial.color = InvalidColor;
@@ -161,20 +144,39 @@ namespace Innoactive.CreatorEditor.XRInteraction
         {
             if (validationMaterial == null)
             {
-                validationMaterial = CreateMaterial();
-                validationMaterial.name = "SnapZoneValidationMaterial";
-
-                if (Directory.Exists(MaterialsPath) == false)
-                {
-                    Directory.CreateDirectory(MaterialsPath);
-                }
-
-                AssetDatabase.CreateAsset(validationMaterial, $"{MaterialsPath}/{validationMaterial.name}.mat");
-                AssetDatabase.Refresh();
+                validationMaterial = UseDefaultMaterial("SnapZoneValidationMaterial");
             }
                 
             validationMaterial.color = ValidationColor;
             return validationMaterial;
+        }
+
+        private Material UseDefaultMaterial(string materialName)
+        {
+            if (Directory.Exists(MaterialsPath) == false)
+            {
+                Directory.CreateDirectory(MaterialsPath);
+            }
+            
+            string filePath = $"{MaterialsPath}/{materialName}.mat";
+
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    return (Material)AssetDatabase.LoadAssetAtPath(filePath, typeof(Material));
+                }
+                catch (Exception)
+                {
+                    Debug.LogError($"Material at '{filePath}' is corrupted or not a material. A new one is created in the same file path.");
+                }
+            }
+
+            Material material = CreateMaterial();
+            material.name = materialName;
+            AssetDatabase.CreateAsset(material, filePath);
+            AssetDatabase.Refresh();
+            return material;
         }
 
         private Material CreateMaterial()
