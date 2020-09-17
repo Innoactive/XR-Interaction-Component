@@ -165,6 +165,7 @@ namespace Innoactive.Creator.XRInteraction
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
+            
             if (IsInSocket == false)
             {
                 XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();
@@ -212,33 +213,23 @@ namespace Innoactive.Creator.XRInteraction
                 base.OnDeactivate(interactor);
             }
         }
-        
+
         private IEnumerator StopInteractingForOneFrame()
         {
-            List<XRBaseInteractor> interactors = new List<XRBaseInteractor>(hoveringInteractors);
-            
-            if (interactors.Contains(selectingInteractor) == false)
+            bool wasTouchable = isTouchable, wasGrabbable = isGrabbable, wasUsable = isUsable;
+            isTouchable = isGrabbable = isUsable = false;
+
+            if (selectingSocket != null)
             {
-                interactors.Add(selectingInteractor);
+                SnapZone snapZone = selectingSocket as SnapZone;
+                snapZone.ForceUnselect();
             }
             
-            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
-            {
-                if (interactor.GetComponent<XRController>() != null)
-                {
-                    interactor.enableInteractions = false;
-                }
-            }
+            yield return new WaitUntil(() => hoveringInteractors.Count == 0 && selectingInteractor == null);
             
-            yield return new WaitUntil(() => isHovered == false && (isSelected == false || IsInSocket));
-            
-            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
-            {
-                if (interactor.GetComponent<XRController>() != null)
-                {
-                    interactor.enableInteractions = true;
-                }
-            }
+            isTouchable = wasTouchable;
+            isGrabbable = wasGrabbable;
+            isUsable = wasUsable;
         }
     }
 }
