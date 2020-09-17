@@ -95,7 +95,7 @@ namespace Innoactive.Creator.XRInteraction
         internal void OnTriggerEnter(Collider other)
         {
             SnapZone target = other.gameObject.GetComponent<SnapZone>();            
-            if (target != null && target.enabled && !IsInSocket)
+            if (target != null && target.enabled && !IsInSocket && isSelected)
             {
                 target.AddHoveredInteractable(this);
             }

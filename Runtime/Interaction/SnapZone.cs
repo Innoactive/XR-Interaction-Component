@@ -361,9 +361,14 @@ namespace Innoactive.Creator.XRInteraction
 
         private void CheckForReleasedHoverTargets()
         {
+            if (selectTarget != null)
+            {
+                return;
+            }
+            
             foreach (XRBaseInteractable target in hoverTargets)
             {
-                if (m_HoverTargets.Contains(target) || target.isSelected || selectTarget != null)
+                if (m_HoverTargets.Contains(target) || target.isSelected)
                 {
                     continue;
                 }
