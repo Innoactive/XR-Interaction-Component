@@ -60,7 +60,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         protected void Reset()
         {
             Interactable.IsGrabbable = true;
-            gameObject.GetComponent<Rigidbody>().isKinematic = false;
+            GetComponent<Rigidbody>().isKinematic = false;
         }
 
         private void HandleXRGrabbed(XRBaseInteractor interactor)

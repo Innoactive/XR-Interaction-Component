@@ -15,7 +15,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// Custom inspector for <see cref="SnappableProperty"/>, adding a button to create <see cref="Innoactive.Creator.XRInteraction.SnapZone"/>s automatically.
     /// </summary>
     [CustomEditor(typeof(SnappableProperty))]
-    public class SnappablePropertyEditor : Editor
+    internal class SnappablePropertyEditor : Editor
     {
         private const string PrefabPath = "Assets/Resources/SnapZones/Prefabs";
 
