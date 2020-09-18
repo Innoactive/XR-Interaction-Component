@@ -159,6 +159,11 @@ namespace Innoactive.Creator.XRInteraction
             OnActivate(selectingInteractor);
         }
 
+        internal void ForceSelectEnter(XRBaseInteractor interactor)
+        {
+            OnSelectEnter(interactor);
+        }
+        
         /// <summary>This method is called by the interaction manager 
         /// when the interactor first initiates selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is initiating the selection.</param>

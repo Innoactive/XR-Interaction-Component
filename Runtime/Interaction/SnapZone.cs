@@ -428,6 +428,11 @@ namespace Innoactive.Creator.XRInteraction
 
             if (interactable.IsSelectableBy(this))
             {
+                if (interactable is InteractableObject interactableObject)
+                {
+                    interactableObject.ForceSelectEnter(this);
+                }
+                
                 OnSelectEnter(interactable);
                 interactable.transform.position = attachTransform.position;
                 interactable.transform.rotation = attachTransform.rotation;
