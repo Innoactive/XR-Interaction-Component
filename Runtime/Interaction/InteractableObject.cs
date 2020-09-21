@@ -87,11 +87,29 @@ namespace Innoactive.Creator.XRInteraction
         protected override void Reset()
         {
             base.Reset();
-            
+
             // Sets the 'interactionLayerMask' to Default in order to not interact with Teleportation or UI rays.
             interactionLayerMask = 1;
         }
 
+        internal void OnTriggerEnter(Collider other)
+        {
+            SnapZone target = other.gameObject.GetComponent<SnapZone>();            
+            if (target != null && target.enabled && !IsInSocket && isSelected)
+            {
+                target.AddHoveredInteractable(this);
+            }
+        }
+
+        internal void OnTriggerExit(Collider other)
+        {
+            SnapZone target = other.gameObject.GetComponent<SnapZone>();            
+            if (target != null && target.enabled)
+            {
+                target.RemoveHoveredInteractable(this);
+            }
+        }
+        
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> can be hovered by a given interactor.
         /// </summary>
@@ -141,12 +159,18 @@ namespace Innoactive.Creator.XRInteraction
             OnActivate(selectingInteractor);
         }
 
+        internal void ForceSelectEnter(XRBaseInteractor interactor)
+        {
+            OnSelectEnter(interactor);
+        }
+        
         /// <summary>This method is called by the interaction manager 
         /// when the interactor first initiates selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is initiating the selection.</param>
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
+            
             if (IsInSocket == false)
             {
                 XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();
@@ -194,33 +218,23 @@ namespace Innoactive.Creator.XRInteraction
                 base.OnDeactivate(interactor);
             }
         }
-        
+
         private IEnumerator StopInteractingForOneFrame()
         {
-            List<XRBaseInteractor> interactors = new List<XRBaseInteractor>(hoveringInteractors);
-            
-            if (interactors.Contains(selectingInteractor) == false)
+            bool wasTouchable = isTouchable, wasGrabbable = isGrabbable, wasUsable = isUsable;
+            isTouchable = isGrabbable = isUsable = false;
+
+            if (selectingSocket != null)
             {
-                interactors.Add(selectingInteractor);
+                SnapZone snapZone = selectingSocket as SnapZone;
+                snapZone.ForceUnselect();
             }
             
-            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
-            {
-                if (interactor.GetComponent<XRController>() != null)
-                {
-                    interactor.enableInteractions = false;
-                }
-            }
+            yield return new WaitUntil(() => hoveringInteractors.Count == 0 && selectingInteractor == null);
             
-            yield return new WaitUntil(() => isHovered == false && (isSelected == false || IsInSocket));
-            
-            foreach (XRBaseInteractor interactor in interactors.Where(interactor => interactor != null))
-            {
-                if (interactor.GetComponent<XRController>() != null)
-                {
-                    interactor.enableInteractions = true;
-                }
-            }
+            isTouchable = wasTouchable;
+            isGrabbable = wasGrabbable;
+            isUsable = wasUsable;
         }
     }
 }

@@ -152,24 +152,25 @@ namespace Innoactive.Creator.XRInteraction
                 previewMesh = value;
             }
         }
-        
+
+        private Transform initialParent;
         private Material activeMaterial;
-
-        private List<Validator> validators = new List<Validator>();
-
         private Vector3 tmpCenterOfMass;
-
+        
+        private List<Validator> validators = new List<Validator>();
+        
+        private List<XRBaseInteractable> hoverTargets = new List<XRBaseInteractable>();
+        
         protected override void Awake()
         {
             base.Awake();
-
-            validators = GetComponents<Validator>().ToList();
             
-            Collider triggerCollider = gameObject.GetComponentsInChildren<Collider>().FirstOrDefault(foundCollider => foundCollider.isTrigger);
-            if (triggerCollider == null)
+            validators = GetComponents<Validator>().ToList();
+
+            if (GetComponentsInChildren<Collider>()?.Any(foundCollider => foundCollider.isTrigger) == false)
             {
-                Debug.LogErrorFormat(gameObject, "The Snap Zone '{0}' does not have any trigger collider. "
-                    + "Make sure you have at least one collider with the property `Is Trigger` enabled.", gameObject.name);
+                Debug.LogError($"The Snap Zone '{name}' does not have any trigger collider. "
+                    + "Make sure you have at least one collider with the property `Is Trigger` enabled.", gameObject);
             }
 
             ShowHighlightObject = ShownHighlightObject != null;
@@ -180,11 +181,28 @@ namespace Innoactive.Creator.XRInteraction
             {
                 UpdateHighlightMeshFilterCache();
             }
+
+            DetachParent();
+        }
+
+        internal void AddHoveredInteractable(XRBaseInteractable interactable)
+        {  
+            if (interactable != null)
+            {
+                hoverTargets.Add(interactable);
+            }
+        }
+
+        internal void RemoveHoveredInteractable(XRBaseInteractable interactable)
+        {
+            hoverTargets.Remove(interactable);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
+            
+            hoverTargets.Clear();
             
             onSelectEnter.AddListener(OnAttach);
             onSelectExit.AddListener(OnDetach);
@@ -194,21 +212,43 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnDisable();
             
+            AttachParent();
+            hoverTargets.Clear();
+            
             onSelectEnter.RemoveListener(OnAttach);
             onSelectExit.RemoveListener(OnDetach);
         }
 
-        private void OnAttach(XRBaseInteractable snappable)
+        private void OnAttach(XRBaseInteractable interactable)
         {
-            Rigidbody rigid = snappable.gameObject.GetComponent<Rigidbody>();
+            Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
             tmpCenterOfMass = rigid.centerOfMass;
             rigid.centerOfMass = Vector3.zero;
         }
         
-        private void OnDetach(XRBaseInteractable snappable)
+        private void OnDetach(XRBaseInteractable interactable)
         {
-            Rigidbody rigid = snappable.gameObject.GetComponent<Rigidbody>();
+            Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
             rigid.centerOfMass = tmpCenterOfMass;
+        }
+        
+        private void DetachParent()
+        {
+            initialParent = transform.parent;
+            
+            if (initialParent != null)
+            {
+                transform.SetParent(null);
+            }
+        }
+
+        private void AttachParent()
+        {
+            if (initialParent != null)
+            {
+                transform.SetParent(initialParent);
+                initialParent = null;
+            }
         }
 
         private void OnDrawGizmos()
@@ -218,6 +258,8 @@ namespace Innoactive.Creator.XRInteraction
 
         protected virtual void Update()
         {
+            AttachParent();
+            
             if (socketActive && selectTarget == null)
             {
                 DrawHighlightMesh();
@@ -317,24 +359,48 @@ namespace Innoactive.Creator.XRInteraction
             {
                 base.ProcessInteractor(updatePhase);
             }
-
+            
             if (socketActive)
             {
-                if (m_HoverTargets.Count == 0 && ShowHighlightObject)
+                hoverTargets.RemoveAll(target => target == null || target.enabled == false);
+                
+                CheckForReleasedHoverTargets();
+                
+                ShowHighlight();
+            }
+        }
+
+        private void CheckForReleasedHoverTargets()
+        {
+            if (selectTarget != null)
+            {
+                return;
+            }
+            
+            foreach (XRBaseInteractable target in hoverTargets)
+            {
+                if (m_HoverTargets.Contains(target) || target.isSelected)
                 {
-                    activeMaterial = HighlightMeshMaterial;
-                } 
-                else if (m_HoverTargets.Count > 0 && showInteractableHoverMeshes)
-                {
-                    if (m_HoverTargets.All(CanSelect))
-                    {
-                        activeMaterial = ValidationMaterial;
-                    }
-                    else
-                    {
-                        activeMaterial = InvalidMaterial;
-                    }
+                    continue;
                 }
+
+                if (CanSelect(target))
+                {
+                    ForceSelect(target);
+                    return;
+                }
+            }
+        }
+
+        private void ShowHighlight()
+        {
+            if (hoverTargets.Count == 0 && ShowHighlightObject)
+            {
+                activeMaterial = HighlightMeshMaterial;
+            }
+            else if (hoverTargets.Count > 0 && showInteractableHoverMeshes)
+            {
+                activeMaterial = hoverTargets.Any(CanSelect) ? ValidationMaterial : InvalidMaterial;
             }
         }
 
@@ -374,17 +440,20 @@ namespace Innoactive.Creator.XRInteraction
             if (interactable.IsSelectableBy(this))
             {
                 OnSelectEnter(interactable);
+                
+                if (interactable is InteractableObject interactableObject)
+                {
+                    interactableObject.ForceSelectEnter(this);
+                }
+                
                 interactable.transform.position = attachTransform.position;
                 interactable.transform.rotation = attachTransform.rotation;
                 ForceSelectTarget = interactable;
             }
             else
             {
-                Debug.LogWarningFormat(interactable.gameObject, 
-                    "Interactable '{0}' is not selectable by Snap Zone '{1}'. "
-                    + "(Maybe the Interaction Layer Masks settings are not correct or the interactable object is locked?)", 
-                    interactable.gameObject.name, 
-                    gameObject.name);
+                Debug.LogWarning($"Interactable '{interactable.name}' is not selectable by Snap Zone '{name}'. "
+                    + $"(Maybe the Interaction Layer Masks settings are not correct or the interactable object is locked?)", interactable.gameObject);
             }
         }
 
