@@ -182,12 +182,7 @@ namespace Innoactive.Creator.XRInteraction
                 UpdateHighlightMeshFilterCache();
             }
 
-            initialParent = transform.parent;
-
-            if (initialParent != null)
-            {
-                transform.SetParent(null);
-            }
+            DetachParent();
         }
 
         internal void AddHoveredInteractable(XRBaseInteractable interactable)
@@ -217,6 +212,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnDisable();
             
+            AttachParent();
             hoverTargets.Clear();
             
             onSelectEnter.RemoveListener(OnAttach);
@@ -235,6 +231,25 @@ namespace Innoactive.Creator.XRInteraction
             Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
             rigid.centerOfMass = tmpCenterOfMass;
         }
+        
+        private void DetachParent()
+        {
+            initialParent = transform.parent;
+            
+            if (initialParent != null)
+            {
+                transform.SetParent(null);
+            }
+        }
+
+        private void AttachParent()
+        {
+            if (initialParent != null)
+            {
+                transform.SetParent(initialParent);
+                initialParent = null;
+            }
+        }
 
         private void OnDrawGizmos()
         {
@@ -243,11 +258,7 @@ namespace Innoactive.Creator.XRInteraction
 
         protected virtual void Update()
         {
-            if (initialParent != null)
-            {
-                transform.SetParent(initialParent);
-                initialParent = null;
-            }
+            AttachParent();
             
             if (socketActive && selectTarget == null)
             {
