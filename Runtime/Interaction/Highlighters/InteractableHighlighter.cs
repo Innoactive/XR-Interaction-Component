@@ -72,6 +72,7 @@ namespace Innoactive.Creator.XRInteraction
         [SerializeField]
         private Color useHighlightColor = new Color32(0, 255, 0, 50);
 
+        private bool isBeingHighlighted;
         private Material colorTouchMaterial;
         private Material colorGrabMaterial;
         private Material colorUseMaterial;
@@ -106,6 +107,12 @@ namespace Innoactive.Creator.XRInteraction
 
         private void OnDisable()
         {
+            if (isBeingHighlighted)
+            {
+                ReenableRenderers();
+                externalHighlights.Clear();
+            }
+            
             interactableObject?.onFirstHoverEnter.RemoveListener(OnTouched);
             interactableObject?.onSelectEnter.RemoveListener(OnGrabbed);
             interactableObject?.onSelectExit.RemoveListener(OnReleased);
@@ -435,6 +442,8 @@ namespace Innoactive.Creator.XRInteraction
             {
                 activeRenderer.enabled = false;
             }
+            
+            isBeingHighlighted = true;
         }
 
         private void ReenableRenderers()
@@ -443,6 +452,8 @@ namespace Innoactive.Creator.XRInteraction
             {
                 renderer.enabled = true;
             }
+            
+            isBeingHighlighted = false;
         }
 
         private bool ShouldHighlightTouching()
