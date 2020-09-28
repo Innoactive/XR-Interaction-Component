@@ -330,8 +330,11 @@ namespace Innoactive.Creator.XRInteraction
 
         internal void ForceRefreshCachedRenderers()
         {
+            ReenableRenderers();
+            
             renderers = default;
             previewMesh = null;
+            
             RefreshCachedRenderers();
         }
 
