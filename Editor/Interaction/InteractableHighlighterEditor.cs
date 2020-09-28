@@ -74,6 +74,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         private void OnEnable()
         {
+            InteractableHighlighter highlighter = target as InteractableHighlighter;
+            highlighter.ForceRefreshCachedRenderers();
+            
             onTouchHighlighting = new HighlightCase(serializedObject, "On Touch Highlight", "touchHighlightColor", "touchHighlightMaterial", "allowOnTouchHighlight", true);
             onGrabHighlighting = new HighlightCase(serializedObject, "On Grab Highlight", "grabHighlightColor", "grabHighlightMaterial", "allowOnGrabHighlight", false);
             onUseHighlighting = new HighlightCase(serializedObject, "On Use Highlight", "useHighlightColor", "useHighlightMaterial", "allowOnUseHighlight", false);

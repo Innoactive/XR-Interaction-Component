@@ -130,6 +130,7 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected XRBaseInteractable ForceSelectTarget { get; set; }
         
+        [SerializeField]
         private Mesh previewMesh;
         
         /// <summary>
@@ -156,9 +157,7 @@ namespace Innoactive.Creator.XRInteraction
         private Transform initialParent;
         private Material activeMaterial;
         private Vector3 tmpCenterOfMass;
-        
         private List<Validator> validators = new List<Validator>();
-        
         private List<XRBaseInteractable> hoverTargets = new List<XRBaseInteractable>();
         
         protected override void Awake()
@@ -329,11 +328,13 @@ namespace Innoactive.Creator.XRInteraction
 
                 for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
                 {
-                    CombineInstance combineInstance = new CombineInstance();
-                    combineInstance.mesh = meshFilter.sharedMesh;
-                    combineInstance.subMeshIndex = i;
-                    combineInstance.transform = meshFilter.transform.localToWorldMatrix;
-                
+                    CombineInstance combineInstance = new CombineInstance
+                    {
+                        subMeshIndex = i,
+                        mesh = meshFilter.sharedMesh,
+                        transform = Matrix4x4.identity
+                    };
+
                     meshes.Add(combineInstance);
                 }
             }
@@ -411,10 +412,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (PreviewMesh != null)
             {
-                for (int i = 0; i < PreviewMesh.subMeshCount; i++)
-                {
-                    Graphics.DrawMesh(PreviewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null, i);
-                }
+                Graphics.DrawMesh(PreviewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null);
             }
         }
 
