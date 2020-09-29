@@ -331,6 +331,11 @@ namespace Innoactive.Creator.XRInteraction
         internal void ForceRefreshCachedRenderers()
         {
             ReenableRenderers();
+
+            if (Application.isPlaying && gameObject.isStatic)
+            {
+                return;
+            }
             
             renderers = default;
             previewMesh = null;
