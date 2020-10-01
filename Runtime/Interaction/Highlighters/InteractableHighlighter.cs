@@ -79,9 +79,17 @@ namespace Innoactive.Creator.XRInteraction
 
         private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
         private InteractableObject interactableObject;
-        private SkinnedMeshRenderer[] cachedSkinnedRenderers = {};
-        private MeshRenderer[] cachedMeshRenderers = {};
-        private MeshFilter[] cachedMeshFilters = {};
+        
+        [SerializeField]
+        private Renderer[] renderers = {};
+        
+        [SerializeField]
+        private Mesh previewMesh = null;
+
+        private void Reset()
+        {
+            RefreshCachedRenderers();
+        }
 
         private void OnEnable()
         {
@@ -101,17 +109,15 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (isBeingHighlighted)
             {
-                ReenableRenderers(cachedSkinnedRenderers);
-                ReenableRenderers(cachedMeshRenderers);
-                
+                ReenableRenderers();
                 externalHighlights.Clear();
             }
             
-            interactableObject.onFirstHoverEnter.RemoveListener(OnTouched);
-            interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
-            interactableObject.onSelectExit.RemoveListener(OnReleased);
-            interactableObject.onActivate.RemoveListener(OnUsed);
-            interactableObject.onDeactivate.RemoveListener(OnUnused);
+            interactableObject?.onFirstHoverEnter.RemoveListener(OnTouched);
+            interactableObject?.onSelectEnter.RemoveListener(OnGrabbed);
+            interactableObject?.onSelectExit.RemoveListener(OnReleased);
+            interactableObject?.onActivate.RemoveListener(OnUsed);
+            interactableObject?.onDeactivate.RemoveListener(OnUnused);
         }
 
         private void OnValidate()
@@ -138,6 +144,11 @@ namespace Innoactive.Creator.XRInteraction
         /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
         public void StartHighlighting(string highlightID, Material highlightMaterial)
         {
+            if (CanObjectBeHighlighted() == false)
+            {
+                return;
+            }
+            
             if (externalHighlights.ContainsKey(highlightID) == false)
             {
                 bool shouldContinueHighlighting = true;
@@ -152,6 +163,11 @@ namespace Innoactive.Creator.XRInteraction
         /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
         public void StartHighlighting(string highlightID, Color highlightColor)
         {
+            if (CanObjectBeHighlighted() == false)
+            {
+                return;
+            }
+            
             if (externalHighlights.ContainsKey(highlightID) == false)
             {
                 bool shouldContinueHighlighting = true;
@@ -167,6 +183,11 @@ namespace Innoactive.Creator.XRInteraction
         /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
         public void StartHighlighting(string highlightID, Texture highlightTexture)
         {
+            if (CanObjectBeHighlighted() == false)
+            {
+                return;
+            }
+            
             if (externalHighlights.ContainsKey(highlightID) == false)
             {
                 bool shouldContinueHighlighting = true;
@@ -214,33 +235,20 @@ namespace Innoactive.Creator.XRInteraction
 
         private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
         {
-            if (cachedSkinnedRenderers.Length == 0 && cachedMeshRenderers.Length == 0)
+            if (previewMesh == null || renderers.Any() == false)
             {
                 RefreshCachedRenderers();
             }
-
+            
             while (shouldContinueHighlighting())
             {
-                isBeingHighlighted = true;
-                DisableRenders(cachedSkinnedRenderers);
-                DisableRenders(cachedMeshRenderers);
-
-                foreach (SkinnedMeshRenderer skinnedRenderer in cachedSkinnedRenderers)
-                {
-                    DrawHighlightedObject(skinnedRenderer.sharedMesh, skinnedRenderer, highlightMaterial);
-                }
-
-                foreach (MeshFilter meshFilter in cachedMeshFilters)
-                {
-                    DrawHighlightedObject(meshFilter.sharedMesh, meshFilter, highlightMaterial);
-                }
+                DisableRenders();
+                Graphics.DrawMesh(previewMesh, transform.localToWorldMatrix, highlightMaterial, gameObject.layer, null);
 
                 yield return null;
             }
 
-            isBeingHighlighted = false;
-            ReenableRenderers(cachedSkinnedRenderers);
-            ReenableRenderers(cachedMeshRenderers);
+            ReenableRenderers();
 
             if (string.IsNullOrEmpty(highlightID) == false && externalHighlights.ContainsKey(highlightID))
             {
@@ -268,7 +276,6 @@ namespace Innoactive.Creator.XRInteraction
                     highlightMaterial = colorTouchMaterial;
                 }
 
-                RefreshCachedRenderers();
                 StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
             }
         }
@@ -321,44 +328,140 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
 
+        internal void ForceRefreshCachedRenderers()
+        {
+            ReenableRenderers();
+
+            if (Application.isPlaying && gameObject.isStatic)
+            {
+                return;
+            }
+            
+            renderers = default;
+            previewMesh = null;
+            
+            RefreshCachedRenderers();
+        }
+
         private void RefreshCachedRenderers()
         {
-            if (cachedSkinnedRenderers.Any() && cachedSkinnedRenderers.First().enabled == false || cachedMeshRenderers.Any() && cachedMeshRenderers.First().enabled == false)
+            if (previewMesh != null && renderers.Any())
             {
                 return;
             }
 
-            cachedSkinnedRenderers = GetComponentsInChildren<SkinnedMeshRenderer>().Where(meshRenderer => meshRenderer.enabled).ToArray();
-            cachedMeshRenderers = GetComponentsInChildren<MeshRenderer>().Where(meshRenderer => meshRenderer.enabled).ToArray();
-            cachedMeshFilters = cachedMeshRenderers.Select(meshRenderer => meshRenderer.GetComponent<MeshFilter>()).ToArray();
+            renderers = GetComponentsInChildren<SkinnedMeshRenderer>()
+                .Where(skinnedMeshRenderer => skinnedMeshRenderer.gameObject.activeInHierarchy && skinnedMeshRenderer.enabled)
+                .Concat<Renderer>(GetComponentsInChildren<MeshRenderer>()
+                    .Where(meshRenderer => meshRenderer.gameObject.activeInHierarchy && meshRenderer.enabled)).ToArray();
+
+            if (renderers == null || renderers.Any() == false)
+            {
+                throw new NullReferenceException($"{name} has no renderers to be highlighted.");
+            }
+
+            GeneratePreviewMesh();
         }
 
-        private void DisableRenders(IEnumerable<Renderer> renderers)
+        private void GeneratePreviewMesh()
+        {
+            bool isAnyPartOfStaticBatch = false;
+            List<CombineInstance> meshes = new List<CombineInstance>();
+
+            foreach (Renderer renderer in renderers)
+            {
+                Type renderType = renderer.GetType();
+                
+                if (renderType == typeof(MeshRenderer))
+                {
+                    MeshFilter meshFilter = renderer.GetComponent<MeshFilter>();
+                    
+                    if (meshFilter.sharedMesh == null)
+                    {
+                        continue;
+                    }
+
+                    if (renderer.isPartOfStaticBatch)
+                    {
+                        isAnyPartOfStaticBatch = true;
+                    }
+
+                    for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
+                    {
+                        CombineInstance combineInstance = new CombineInstance
+                        {
+                            subMeshIndex = i,
+                            mesh = meshFilter.sharedMesh,
+                            transform = Matrix4x4.identity
+                        };
+
+                        meshes.Add(combineInstance);
+                    }
+                }
+                else if (renderType == typeof(SkinnedMeshRenderer))
+                {
+                    SkinnedMeshRenderer skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
+                    
+                    if (skinnedMeshRenderer.sharedMesh == null)
+                    {
+                        continue;
+                    }
+                    
+                    if (renderer.isPartOfStaticBatch)
+                    {
+                        isAnyPartOfStaticBatch = true;
+                    }
+
+                    for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
+                    {
+                        CombineInstance combineInstance = new CombineInstance
+                        {
+                            subMeshIndex = i,
+                            mesh = skinnedMeshRenderer.sharedMesh,
+                            transform = Matrix4x4.identity
+                        };
+
+                        meshes.Add(combineInstance);
+                    }
+                }
+            }
+
+            if (isAnyPartOfStaticBatch)
+            {
+                throw new NullReferenceException($"{name} is marked as 'Batching Static', no preview mesh to be highlighted could be generated at runtime.\n" +
+                                                 $"In order to fix this issue, please either remove the static flag of this GameObject or simply " +
+                                                 $"select it in edit mode so a preview mesh could be generated and cached.");
+            } 
+            
+            if (meshes.Any())
+            {
+                previewMesh = new Mesh();
+                previewMesh.CombineMeshes(meshes.ToArray());
+            }
+            else
+            {
+                throw new NullReferenceException($"{name} has no valid meshes to be highlighted.");
+            }
+        }
+
+        private void DisableRenders()
         {
             foreach (Renderer activeRenderer in renderers)
             {
                 activeRenderer.enabled = false;
             }
+            
+            isBeingHighlighted = true;
         }
 
-        private void ReenableRenderers(IEnumerable<Renderer> renderers)
+        private void ReenableRenderers()
         {
             foreach (Renderer renderer in renderers)
             {
                 renderer.enabled = true;
             }
-        }
-
-        private void DrawHighlightedObject(Mesh mesh, Component renderer, Material material)
-        {
-            LayerMask layerMask = renderer.gameObject.layer;
-            Transform rendersTransform = renderer.transform;
-            Matrix4x4 matrix = Matrix4x4.TRS(rendersTransform.position, rendersTransform.rotation, rendersTransform.lossyScale);
-
-            for (int i = 0; i < mesh.subMeshCount; i++)
-            {
-                Graphics.DrawMesh(mesh, matrix, material, layerMask, null, i);
-            }
+            
+            isBeingHighlighted = false;
         }
 
         private bool ShouldHighlightTouching()
@@ -424,6 +527,23 @@ namespace Innoactive.Creator.XRInteraction
             }
 
             return new Material(shader);
+        }
+
+        private bool CanObjectBeHighlighted()
+        {
+            if (enabled == false)
+            {
+                Debug.LogError($"{GetType().Name} component is disabled for {name} and can not be highlighted.", gameObject);
+                return false;
+            }
+            
+            if (gameObject.activeInHierarchy == false)
+            {
+                Debug.LogError($"{name} is disabled and can not be highlighted.", gameObject);
+                return false;
+            }
+
+            return true;
         }
     }
 }

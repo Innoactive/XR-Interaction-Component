@@ -42,7 +42,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         public IEnumerator CreateHighlightProperty()
         {
             // Given an empty GameObject.
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             
             Assert.That(interactable.GetComponent<InteractableObject>() == null);
             Assert.That(interactable.GetComponent<InteractableHighlighter>() == null);
@@ -73,7 +74,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         public IEnumerator CreateDummyHighlightProperty()
         {
             // Given an empty GameObject.
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             
             Assert.That(interactable.GetComponent<InteractableObject>() == null);
             Assert.That(interactable.GetComponent<InteractableHighlighter>() == null);
@@ -105,7 +107,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         {
             // Given a HighlightObjectBehavior with a HighlightProperty in a linear chapter.
             Color highlightColor = Color.yellow;
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
         
@@ -164,7 +167,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         
             RuntimeConfigurator.Configuration = testRuntimeConfiguration;
             
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
             highlightBehavior.Configure(testRuntimeConfiguration.Modes.CurrentMode);
@@ -185,7 +189,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         {
             // Given a HighlightObjectBehavior with a HighlightProperty.
             Color highlightColor = Color.cyan;
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
         
@@ -203,7 +208,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         {
             // Given a HighlightObjectBehavior with a HighlightProperty.
             Color highlightColor = Color.red;
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
         
@@ -222,7 +228,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         {
             // Given a HighlightObjectBehavior with a HighlightProperty.
             Color highlightColor = Color.white;
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
         
@@ -242,7 +249,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         {
             // Given a HighlightObjectBehavior with a HighlightProperty.
             Color highlightColor = Color.blue;
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
         
@@ -261,7 +269,8 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         {
             // Given a HighlightObjectBehavior with a HighlightProperty.
             Color highlightColor = Color.black;
-            GameObject interactable = new GameObject(targetName);
+            GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            interactable.name = targetName;
             DummyHighlightProperty highlightProperty = interactable.AddComponent<DummyHighlightProperty>();
             HighlightObjectBehavior highlightBehavior = new HighlightObjectBehavior(highlightProperty, highlightColor);
             highlightBehavior.Configure(RuntimeConfigurator.Configuration.Modes.CurrentMode);
