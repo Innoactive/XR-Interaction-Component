@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SnapZoneSettingsProvider : SettingsProvider
+internal class SnapZoneSettingsProvider : SettingsProvider
 {
     const string Path = "Project/Creator/Snap Zones";
 
