@@ -13,11 +13,6 @@ internal class SnapZoneSettingsProvider : SettingsProvider
     
     public SnapZoneSettingsProvider() : base(Path, SettingsScope.Project) {}
 
-    public static bool IsSettingsAvailable()
-    {
-        return true;
-    }
-
     public override void OnGUI(string searchContext)
     {
         EditorGUILayout.Space();
@@ -48,12 +43,7 @@ internal class SnapZoneSettingsProvider : SettingsProvider
     [SettingsProvider]
     public static SettingsProvider Provider()
     {
-        if (IsSettingsAvailable())
-        {
-            SettingsProvider provider = new SnapZoneSettingsProvider();
-            return provider;
-        }
-
-        return null;
+        SettingsProvider provider = new SnapZoneSettingsProvider();
+        return provider;
     }
 }
