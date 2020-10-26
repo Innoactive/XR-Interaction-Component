@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Innoactive.Creator.Core.Runtime.Utils;
 using UnityEditor;
 using UnityEngine;
 using Innoactive.Creator.XRInteraction;
@@ -10,7 +11,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// Settings for <see cref="SnapZone"/>s for e.g. automatic creation of such snap zones.
     /// </summary>
     [CreateAssetMenu(fileName = "SnapZoneSettings", menuName = "Innoactive/SnapZoneSettings", order = 1)]
-    public class SnapZoneSettings : ScriptableObject
+    public class SnapZoneSettings : SettingsObject<SnapZoneSettings>
     {
         private const string MaterialsPath = "Assets/Resources/SnapZones";
         private static SnapZoneSettings settings;
