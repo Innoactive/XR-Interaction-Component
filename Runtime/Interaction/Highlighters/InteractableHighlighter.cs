@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using Innoactive.Creator.Unity;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -84,7 +85,12 @@ namespace Innoactive.Creator.XRInteraction
         private Renderer[] renderers = {};
         
         [SerializeField]
-        private Mesh previewMesh = null;
+        private MeshRenderer highlightMeshRenderer = null;
+        
+        [SerializeField]
+        private MeshFilter highlightMeshFilter = null;
+        
+        
 
         private void Reset()
         {
@@ -235,16 +241,16 @@ namespace Innoactive.Creator.XRInteraction
 
         private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
         {
-            if (previewMesh == null || renderers.Any() == false)
+            if (highlightMeshRenderer == null || renderers == null || renderers.Any() == false)
             {
                 RefreshCachedRenderers();
             }
-            
+
             while (shouldContinueHighlighting())
             {
                 DisableRenders();
-                Graphics.DrawMesh(previewMesh, transform.localToWorldMatrix, highlightMaterial, gameObject.layer, null);
-
+                highlightMeshRenderer.sharedMaterial = highlightMaterial;
+            
                 yield return null;
             }
 
@@ -330,6 +336,11 @@ namespace Innoactive.Creator.XRInteraction
 
         internal void ForceRefreshCachedRenderers()
         {
+            if (isBeingHighlighted)
+            {
+                return;
+            }
+            
             ReenableRenderers();
 
             if (Application.isPlaying && gameObject.isStatic)
@@ -338,16 +349,24 @@ namespace Innoactive.Creator.XRInteraction
             }
             
             renderers = default;
-            previewMesh = null;
-            
             RefreshCachedRenderers();
         }
 
         private void RefreshCachedRenderers()
         {
-            if (previewMesh != null && renderers.Any())
+            if (highlightMeshRenderer != null && renderers != null && renderers.Any())
             {
                 return;
+            }
+            
+            if (highlightMeshRenderer == null)
+            {
+                GenerateHighlightRenderer();
+            }
+            else
+            {
+                highlightMeshRenderer.enabled = false;
+                highlightMeshRenderer.gameObject.SetActive(false);
             }
 
             renderers = GetComponentsInChildren<SkinnedMeshRenderer>()
@@ -363,81 +382,113 @@ namespace Innoactive.Creator.XRInteraction
             GeneratePreviewMesh();
         }
 
+        private void GenerateHighlightRenderer()
+        {
+            Transform child = transform.Find("Highlight Renderer");
+
+            if (child == null)
+            {
+                child = new GameObject("Highlight Renderer").transform;
+            }
+            
+            child.SetPositionAndRotation(transform.position, transform.rotation);
+            child.SetParent(transform);
+            
+            highlightMeshFilter = child.gameObject.GetOrAddComponent<MeshFilter>();
+            highlightMeshRenderer = child.gameObject.GetOrAddComponent<MeshRenderer>();
+
+            highlightMeshRenderer.enabled = false;
+            highlightMeshRenderer.gameObject.SetActive(false);
+        }
+
         private void GeneratePreviewMesh()
         {
             bool isAnyPartOfStaticBatch = false;
             List<CombineInstance> meshes = new List<CombineInstance>();
 
-            foreach (Renderer renderer in renderers)
+            Vector3 cachedPosition = transform.position;
+            Quaternion cachedRotation = transform.rotation;
+            
+            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            try
             {
-                Type renderType = renderer.GetType();
-                
-                if (renderType == typeof(MeshRenderer))
+                foreach (Renderer renderer in renderers)
                 {
-                    MeshFilter meshFilter = renderer.GetComponent<MeshFilter>();
-                    
-                    if (meshFilter.sharedMesh == null)
-                    {
-                        continue;
-                    }
+                    Type renderType = renderer.GetType();
 
-                    if (renderer.isPartOfStaticBatch)
+                    if (renderType == typeof(MeshRenderer))
                     {
-                        isAnyPartOfStaticBatch = true;
-                    }
+                        MeshFilter meshFilter = renderer.GetComponent<MeshFilter>();
 
-                    for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
-                    {
-                        CombineInstance combineInstance = new CombineInstance
+                        if (meshFilter.sharedMesh == null)
                         {
-                            subMeshIndex = i,
-                            mesh = meshFilter.sharedMesh,
-                            transform = Matrix4x4.identity
-                        };
+                            continue;
+                        }
 
-                        meshes.Add(combineInstance);
+                        if (renderer.isPartOfStaticBatch)
+                        {
+                            isAnyPartOfStaticBatch = true;
+                        }
+
+                        for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
+                        {
+                            CombineInstance combineInstance = new CombineInstance
+                            {
+                                subMeshIndex = i,
+                                mesh = meshFilter.sharedMesh,
+                                transform = meshFilter.transform.localToWorldMatrix
+                            };
+
+                            meshes.Add(combineInstance);
+                        }
+                    }
+                    else if (renderType == typeof(SkinnedMeshRenderer))
+                    {
+                        SkinnedMeshRenderer skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
+
+                        if (skinnedMeshRenderer.sharedMesh == null)
+                        {
+                            continue;
+                        }
+
+                        if (renderer.isPartOfStaticBatch)
+                        {
+                            isAnyPartOfStaticBatch = true;
+                        }
+
+                        for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
+                        {
+                            CombineInstance combineInstance = new CombineInstance
+                            {
+                                subMeshIndex = i,
+                                mesh = skinnedMeshRenderer.sharedMesh,
+                                transform = skinnedMeshRenderer.transform.localToWorldMatrix
+                            };
+
+                            meshes.Add(combineInstance);
+                        }
                     }
                 }
-                else if (renderType == typeof(SkinnedMeshRenderer))
-                {
-                    SkinnedMeshRenderer skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
-                    
-                    if (skinnedMeshRenderer.sharedMesh == null)
-                    {
-                        continue;
-                    }
-                    
-                    if (renderer.isPartOfStaticBatch)
-                    {
-                        isAnyPartOfStaticBatch = true;
-                    }
-
-                    for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
-                    {
-                        CombineInstance combineInstance = new CombineInstance
-                        {
-                            subMeshIndex = i,
-                            mesh = skinnedMeshRenderer.sharedMesh,
-                            transform = Matrix4x4.identity
-                        };
-
-                        meshes.Add(combineInstance);
-                    }
-                }
+            }
+            finally
+            {
+                transform.SetPositionAndRotation(cachedPosition, cachedRotation);
             }
 
             if (isAnyPartOfStaticBatch)
             {
                 throw new NullReferenceException($"{name} is marked as 'Batching Static', no preview mesh to be highlighted could be generated at runtime.\n" +
-                                                 $"In order to fix this issue, please either remove the static flag of this GameObject or simply " +
-                                                 $"select it in edit mode so a preview mesh could be generated and cached.");
+                                                 "In order to fix this issue, please either remove the static flag of this GameObject or simply " +
+                                                 "select it in edit mode so a preview mesh could be generated and cached.");
             } 
             
             if (meshes.Any())
             {
-                previewMesh = new Mesh();
+                Mesh previewMesh = new Mesh();
                 previewMesh.CombineMeshes(meshes.ToArray());
-            }
+                
+                highlightMeshFilter.mesh = previewMesh;            }
             else
             {
                 throw new NullReferenceException($"{name} has no valid meshes to be highlighted.");
@@ -446,21 +497,39 @@ namespace Innoactive.Creator.XRInteraction
 
         private void DisableRenders()
         {
-            foreach (Renderer activeRenderer in renderers)
+            if (highlightMeshRenderer != null)
             {
-                activeRenderer.enabled = false;
+                highlightMeshRenderer.enabled = true;
+                highlightMeshRenderer.gameObject.SetActive(true);
             }
-            
+
+            if (renderers != null && renderers.Any())
+            {
+                foreach (Renderer activeRenderer in renderers)
+                {
+                    activeRenderer.enabled = false;
+                }
+            }
+
             isBeingHighlighted = true;
         }
 
         private void ReenableRenderers()
         {
-            foreach (Renderer renderer in renderers)
+            if (highlightMeshRenderer != null)
             {
-                renderer.enabled = true;
+                highlightMeshRenderer.enabled = false;
+                highlightMeshRenderer.gameObject.SetActive(false);
             }
-            
+
+            if (renderers != null && renderers.Any())
+            {
+                foreach (Renderer renderer in renderers)
+                {
+                    renderer.enabled = true;
+                }
+            }
+
             isBeingHighlighted = false;
         }
 
