@@ -332,7 +332,7 @@ namespace Innoactive.Creator.XRInteraction
                     {
                         subMeshIndex = i,
                         mesh = meshFilter.sharedMesh,
-                        transform = Matrix4x4.identity
+                        transform = meshFilter.transform.localToWorldMatrix
                     };
 
                     meshes.Add(combineInstance);
