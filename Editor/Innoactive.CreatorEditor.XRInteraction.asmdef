@@ -22,8 +22,13 @@
     "versionDefines": [
         {
             "name": "com.unity.xr.interaction.toolkit",
-            "expression": "[0.9.4-preview]",
+            "expression": "",
             "define": "XR_INTERACTION_TOOLKIT"
+        },
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "0.10.0-preview",
+            "define": "XRIT_0_10_OR_NEWER"
         }
     ],
     "noEngineReferences": false

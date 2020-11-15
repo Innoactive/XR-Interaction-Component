@@ -43,8 +43,13 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
+#if XRIT_0_10_OR_NEWER
+            Interactable.onSelectEntered.AddListener(HandleXRGrabbed);
+            Interactable.onSelectExited.AddListener(HandleXRUngrabbed);
+#else
             Interactable.onSelectEnter.AddListener(HandleXRGrabbed);
             Interactable.onSelectExit.AddListener(HandleXRUngrabbed);
+#endif
 
             InternalSetLocked(IsLocked);
         }
@@ -53,8 +58,13 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnDisable();
         
+#if XRIT_0_10_OR_NEWER
+            Interactable.onSelectEntered.RemoveListener(HandleXRGrabbed);
+            Interactable.onSelectExited.RemoveListener(HandleXRUngrabbed);
+#else
             Interactable.onSelectEnter.RemoveListener(HandleXRGrabbed);
             Interactable.onSelectExit.RemoveListener(HandleXRUngrabbed);
+#endif
         }
         
         protected void Reset()

@@ -1,11 +1,10 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using Innoactive.Creator.BasicInteraction.Validation;
-using Innoactive.Creator.Core.SceneObjects;
 using Innoactive.Creator.XRInteraction;
+using Innoactive.Creator.Core.SceneObjects;
 using Innoactive.Creator.XRInteraction.Properties;
+using Innoactive.Creator.BasicInteraction.Validation;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +13,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// <summary>
     /// Custom inspector for <see cref="SnappableProperty"/>, adding a button to create <see cref="Innoactive.Creator.XRInteraction.SnapZone"/>s automatically.
     /// </summary>
-    [CustomEditor(typeof(SnappableProperty))]
+    [CustomEditor(typeof(SnappableProperty)), CanEditMultipleObjects]
     internal class SnappablePropertyEditor : Editor
     {
         private const string PrefabPath = "Assets/Resources/SnapZones/Prefabs";
@@ -22,14 +21,17 @@ namespace Innoactive.CreatorEditor.XRInteraction
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            
-            SnappableProperty snappable = (SnappableProperty)target;
-
             EditorGUILayout.Space();
 
             if (GUILayout.Button("Create Snap Zone"))
             {
-                CreateSnapZone(snappable);
+                foreach (UnityEngine.Object targetObject in serializedObject.targetObjects)
+                {
+                    if (targetObject is SnappableProperty snappable)
+                    {
+                        CreateSnapZone(snappable);
+                    }
+                }
             }
         }
         
