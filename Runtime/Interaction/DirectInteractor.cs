@@ -91,5 +91,20 @@ namespace Innoactive.Creator.XRInteraction
             
             base.OnSelectEnter(interactable);
         }
+        
+        /// <summary>
+        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
+        /// </summary>
+        /// <param name="interactable">Interactable that is no longer selected.</param>
+        protected override void OnSelectExit(XRBaseInteractable interactable)
+        {
+            base.OnSelectExit(interactable);
+            
+            if (precisionGrab)
+            {
+                attachTransform.localPosition = initialAttachPosition;
+                attachTransform.localRotation = initialAttachRotation;
+            }
+        }
     }
 }
