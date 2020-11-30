@@ -7,13 +7,14 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// <summary>
     /// Drawer class for <see cref="SnapZone"/>.
     /// </summary>
-    [CustomEditor(typeof(SnapZone))]
+    [CustomEditor(typeof(SnapZone)), CanEditMultipleObjects]
     internal class SnapZoneEditor : Editor
     {
+        private SerializedProperty socketActive;
         private SerializedProperty showHighlightInEditor;
         private SerializedProperty shownHighlightObject;
         private SerializedProperty shownHighlightObjectColor;
-        
+
         private SerializedProperty interactionManager;
         private SerializedProperty interactionLayerMask;
         private SerializedProperty attachTransform;
@@ -21,14 +22,14 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         private SerializedProperty interactableHoverMeshMaterial;
         
-        private SerializedProperty onHoverEnter;
-        private SerializedProperty onHoverExit;
-        private SerializedProperty onSelectEnter;
-        private SerializedProperty onSelectExit;
-        private bool showInteractorEvents;
+        private SerializedProperty onHoverEntered;
+        private SerializedProperty onHoverExited;
+        private SerializedProperty onSelectEntered;
+        private SerializedProperty onSelectExited;
         
         private static class Tooltips
         {
+            public static readonly GUIContent SocketActive = new GUIContent("Snap Zone Active", "Turn snap zone interaction on/off.");
             public static readonly GUIContent InteractionManager = new GUIContent("Interaction Manager", "Manager to handle all interaction management (will find one if empty).");
             public static readonly GUIContent InteractionLayerMask = new GUIContent("Interaction Layer Mask", "Only interactables with this Layer Mask will respond to this interactor.");
             public static readonly GUIContent AttachTransform = new GUIContent("Attach Transform", "Attach Transform to use for this Interactor.  Will create empty GameObject if none set.");
@@ -42,6 +43,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         private void OnEnable()
         {
+            socketActive = serializedObject.FindProperty("m_SocketActive");
             showHighlightInEditor = serializedObject.FindProperty("ShowHighlightInEditor");
             shownHighlightObject = serializedObject.FindProperty("shownHighlightObject");
             shownHighlightObjectColor = serializedObject.FindProperty("shownHighlightObjectColor");
@@ -53,19 +55,26 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             interactableHoverMeshMaterial = serializedObject.FindProperty("validationMaterial");
             
-            onHoverEnter = serializedObject.FindProperty("m_OnHoverEnter");
-            onHoverExit = serializedObject.FindProperty("m_OnHoverExit");
-            onSelectEnter = serializedObject.FindProperty("m_OnSelectEnter");
-            onSelectExit = serializedObject.FindProperty("m_OnSelectExit");
+#if XRIT_0_10_OR_NEWER
+            onHoverEntered = serializedObject.FindProperty("m_OnHoverEntered");
+            onHoverExited = serializedObject.FindProperty("m_OnHoverExited");
+            onSelectEntered = serializedObject.FindProperty("m_OnSelectEntered");
+            onSelectExited = serializedObject.FindProperty("m_OnSelectExited");
+#else
+            onHoverEntered = serializedObject.FindProperty("m_OnHoverEnter");
+            onHoverExited = serializedObject.FindProperty("m_OnHoverExit");
+            onSelectEntered = serializedObject.FindProperty("m_OnSelectEnter");
+            onSelectExited = serializedObject.FindProperty("m_OnSelectExit");
+#endif
         }
 
         public override void OnInspectorGUI()
         {
-            GUI.enabled = false;
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((SnapZone)target), typeof(SnapZone), false);
-            GUI.enabled = true;
-
             serializedObject.Update();
+            
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField(EditorGUIUtility.TrTempContent("Script"), MonoScript.FromMonoBehaviour((SnapZone)target), typeof(SnapZone), false);
+            EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.PropertyField(interactionManager, Tooltips.InteractionManager);
             EditorGUILayout.PropertyField(interactionLayerMask, Tooltips.InteractionLayerMask);
@@ -73,26 +82,32 @@ namespace Innoactive.CreatorEditor.XRInteraction
             EditorGUILayout.PropertyField(startingSelectedInteractable, Tooltips.StartingSelectedInteractable);
             
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Snap Zone", EditorStyles.boldLabel); 
+            EditorGUILayout.LabelField(EditorGUIUtility.TrTempContent("Snap Zone"), EditorStyles.boldLabel); 
             
             EditorGUILayout.PropertyField(showHighlightInEditor, Tooltips.ShowHighlightInEditor);
             
+            EditorGUI.indentLevel++;
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(shownHighlightObject, Tooltips.ShownHighlightObject);
             EditorGUILayout.PropertyField(shownHighlightObjectColor, Tooltips.ShownHighlightObjectColor);
             bool isPreviewMeshChanged = EditorGUI.EndChangeCheck();
             
             EditorGUILayout.PropertyField(interactableHoverMeshMaterial, Tooltips.InteractableHoverMeshMaterial);
+            EditorGUI.indentLevel--;
             
-            showInteractorEvents = EditorGUILayout.Toggle("Show Interactor Events", showInteractorEvents);
+            EditorGUILayout.PropertyField(socketActive, Tooltips.SocketActive);
             
-            if (showInteractorEvents)
+            EditorGUILayout.Space();
+            
+            onHoverEntered.isExpanded = EditorGUILayout.Foldout(onHoverEntered.isExpanded, EditorGUIUtility.TrTempContent("Interactor Events"), true);
+            
+            if (onHoverEntered.isExpanded)
             {
                 // UnityEvents have not yet supported Tooltips
-                EditorGUILayout.PropertyField(onHoverEnter);
-                EditorGUILayout.PropertyField(onHoverExit);
-                EditorGUILayout.PropertyField(onSelectEnter);
-                EditorGUILayout.PropertyField(onSelectExit);
+                EditorGUILayout.PropertyField(onHoverEntered);
+                EditorGUILayout.PropertyField(onHoverExited);
+                EditorGUILayout.PropertyField(onSelectEntered);
+                EditorGUILayout.PropertyField(onSelectExited);
             }
             
             serializedObject.ApplyModifiedProperties();

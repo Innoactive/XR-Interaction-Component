@@ -66,17 +66,27 @@ namespace Innoactive.Creator.XRInteraction.Properties
         protected override void OnEnable()
         {
             base.OnEnable();
-
+        
+#if XRIT_0_10_OR_NEWER
+            SnapZone.onSelectEntered.AddListener(HandleObjectSnapped);
+            SnapZone.onSelectExited.AddListener(HandleObjectUnsnapped);
+#else
             SnapZone.onSelectEnter.AddListener(HandleObjectSnapped);
             SnapZone.onSelectExit.AddListener(HandleObjectUnsnapped);
+#endif
         }
         
         protected override void OnDisable()
         {
             base.OnDisable();
 
+#if XRIT_0_10_OR_NEWER
+            SnapZone.onSelectEntered.RemoveListener(HandleObjectSnapped);
+            SnapZone.onSelectExited.RemoveListener(HandleObjectUnsnapped);
+#else
             SnapZone.onSelectEnter.RemoveListener(HandleObjectSnapped);
             SnapZone.onSelectExit.RemoveListener(HandleObjectUnsnapped);
+#endif
         }
         
         private void HandleObjectSnapped(XRBaseInteractable interactable)

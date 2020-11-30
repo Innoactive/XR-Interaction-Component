@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Innoactive.Creator.BasicInteraction.Validation;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XRInteraction
@@ -158,7 +160,7 @@ namespace Innoactive.Creator.XRInteraction
         private Material activeMaterial;
         private Vector3 tmpCenterOfMass;
         private List<Validator> validators = new List<Validator>();
-        private List<XRBaseInteractable> hoverTargets = new List<XRBaseInteractable>();
+        private List<XRBaseInteractable> snapZoneHoverTargets = new List<XRBaseInteractable>();
         
         protected override void Awake()
         {
@@ -188,23 +190,28 @@ namespace Innoactive.Creator.XRInteraction
         {  
             if (interactable != null)
             {
-                hoverTargets.Add(interactable);
+                snapZoneHoverTargets.Add(interactable);
             }
         }
 
         internal void RemoveHoveredInteractable(XRBaseInteractable interactable)
         {
-            hoverTargets.Remove(interactable);
+            snapZoneHoverTargets.Remove(interactable);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             
-            hoverTargets.Clear();
+            snapZoneHoverTargets.Clear();
             
+#if XRIT_0_10_OR_NEWER
+            onSelectEntered.AddListener(OnAttach);
+            onSelectExited.AddListener(OnDetach);
+#else
             onSelectEnter.AddListener(OnAttach);
             onSelectExit.AddListener(OnDetach);
+#endif
         }
 
         protected override void OnDisable()
@@ -212,23 +219,34 @@ namespace Innoactive.Creator.XRInteraction
             base.OnDisable();
             
             AttachParent();
-            hoverTargets.Clear();
-            
+            snapZoneHoverTargets.Clear();
+
+#if XRIT_0_10_OR_NEWER
+            onSelectEntered.RemoveListener(OnAttach);
+            onSelectExited.RemoveListener(OnDetach);
+#else
             onSelectEnter.RemoveListener(OnAttach);
             onSelectExit.RemoveListener(OnDetach);
+#endif
         }
 
         private void OnAttach(XRBaseInteractable interactable)
         {
-            Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
-            tmpCenterOfMass = rigid.centerOfMass;
-            rigid.centerOfMass = Vector3.zero;
+            if (interactable != null)
+            {
+                Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
+                tmpCenterOfMass = rigid.centerOfMass;
+                rigid.centerOfMass = Vector3.zero;
+            }
         }
         
         private void OnDetach(XRBaseInteractable interactable)
         {
-            Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
-            rigid.centerOfMass = tmpCenterOfMass;
+            if (interactable != null)
+            {
+                Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
+                rigid.centerOfMass = tmpCenterOfMass;
+            }
         }
         
         private void DetachParent()
@@ -271,12 +289,22 @@ namespace Innoactive.Creator.XRInteraction
         /// <returns>A transparent <see cref="Material"/>. Null, otherwise, if Unity's "Standard" shader cannot be found.</returns>
         protected virtual Material CreateTransparentMaterial()
         {
-            Material highlightMeshMaterial = new Material(Shader.Find("Standard"));
+            string shaderName = GraphicsSettings.currentRenderPipeline ? "Universal Render Pipeline/Lit" : "Standard";
+            Shader defaultShader = Shader.Find(shaderName);
+
+            if (defaultShader == null)
+            {
+                throw new NullReferenceException($"{name} failed to create a default material," + 
+                    $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
+            }
+            
+            Material highlightMeshMaterial = new Material(defaultShader);
+            
             if (highlightMeshMaterial != null)
             {
                 highlightMeshMaterial.SetFloat("_Mode", 3);
-                highlightMeshMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                highlightMeshMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                highlightMeshMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+                highlightMeshMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
                 highlightMeshMaterial.SetInt("_ZWrite", 0);
                 highlightMeshMaterial.DisableKeyword("_ALPHATEST_ON");
                 highlightMeshMaterial.EnableKeyword("_ALPHABLEND_ON");
@@ -363,7 +391,7 @@ namespace Innoactive.Creator.XRInteraction
             
             if (socketActive)
             {
-                hoverTargets.RemoveAll(target => target == null || target.enabled == false);
+                snapZoneHoverTargets.RemoveAll(target => target == null || target.enabled == false);
                 
                 CheckForReleasedHoverTargets();
                 
@@ -378,9 +406,13 @@ namespace Innoactive.Creator.XRInteraction
                 return;
             }
             
-            foreach (XRBaseInteractable target in hoverTargets)
+            foreach (XRBaseInteractable target in snapZoneHoverTargets)
             {
+#if XRIT_0_10_OR_NEWER
+                if (hoverTargets.Contains(target) || target.isSelected)
+#else
                 if (m_HoverTargets.Contains(target) || target.isSelected)
+#endif
                 {
                     continue;
                 }
@@ -395,13 +427,13 @@ namespace Innoactive.Creator.XRInteraction
 
         private void ShowHighlight()
         {
-            if (hoverTargets.Count == 0 && ShowHighlightObject)
+            if (snapZoneHoverTargets.Count == 0 && ShowHighlightObject)
             {
                 activeMaterial = HighlightMeshMaterial;
             }
-            else if (hoverTargets.Count > 0 && showInteractableHoverMeshes)
+            else if (snapZoneHoverTargets.Count > 0 && showInteractableHoverMeshes)
             {
-                activeMaterial = hoverTargets.Any(CanSelect) ? ValidationMaterial : InvalidMaterial;
+                activeMaterial = snapZoneHoverTargets.Any(CanSelect) ? ValidationMaterial : InvalidMaterial;
             }
         }
 
@@ -437,7 +469,11 @@ namespace Innoactive.Creator.XRInteraction
 
             if (interactable.IsSelectableBy(this))
             {
+#if XRIT_0_10_OR_NEWER
+                OnSelectEntering(interactable);
+#else
                 OnSelectEnter(interactable);
+#endif
                 
                 if (interactable is InteractableObject interactableObject)
                 {

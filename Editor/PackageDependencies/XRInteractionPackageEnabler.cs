@@ -6,7 +6,7 @@
     public class XRInteractionPackageEnabler : Dependency 
     {        
         /// <inheritdoc/>
-        public override string Package { get; } = "com.unity.xr.interaction.toolkit@0.9.4-preview";
+        public override string Package { get; } = "com.unity.xr.interaction.toolkit";
 
         /// <inheritdoc/>
         public override int Priority { get; } = 4;
