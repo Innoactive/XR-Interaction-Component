@@ -64,7 +64,49 @@ namespace Innoactive.Creator.XRInteraction
         {
             forceGrab = true;
         }
+
+#if XRIT_0_10_OR_NEWER
+        /// <summary>
+        /// This method is called when the interactor first initiates selection of an interactable.
+        /// </summary>
+        /// <param name="interactable">Interactable that is being selected.</param>
+        protected override void OnSelectEntering(XRBaseInteractable interactable)
+        {
+            InteractableObject interactableObject = interactable as InteractableObject;
+            
+            if (precisionGrab && interactableObject.attachTransform == null)
+            {
+                switch (interactableObject.movementType)
+                {
+                    case XRBaseInteractable.MovementType.VelocityTracking:
+                    case XRBaseInteractable.MovementType.Kinematic:
+                        attachTransform.SetPositionAndRotation(interactable.transform.position, interactable.transform.rotation);
+                        break;
+                    case XRBaseInteractable.MovementType.Instantaneous:
+                        Debug.LogWarning("Precision Grab is currently not compatible with interactable objects with Movement Type configured as Instantaneous.\n"
+                        + $"Please change the Movement Type in {interactable.name}.", interactable);
+                        break;
+                }
+            }
+            
+            base.OnSelectEntering(interactable);
+        }
         
+        /// <summary>
+        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
+        /// </summary>
+        /// <param name="interactable">Interactable that is no longer selected.</param>
+        protected override void OnSelectExiting(XRBaseInteractable interactable)
+        {
+            base.OnSelectExiting(interactable);
+
+            if (precisionGrab)
+            {
+                attachTransform.localPosition = initialAttachPosition;
+                attachTransform.localRotation = initialAttachRotation;
+            }
+        }
+#else
         /// <summary>
         /// This method is called when the interactor first initiates selection of an interactable.
         /// </summary>
@@ -78,8 +120,6 @@ namespace Innoactive.Creator.XRInteraction
                 switch (interactableObject.movementType)
                 {
                     case XRBaseInteractable.MovementType.VelocityTracking:
-                        attachTransform.SetPositionAndRotation(interactableObject.Rigidbody.worldCenterOfMass, interactable.transform.rotation);
-                        break;
                     case XRBaseInteractable.MovementType.Kinematic:
                         attachTransform.SetPositionAndRotation(interactableObject.Rigidbody.worldCenterOfMass, interactable.transform.rotation);
                         break;
@@ -91,5 +131,21 @@ namespace Innoactive.Creator.XRInteraction
             
             base.OnSelectEnter(interactable);
         }
+        
+        /// <summary>
+        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
+        /// </summary>
+        /// <param name="interactable">Interactable that is no longer selected.</param>
+        protected override void OnSelectExit(XRBaseInteractable interactable)
+        {
+            base.OnSelectExit(interactable);
+            
+            if (precisionGrab)
+            {
+                attachTransform.localPosition = initialAttachPosition;
+                attachTransform.localRotation = initialAttachRotation;
+            }
+        }
+#endif
     }
 }

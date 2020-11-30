@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Innoactive.Creator.Unity;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.Creator.XRInteraction
@@ -90,8 +91,6 @@ namespace Innoactive.Creator.XRInteraction
         [SerializeField]
         private MeshFilter highlightMeshFilter = null;
         
-        
-
         private void Reset()
         {
             RefreshCachedRenderers();
@@ -104,9 +103,15 @@ namespace Innoactive.Creator.XRInteraction
                 interactableObject = gameObject.GetComponent<InteractableObject>();
             }
 
+#if XRIT_0_10_OR_NEWER
+            interactableObject.onFirstHoverEntered.AddListener(OnTouched);
+            interactableObject.onSelectEntered.AddListener(OnGrabbed);
+            interactableObject.onSelectExited.AddListener(OnReleased);
+#else
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
             interactableObject.onSelectExit.AddListener(OnReleased);
+#endif
             interactableObject.onActivate.AddListener(OnUsed);
             interactableObject.onDeactivate.AddListener(OnUnused);
         }
@@ -119,9 +124,15 @@ namespace Innoactive.Creator.XRInteraction
                 externalHighlights.Clear();
             }
             
+#if XRIT_0_10_OR_NEWER
+            interactableObject?.onFirstHoverEntered.RemoveListener(OnTouched);
+            interactableObject?.onSelectEntered.RemoveListener(OnGrabbed);
+            interactableObject?.onSelectExited.RemoveListener(OnReleased);
+#else
             interactableObject?.onFirstHoverEnter.RemoveListener(OnTouched);
             interactableObject?.onSelectEnter.RemoveListener(OnGrabbed);
             interactableObject?.onSelectExit.RemoveListener(OnReleased);
+#endif
             interactableObject?.onActivate.RemoveListener(OnUsed);
             interactableObject?.onDeactivate.RemoveListener(OnUnused);
         }
@@ -503,11 +514,11 @@ namespace Innoactive.Creator.XRInteraction
                 highlightMeshRenderer.gameObject.SetActive(true);
             }
 
-            if (renderers != null && renderers.Any())
+            foreach (Renderer renderer in renderers)
             {
-                foreach (Renderer activeRenderer in renderers)
+                if (renderer != null)
                 {
-                    activeRenderer.enabled = false;
+                    renderer.enabled = false;
                 }
             }
 
@@ -522,9 +533,9 @@ namespace Innoactive.Creator.XRInteraction
                 highlightMeshRenderer.gameObject.SetActive(false);
             }
 
-            if (renderers != null && renderers.Any())
+            foreach (Renderer renderer in renderers)
             {
-                foreach (Renderer renderer in renderers)
+                if (renderer != null)
                 {
                     renderer.enabled = true;
                 }
@@ -588,14 +599,16 @@ namespace Innoactive.Creator.XRInteraction
 
         private Material CreateHighlightMaterial()
         {
-            Shader shader = Shader.Find("Standard");
+            string shaderName = GraphicsSettings.currentRenderPipeline ? "Universal Render Pipeline/Lit" : "Standard";
+            Shader defaultShader = Shader.Find(shaderName);
 
-            if (shader == null)
+            if (defaultShader == null)
             {
-                throw new NullReferenceException("Standard shader could not be found.");
+                throw new NullReferenceException($"{name} failed to create a default material," + 
+                    $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
             }
 
-            return new Material(shader);
+            return new Material(defaultShader);
         }
 
         private bool CanObjectBeHighlighted()

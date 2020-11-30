@@ -58,16 +58,26 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
+#if XRIT_0_10_OR_NEWER
+            Interactable.onSelectEntered.AddListener(HandleSnappedToDropZone);
+            Interactable.onSelectExited.AddListener(HandleUnsnappedFromDropZone);
+#else
             Interactable.onSelectEnter.AddListener(HandleSnappedToDropZone);
             Interactable.onSelectExit.AddListener(HandleUnsnappedFromDropZone);
+#endif
 
             InternalSetLocked(IsLocked);
         }
         
         protected new virtual void OnDisable()
         {
+#if XRIT_0_10_OR_NEWER
+            Interactable.onSelectEntered.RemoveListener(HandleSnappedToDropZone);
+            Interactable.onSelectEntered.RemoveListener(HandleUnsnappedFromDropZone);
+#else
             Interactable.onSelectEnter.RemoveListener(HandleSnappedToDropZone);
             Interactable.onSelectEnter.RemoveListener(HandleUnsnappedFromDropZone);
+#endif
         }
         
         private void HandleSnappedToDropZone(XRBaseInteractor interactor)

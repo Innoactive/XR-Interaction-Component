@@ -446,7 +446,11 @@ namespace Innoactive.Creator.XRInteraction.Tests
             Color testValidationColor = Color.blue;
 
             Assert.NotNull(settings);
+#if XRIT_0_10_OR_NEWER
+            Assert.That(snapZone.interactionLayerMask != testLayerMask);
+#else
             Assert.That(snapZone.InteractionLayerMask != testLayerMask);
+#endif
             Assert.That(snapZone.ShownHighlightObjectColor != testHighlightColor);
             Assert.That(snapZone.ValidationMaterial.color != testValidationColor);
 
@@ -457,7 +461,11 @@ namespace Innoactive.Creator.XRInteraction.Tests
             settings.ApplySettingsToSnapZone(snapZone);
             
             // Then the snap zone is updated.
+#if XRIT_0_10_OR_NEWER
+            Assert.That(snapZone.interactionLayerMask == testLayerMask);
+#else
             Assert.That(snapZone.InteractionLayerMask == testLayerMask);
+#endif
             Assert.That(snapZone.ShownHighlightObjectColor == testHighlightColor);
             Assert.That(snapZone.ValidationMaterial.color == testValidationColor);
         }

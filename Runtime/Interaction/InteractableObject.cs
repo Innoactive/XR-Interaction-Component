@@ -161,15 +161,25 @@ namespace Innoactive.Creator.XRInteraction
 
         internal void ForceSelectEnter(XRBaseInteractor interactor)
         {
+#if XRIT_0_10_OR_NEWER
+            OnSelectEntering(interactor);
+#else
             OnSelectEnter(interactor);
+#endif
         }
         
         /// <summary>This method is called by the interaction manager 
         /// when the interactor first initiates selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is initiating the selection.</param>
+#if XRIT_0_10_OR_NEWER
+        protected override void OnSelectEntering(XRBaseInteractor interactor)
+        {
+            base.OnSelectEntering(interactor);
+#else
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
+#endif
             
             if (IsInSocket == false)
             {
@@ -185,10 +195,15 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor ends selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is ending the selection.</param>
+#if XRIT_0_10_OR_NEWER
+        protected override void OnSelectExiting(XRBaseInteractor interactor)
+        {
+            base.OnSelectExiting(interactor);
+#else
         protected override void OnSelectExit(XRBaseInteractor interactor)
         {
             base.OnSelectExit(interactor);
-            
+#endif 
             if (IsInSocket && interactor == selectingSocket)
             {
                 selectingSocket = null;

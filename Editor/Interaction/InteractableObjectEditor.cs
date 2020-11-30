@@ -7,7 +7,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// <summary>
     /// Drawer class for <see cref="InteractableObject"/>.
     /// </summary>
-    [CustomEditor(typeof(InteractableObject))]
+    [CustomEditor(typeof(InteractableObject)), CanEditMultipleObjects]
     internal class InteractableObjectEditor : Editor
     {
         private SerializedProperty attachTransformProperty;
@@ -28,27 +28,32 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private SerializedProperty throwAngularVelocityScaleProperty;
         private SerializedProperty gravityOnDetachProperty;
         private SerializedProperty retainTransformParentProperty;
-        private SerializedProperty onFirstHoverEnterProperty;
-        private SerializedProperty onHoverEnterProperty;
-        private SerializedProperty onHoverExitProperty;
-        private SerializedProperty onLastHoverExitProperty;
-        private SerializedProperty onSelectEnterProperty;
-        private SerializedProperty onSelectExitProperty;
+        
+        private SerializedProperty onFirstHoverEntered;
+        private SerializedProperty onHoverEntered;
+        private SerializedProperty onHoverExited;
+        private SerializedProperty onLastHoverExited;
+        private SerializedProperty onSelectEntered;
+        private SerializedProperty onSelectExited;
+#if XRIT_0_10_OR_NEWER
+        private SerializedProperty onSelectCanceled;
+#endif
         private SerializedProperty onActivateProperty;
         private SerializedProperty onDeactivateProperty;
+        
+        private SerializedProperty interactionManager;
         private SerializedProperty collidersProperty;
         private SerializedProperty interactionLayerMaskProperty;
         private SerializedProperty isTouchableProperty;
         private SerializedProperty isGrabbableProperty;
         private SerializedProperty isUsableProperty;
 
-        private bool showInteractableEvents;
-        private bool showInteractionOptions;
         private bool showHighlightOptions;
         private InteractableObject interactableObject;
 
         private static class Tooltips
         {
+            public static readonly GUIContent InteractionManager = new GUIContent("Interaction Manager", "Manager to handle all interaction management (will find one if empty).");
             public static readonly GUIContent AttachTransform = new GUIContent("Attach Transform", "Attach point to use on this Interactable (will use RigidBody center if none set).");
             public static readonly GUIContent AttachEaseInTime = new GUIContent("Attach Ease In Time", "Time it takes to ease in the attach (time of 0.0 indicates no easing).");
             public static readonly GUIContent MovementType = new GUIContent("Movement Type", "Type of movement for RigidBody.");
@@ -98,12 +103,23 @@ namespace Innoactive.CreatorEditor.XRInteraction
             throwAngularVelocityScaleProperty = serializedObject.FindProperty("m_ThrowAngularVelocityScale");
             gravityOnDetachProperty = serializedObject.FindProperty("m_GravityOnDetach");
             retainTransformParentProperty = serializedObject.FindProperty("m_RetainTransformParent");
-            onFirstHoverEnterProperty = serializedObject.FindProperty("m_OnFirstHoverEnter");
-            onHoverEnterProperty = serializedObject.FindProperty("m_OnHoverEnter");
-            onHoverExitProperty = serializedObject.FindProperty("m_OnHoverExit");
-            onLastHoverExitProperty = serializedObject.FindProperty("m_OnLastHoverExit");
-            onSelectEnterProperty = serializedObject.FindProperty("m_OnSelectEnter");
-            onSelectExitProperty = serializedObject.FindProperty("m_OnSelectExit");
+            interactionManager = serializedObject.FindProperty("m_InteractionManager");
+#if XRIT_0_10_OR_NEWER
+            onFirstHoverEntered = serializedObject.FindProperty("m_OnFirstHoverEntered");
+            onHoverEntered = serializedObject.FindProperty("m_OnHoverEntered");
+            onHoverExited = serializedObject.FindProperty("m_OnHoverExited");
+            onLastHoverExited = serializedObject.FindProperty("m_OnLastHoverExited");
+            onSelectEntered = serializedObject.FindProperty("m_OnSelectEntered");
+            onSelectExited = serializedObject.FindProperty("m_OnSelectExited");
+            onSelectCanceled = serializedObject.FindProperty("m_OnSelectCanceled");
+#else
+            onFirstHoverEntered = serializedObject.FindProperty("m_OnFirstHoverEnter");
+            onHoverEntered = serializedObject.FindProperty("m_OnHoverEnter");
+            onHoverExited = serializedObject.FindProperty("m_OnHoverExit");
+            onLastHoverExited = serializedObject.FindProperty("m_OnLastHoverExit");
+            onSelectEntered = serializedObject.FindProperty("m_OnSelectEnter");
+            onSelectExited = serializedObject.FindProperty("m_OnSelectExit");
+#endif
             onActivateProperty = serializedObject.FindProperty("m_OnActivate");
             onDeactivateProperty = serializedObject.FindProperty("m_OnDeactivate");
             collidersProperty = serializedObject.FindProperty("m_Colliders");
@@ -115,31 +131,36 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         public override void OnInspectorGUI()
         {
-            GUI.enabled = false;
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour(interactableObject), typeof(InteractableObject), false);
-            GUI.enabled = true;
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField(EditorGUIUtility.TrTempContent("Script"), MonoScript.FromMonoBehaviour(interactableObject), typeof(InteractableObject), false);
+            EditorGUI.EndDisabledGroup();
 
             serializedObject.Update();
             
-            showInteractionOptions = EditorGUILayout.Foldout(showInteractionOptions, "Interactable Options");
-            if (showInteractionOptions)
+            isTouchableProperty.isExpanded = EditorGUILayout.Foldout(isTouchableProperty.isExpanded, "Interactable Options");
+
+            if (isTouchableProperty.isExpanded)
             {
+                EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(isTouchableProperty, Tooltips.IsTouchable);
                 EditorGUILayout.PropertyField(isGrabbableProperty, Tooltips.IsGrabbable);
                 EditorGUILayout.PropertyField(isUsableProperty, Tooltips.IsUsable);
+                EditorGUI.indentLevel--;
             }
-
-            EditorGUILayout.PropertyField(attachTransformProperty, Tooltips.AttachTransform);
-            EditorGUILayout.PropertyField(attachEaseInTimeProperty, Tooltips.AttachEaseInTime);
-            EditorGUILayout.PropertyField(movementTypeProperty, Tooltips.MovementType);
-
-            EditorGUILayout.PropertyField(collidersProperty, Tooltips.Colliders, true);
-
+            
+            EditorGUILayout.Space();
+            
+            EditorGUILayout.PropertyField(interactionManager, Tooltips.InteractionManager);
             EditorGUILayout.PropertyField(interactionLayerMaskProperty, Tooltips.InteractionLayerMask);
+            EditorGUILayout.PropertyField(collidersProperty, Tooltips.Colliders, true);
+            
+            EditorGUILayout.Space();
 
+            EditorGUILayout.PropertyField(movementTypeProperty, Tooltips.MovementType);
             EditorGUILayout.PropertyField(retainTransformParentProperty, Tooltips.RetainTransformParent);
-
+            
             EditorGUILayout.PropertyField(trackPositionProperty, Tooltips.TrackPosition);
+            
             if (trackPositionProperty.boolValue)
             {
                 EditorGUI.indentLevel++;
@@ -156,6 +177,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
 
             EditorGUILayout.PropertyField(trackRotationProperty, Tooltips.TrackRotation);
+            
             if (trackRotationProperty.boolValue)
             {
                 EditorGUI.indentLevel++;
@@ -172,6 +194,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
 
             EditorGUILayout.PropertyField(throwOnDetachProperty, Tooltips.ThrowOnDetach);
+            
             if (throwOnDetachProperty.boolValue)
             {
                 EditorGUI.indentLevel++;
@@ -182,25 +205,44 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 EditorGUILayout.PropertyField(gravityOnDetachProperty, Tooltips.GravityOnDetach);
                 EditorGUI.indentLevel--;
             }
+            
+            EditorGUILayout.PropertyField(attachTransformProperty, Tooltips.AttachTransform);
+            EditorGUILayout.PropertyField(attachEaseInTimeProperty, Tooltips.AttachEaseInTime);
+            
+            EditorGUILayout.Space();
 
-            showInteractableEvents = EditorGUILayout.Foldout(showInteractableEvents, "Interactable Events");
-            if (showInteractableEvents)
+            onFirstHoverEntered.isExpanded = EditorGUILayout.Foldout(onFirstHoverEntered.isExpanded, EditorGUIUtility.TrTempContent("Interactable Events"), true);
+            
+            if (onFirstHoverEntered.isExpanded)
             {
                 // UnityEvents have not yet supported Tooltips
-                EditorGUILayout.PropertyField(onFirstHoverEnterProperty);
-                EditorGUILayout.PropertyField(onHoverEnterProperty);
-                EditorGUILayout.PropertyField(onHoverExitProperty);
-                EditorGUILayout.PropertyField(onLastHoverExitProperty);
-                EditorGUILayout.PropertyField(onSelectEnterProperty);
-                EditorGUILayout.PropertyField(onSelectExitProperty);
+                EditorGUILayout.PropertyField(onFirstHoverEntered);
+                EditorGUILayout.PropertyField(onHoverEntered);
+                EditorGUILayout.PropertyField(onHoverExited);
+                EditorGUILayout.PropertyField(onLastHoverExited);
+                EditorGUILayout.PropertyField(onSelectEntered);
+                EditorGUILayout.PropertyField(onSelectExited);
+#if XRIT_0_10_OR_NEWER
+                EditorGUILayout.PropertyField(onSelectCanceled);
+#endif
                 EditorGUILayout.PropertyField(onActivateProperty);
                 EditorGUILayout.PropertyField(onDeactivateProperty);
             }
-
-            if (showHighlightOptions && GUILayout.Button(Tooltips.HighlightOptions))
+            
+            if (showHighlightOptions)
             {
-                showHighlightOptions = false;
-                interactableObject.gameObject.AddComponent<InteractableHighlighter>();
+                EditorGUILayout.Space();
+                
+                if (GUILayout.Button(Tooltips.HighlightOptions))
+                {
+                    foreach (Object targetObject in serializedObject.targetObjects)
+                    {
+                        if (targetObject is InteractableObject interactable && interactable.GetComponent<InteractableHighlighter>() == null)
+                        {
+                            interactable.gameObject.AddComponent<InteractableHighlighter>();
+                        }
+                    }
+                }
             }
 
             serializedObject.ApplyModifiedProperties();

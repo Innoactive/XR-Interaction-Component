@@ -1,9 +1,10 @@
 using System;
 using System.IO;
-using Innoactive.Creator.Core.Runtime.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Innoactive.Creator.XRInteraction;
+using Innoactive.Creator.Core.Runtime.Utils;
 
 namespace Innoactive.CreatorEditor.XRInteraction
 {
@@ -78,7 +79,11 @@ namespace Innoactive.CreatorEditor.XRInteraction
         /// </summary>
         public void ApplySettingsToSnapZone(SnapZone snapZone)
         {
+#if XRIT_0_10_OR_NEWER
+            snapZone.interactionLayerMask = InteractionLayerMask;
+#else
             snapZone.InteractionLayerMask = InteractionLayerMask;
+#endif
             snapZone.ShownHighlightObjectColor = HighlightColor;
             snapZone.ValidationMaterial = ValidationMaterial;
             snapZone.InvalidMaterial = InvalidMaterial;
@@ -182,11 +187,20 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         private Material CreateMaterial()
         {
-            Shader standardShader = Shader.Find("Standard");
-            Material material = new Material(standardShader);
+            string shaderName = GraphicsSettings.currentRenderPipeline ? "Universal Render Pipeline/Lit" : "Standard";
+            Shader defaultShader = Shader.Find(shaderName);
+
+            if (defaultShader == null)
+            {
+                throw new NullReferenceException($"{nameof(GetType)} failed to create a default material," + 
+                    $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
+            }
             
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            Material material = new Material(defaultShader);
+            
+            material.SetFloat("_Mode", 3);
+            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
             material.SetInt("_ZWrite", 0);
             material.DisableKeyword("_ALPHATEST_ON");
             material.DisableKeyword("_ALPHABLEND_ON");

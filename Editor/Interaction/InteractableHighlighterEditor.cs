@@ -84,6 +84,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
         public override void OnInspectorGUI()
         {
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField(EditorGUIUtility.TrTempContent("Script"), MonoScript.FromMonoBehaviour((InteractableHighlighter)target), typeof(InteractableHighlighter), false);
+            EditorGUI.EndDisabledGroup();
+            
             serializedObject.Update();
             
             DrawTouchHighlightSection(onTouchHighlighting);
