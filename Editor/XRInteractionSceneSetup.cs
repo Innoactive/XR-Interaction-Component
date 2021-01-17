@@ -1,6 +1,4 @@
 ﻿using Innoactive.CreatorEditor.BasicInteraction;
-using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Innoactive.CreatorEditor.XRInteraction
 {
@@ -18,7 +16,11 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private void SetupXR()
         {
             RemoveMainCamera();
-            SetupPrefab("[XR_Setup]");
+#if ENABLE_LEGACY_INPUT_MANAGER && XRIT_0_10_OR_NEWER
+            SetupPrefab("[XR_Setup_Action_Based]");
+#else
+            SetupPrefab("[XR_Setup_Device_Based]");
+#endif
         }
     }
 }
