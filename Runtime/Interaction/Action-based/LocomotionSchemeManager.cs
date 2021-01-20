@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if XRIT_0_10_OR_NEWER
+using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using UnityEngine;
@@ -554,3 +555,4 @@ namespace Innoactive.Creator.XRInteraction
         }
     }
 }
+#endif
