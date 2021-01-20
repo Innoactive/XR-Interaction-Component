@@ -14,7 +14,7 @@ using UnityEngine.Serialization;
 [DefaultExecutionOrder(kControllerManagerUpdateOrder)]
 public class ActionBasedControllerManager : MonoBehaviour
 {
-    public const int kControllerManagerUpdateOrder = 10;
+    private const int kControllerManagerUpdateOrder = 10;
 
     public enum StateId
     {
