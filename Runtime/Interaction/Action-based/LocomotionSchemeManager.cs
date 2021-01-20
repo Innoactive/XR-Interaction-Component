@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
-namespace UnityEngine.XR.Interaction.Toolkit.Examples
+namespace Innoactive.Creator.XRInteraction
 {
     /// <summary>
     /// Use this class as a central manager to configure locomotion control schemes and configuration preferences.
@@ -24,10 +26,10 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
     /// Set <see cref="continuousControlScheme"/>="Continuous Move"
     /// Set <see cref="actions"/> to be both input actions (Teleport and Move).
     ///
-    /// When <see cref="moveScheme"/>=<see cref="MoveScheme.Noncontinuous"/>,
+    /// When <see cref="moveScheme"/>=<see cref="MoveSchemeType.Noncontinuous"/>,
     /// bindings (1) and (2) will be enabled, but binding (3) will be disabled.
     ///
-    /// When <see cref="moveScheme"/>=<see cref="MoveScheme.Continuous"/>,
+    /// When <see cref="moveScheme"/>=<see cref="MoveSchemeType.Continuous"/>,
     /// bindings (1) and (3) will be enabled, but binding (2) will be disabled.
     /// </example>
     /// </remarks>
@@ -37,7 +39,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
         /// Sets which movement control scheme to use.
         /// </summary>
         /// <seealso cref="moveScheme"/>
-        public enum MoveScheme
+        public enum MoveSchemeType
         {
             /// <summary>
             /// Use noncontinuous movement control scheme.
@@ -54,7 +56,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
         /// Sets which turn style of locomotion to use.
         /// </summary>
         /// <seealso cref="turnStyle"/>
-        public enum TurnStyle
+        public enum TurnStyleType
         {
             /// <summary>
             /// Use snap turning to rotate the direction you are facing by snapping by a specified angle.
@@ -72,7 +74,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
         /// </summary>
         /// <seealso cref="moveForwardSource"/>
         /// <seealso cref="ContinuousMoveProviderBase.forwardSource"/>
-        public enum MoveForwardSource
+        public enum MoveForwardSourceType
         {
             /// <summary>
             /// Use to continuously move in a direction based on the head orientation.
@@ -92,333 +94,350 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
 
         [SerializeField]
         [Tooltip("Controls which movement control scheme to use.")]
-        MoveScheme m_MoveScheme;
+        private MoveSchemeType moveScheme;
+        
         /// <summary>
         /// Controls which movement control scheme to use.
         /// </summary>
-        /// <seealso cref="MoveScheme"/>
-        public MoveScheme moveScheme
+        /// <seealso cref="MoveSchemeType"/>
+        public MoveSchemeType MoveScheme
         {
-            get => m_MoveScheme;
+            get => moveScheme;
             set
             {
                 SetMoveScheme(value);
-                m_MoveScheme = value;
+                moveScheme = value;
             }
         }
 
         [SerializeField]
         [Tooltip("Controls which turn style of locomotion to use.")]
-        TurnStyle m_TurnStyle;
+        private TurnStyleType turnStyle;
+        
         /// <summary>
         /// Controls which turn style of locomotion to use.
         /// </summary>
-        /// <seealso cref="TurnStyle"/>
-        public TurnStyle turnStyle
+        /// <seealso cref="TurnStyleType"/>
+        public TurnStyleType TurnStyle
         {
-            get => m_TurnStyle;
+            get => turnStyle;
             set
             {
                 SetTurnStyle(value);
-                m_TurnStyle = value;
+                turnStyle = value;
             }
         }
 
         [SerializeField]
         [Tooltip("Controls which orientation the forward direction of continuous movement is relative to.")]
-        MoveForwardSource m_MoveForwardSource;
+        private MoveForwardSourceType moveForwardSource;
+        
         /// <summary>
         /// Controls which orientation the forward direction of continuous movement is relative to.
         /// </summary>
-        /// <seealso cref="MoveForwardSource"/>
-        public MoveForwardSource moveForwardSource
+        /// <seealso cref="MoveForwardSourceType"/>
+        public MoveForwardSourceType MoveForwardSource
         {
-            get => m_MoveForwardSource;
+            get => moveForwardSource;
             set
             {
                 SetMoveForwardSource(value);
-                m_MoveForwardSource = value;
+                moveForwardSource = value;
             }
         }
 
         [SerializeField]
         [Tooltip("Input action assets associated with locomotion to affect when the active movement control scheme is set." +
             " Can use this list by itself or together with the Action Maps list to set control scheme masks by Asset or Map.")]
-        List<InputActionAsset> m_ActionAssets;
+        private List<InputActionAsset> actionAssets;
+        
         /// <summary>
         /// Input action assets associated with locomotion to affect when the active movement control scheme is set.
         /// Can use this list by itself or together with the Action Maps list to set control scheme masks by Asset or Map.
         /// </summary>
         /// <seealso cref="actionMaps"/>
-        public List<InputActionAsset> actionAssets
+        public List<InputActionAsset> ActionAssets
         {
-            get => m_ActionAssets;
-            set => m_ActionAssets = value;
+            get => actionAssets;
+            set => actionAssets = value;
         }
 
         [SerializeField]
         [Tooltip("Input action maps associated with locomotion to affect when the active movement control scheme is set." +
             " Can use this list together with the Action Assets list to set control scheme masks by Map instead of the whole Asset.")]
-        List<string> m_ActionMaps;
+        private List<string> actionMaps;
+        
         /// <summary>
         /// Input action maps associated with locomotion to affect when the active movement control scheme is set.
         /// Can use this list together with the Action Assets list to set control scheme masks by Map instead of the whole Asset.
         /// </summary>
         /// <seealso cref="actionAssets"/>
-        public List<string> actionMaps
+        public List<string> ActionMaps
         {
-            get => m_ActionMaps;
-            set => m_ActionMaps = value;
+            get => actionMaps;
+            set => actionMaps = value;
         }
 
         [SerializeField]
         [Tooltip("Input actions associated with locomotion to affect when the active movement control scheme is set." +
             " Can use this list to select exactly the actions to affect instead of setting control scheme masks by Asset or Map.")]
-        List<InputActionReference> m_Actions;
+        private List<InputActionReference> actions;
+        
         /// <summary>
         /// Input actions associated with locomotion that are affected by the active movement control scheme.
         /// Can use this list to select exactly the actions to affect instead of setting control scheme masks by Asset or Map.
         /// </summary>
         /// <seealso cref="actionAssets"/>
         /// <seealso cref="actionMaps"/>
-        public List<InputActionReference> actions
+        public List<InputActionReference> Actions
         {
-            get => m_Actions;
-            set => m_Actions = value;
+            get => actions;
+            set => actions = value;
         }
 
         [SerializeField]
         [Tooltip("Name of an input control scheme that defines the grouping of bindings that should remain enabled when applying any movement control scheme." +
             " Control schemes are created and named in the Input Actions window. The other movement control schemes are applied additively to this scheme." +
             " Can be an empty string, which means only bindings that match the specified movement control scheme will be enabled.")]
-        string m_BaseControlScheme;
+        private string baseControlScheme;
+        
         /// <summary>
         /// Name of an input control scheme that defines the grouping of bindings that should remain enabled when applying any movement control scheme.
         /// Control schemes are created and named in the Input Actions window. The other movement control schemes are applied additively to this scheme.
         /// Can be an empty string, which means only bindings that match the specified movement control scheme will be enabled.
         /// </summary>
-        public string baseControlScheme
+        public string BaseControlScheme
         {
-            get => m_BaseControlScheme;
-            set => m_BaseControlScheme = value;
+            get => baseControlScheme;
+            set => baseControlScheme = value;
         }
 
         [SerializeField]
         [Tooltip("Name of an input control scheme that defines the grouping of bindings that should remain enabled when applying the noncontinuous movement control scheme." +
             " Control schemes are created and named in the Input Actions window. Can be an empty string, which means only bindings that match the" +
             " base control scheme will be enabled.")]
-        string m_NoncontinuousControlScheme;
+        private string noncontinuousControlScheme;
+        
         /// <summary>
         /// Name of an input control scheme that defines the grouping of bindings that should remain enabled when applying the noncontinuous movement control scheme.
         /// Control schemes are created and named in the Input Actions window. Can be an empty string, which means only bindings that match the
         /// base control scheme will be enabled.
         /// </summary>
-        public string noncontinuousControlScheme
+        public string NoncontinuousControlScheme
         {
-            get => m_NoncontinuousControlScheme;
-            set => m_NoncontinuousControlScheme = value;
+            get => noncontinuousControlScheme;
+            set => noncontinuousControlScheme = value;
         }
 
         [SerializeField]
         [Tooltip("Name of an input control scheme that defines the grouping of bindings that should remain enabled when applying the continuous movement control scheme." +
             " Control schemes are created and named in the Input Actions window. Can be an empty string, which means only bindings that match the" +
             " base control scheme will be enabled.")]
-        string m_ContinuousControlScheme;
+        private string continuousControlScheme;
+        
         /// <summary>
         /// Name of an input control scheme that defines the grouping of bindings that should remain enabled when applying the continuous movement control scheme.
         /// Control schemes are created and named in the Input Actions window. Can be an empty string, which means only bindings that match the
         /// base control scheme will be enabled.
         /// </summary>
-        public string continuousControlScheme
+        public string ContinuousControlScheme
         {
-            get => m_ContinuousControlScheme;
-            set => m_ContinuousControlScheme = value;
+            get => continuousControlScheme;
+            set => continuousControlScheme = value;
         }
 
         [SerializeField]
         [Tooltip("Stores the locomotion provider for continuous movement.")]
-        ContinuousMoveProviderBase m_ContinuousMoveProvider;
+        private ContinuousMoveProviderBase continuousMoveProvider;
+        
         /// <summary>
         /// Stores the locomotion provider for continuous movement.
         /// </summary>
         /// <seealso cref="ContinuousMoveProviderBase"/>
-        public ContinuousMoveProviderBase continuousMoveProvider
+        public ContinuousMoveProviderBase ContinuousMoveProvider
         {
-            get => m_ContinuousMoveProvider;
-            set => m_ContinuousMoveProvider = value;
+            get => continuousMoveProvider;
+            set => continuousMoveProvider = value;
         }
 
         [SerializeField]
         [Tooltip("Stores the locomotion provider for continuous turning.")]
-        ContinuousTurnProviderBase m_ContinuousTurnProvider;
+        private ContinuousTurnProviderBase continuousTurnProvider;
+        
         /// <summary>
         /// Stores the locomotion provider for continuous turning.
         /// </summary>
         /// <seealso cref="ContinuousTurnProviderBase"/>
-        public ContinuousTurnProviderBase continuousTurnProvider
+        public ContinuousTurnProviderBase ContinuousTurnProvider
         {
-            get => m_ContinuousTurnProvider;
-            set => m_ContinuousTurnProvider = value;
+            get => continuousTurnProvider;
+            set => continuousTurnProvider = value;
         }
 
         [SerializeField]
         [Tooltip("Stores the locomotion provider for snap turning.")]
-        SnapTurnProviderBase m_SnapTurnProvider;
+        private SnapTurnProviderBase snapTurnProvider;
+        
         /// <summary>
         /// Stores the locomotion provider for snap turning.
         /// </summary>
         /// <seealso cref="SnapTurnProviderBase"/>
-        public SnapTurnProviderBase snapTurnProvider
+        public SnapTurnProviderBase SnapTurnProvider
         {
-            get => m_SnapTurnProvider;
-            set => m_SnapTurnProvider = value;
+            get => snapTurnProvider;
+            set => snapTurnProvider = value;
         }
 
         [SerializeField]
         [Tooltip("Stores the \"Head\" Transform used with continuous movement when inputs should be relative to head orientation (usually the main camera).")]
-        Transform m_HeadForwardSource;
+        private Transform headForwardSource;
+        
         /// <summary>
         /// Stores the "Head" <see cref="Transform"/> used with continuous movement when inputs should be relative to head orientation (usually the main camera).
         /// </summary>
-        public Transform headForwardSource
+        public Transform HeadForwardSource
         {
-            get => m_HeadForwardSource;
-            set => m_HeadForwardSource = value;
+            get => headForwardSource;
+            set => headForwardSource = value;
         }
 
         [SerializeField]
         [Tooltip("Stores the \"Left Hand\" Transform used with continuous movement when inputs should be relative to the left hand's orientation.")]
-        Transform m_LeftHandForwardSource;
+        private Transform leftHandForwardSource;
+        
         /// <summary>
         /// Stores the "Left Hand" <see cref="Transform"/> used with continuous movement when inputs should be relative to the left hand's orientation.
         /// </summary>
-        public Transform leftHandForwardSource
+        public Transform LeftHandForwardSource
         {
-            get => m_LeftHandForwardSource;
-            set => m_LeftHandForwardSource = value;
+            get => leftHandForwardSource;
+            set => leftHandForwardSource = value;
         }
 
         [SerializeField]
         [Tooltip("Stores the \"Right Hand\" Transform used with continuous movement when inputs should be relative to the right hand's orientation.")]
-        Transform m_RightHandForwardSource;
+        private Transform rightHandForwardSource;
+        
         /// <summary>
         /// Stores the "Right Hand" <see cref="Transform"/> used with continuous movement when inputs should be relative to the right hand's orientation.
         /// </summary>
-        public Transform rightHandForwardSource
+        public Transform RightHandForwardSource
         {
-            get => m_RightHandForwardSource;
-            set => m_RightHandForwardSource = value;
+            get => rightHandForwardSource;
+            set => rightHandForwardSource = value;
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
-            SetMoveScheme(m_MoveScheme);
-            SetTurnStyle(m_TurnStyle);
-            SetMoveForwardSource(m_MoveForwardSource);
+            SetMoveScheme(moveScheme);
+            SetTurnStyle(turnStyle);
+            SetMoveForwardSource(moveForwardSource);
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             ClearBindingMasks();
         }
 
-        void SetMoveScheme(MoveScheme scheme)
+        private void SetMoveScheme(MoveSchemeType scheme)
         {
             switch (scheme)
             {
-                case MoveScheme.Noncontinuous:
-                    SetBindingMasks(m_NoncontinuousControlScheme);
-                    if (m_ContinuousMoveProvider != null)
+                case MoveSchemeType.Noncontinuous:
+                    SetBindingMasks(noncontinuousControlScheme);
+                    
+                    if (continuousMoveProvider != null)
                     {
-                        m_ContinuousMoveProvider.enabled = false;
+                        continuousMoveProvider.enabled = false;
                     }
-
                     break;
-                case MoveScheme.Continuous:
-                    SetBindingMasks(m_ContinuousControlScheme);
-                    if (m_ContinuousMoveProvider != null)
+                case MoveSchemeType.Continuous:
+                    SetBindingMasks(continuousControlScheme);
+                    
+                    if (continuousMoveProvider != null)
                     {
-                        m_ContinuousMoveProvider.enabled = true;
+                        continuousMoveProvider.enabled = true;
                     }
-
                     break;
                 default:
-                    throw new InvalidEnumArgumentException(nameof(scheme), (int)scheme, typeof(MoveScheme));
+                    throw new InvalidEnumArgumentException(nameof(scheme), (int)scheme, typeof(MoveSchemeType));
             }
         }
 
-        void SetTurnStyle(TurnStyle style)
+        private void SetTurnStyle(TurnStyleType style)
         {
             switch (style)
             {
-                case TurnStyle.Snap:
-                    if (m_ContinuousTurnProvider != null)
+                case TurnStyleType.Snap:
+                    if (continuousTurnProvider != null)
                     {
-                        m_ContinuousTurnProvider.enabled = false;
+                        continuousTurnProvider.enabled = false;
                     }
 
-                    if (m_SnapTurnProvider != null)
+                    if (snapTurnProvider != null)
                     {
                         // TODO: If the Continuous Turn and Snap Turn providers both use the same
                         // action, then disabling the first provider will cause the action to be
                         // disabled, so the action needs to be enabled, which is done by forcing
                         // the OnEnable() of the second provider to be called.
                         // ReSharper disable Unity.InefficientPropertyAccess
-                        m_SnapTurnProvider.enabled = false;
-                        m_SnapTurnProvider.enabled = true;
+                        snapTurnProvider.enabled = false;
+                        snapTurnProvider.enabled = true;
                         // ReSharper restore Unity.InefficientPropertyAccess
-                        m_SnapTurnProvider.enableTurnLeftRight = true;
+                        snapTurnProvider.enableTurnLeftRight = true;
                     }
                     break;
-                case TurnStyle.Continuous:
-                    if (m_SnapTurnProvider != null)
+                case TurnStyleType.Continuous:
+                    if (snapTurnProvider != null)
                     {
-                        m_SnapTurnProvider.enableTurnLeftRight = false;
+                        snapTurnProvider.enableTurnLeftRight = false;
                     }
 
-                    if (m_ContinuousTurnProvider != null)
+                    if (continuousTurnProvider != null)
                     {
-                        m_ContinuousTurnProvider.enabled = true;
+                        continuousTurnProvider.enabled = true;
                     }
                     break;
                 default:
-                    throw new InvalidEnumArgumentException(nameof(style), (int)style, typeof(TurnStyle));
+                    throw new InvalidEnumArgumentException(nameof(style), (int)style, typeof(TurnStyleType));
             }
         }
 
-        void SetMoveForwardSource(MoveForwardSource forwardSource)
+        private void SetMoveForwardSource(MoveForwardSourceType forwardSource)
         {
-            if (m_ContinuousMoveProvider == null)
+            if (continuousMoveProvider == null)
             {
-                Debug.LogError($"Cannot set forward source to {forwardSource}," +
-                    $" the reference to the {nameof(ContinuousMoveProviderBase)} is missing or the object has been destroyed.", this);
+                Debug.LogError($"Cannot set forward source to {forwardSource}, the reference to the {nameof(ContinuousMoveProviderBase)} is missing or the object has been destroyed.", this);
                 return;
             }
 
             switch (forwardSource)
             {
-                case MoveForwardSource.Head:
-                    m_ContinuousMoveProvider.forwardSource = m_HeadForwardSource;
+                case MoveForwardSourceType.Head:
+                    continuousMoveProvider.forwardSource = headForwardSource;
                     break;
-                case MoveForwardSource.LeftHand:
-                    m_ContinuousMoveProvider.forwardSource = m_LeftHandForwardSource;
+                case MoveForwardSourceType.LeftHand:
+                    continuousMoveProvider.forwardSource = leftHandForwardSource;
                     break;
-                case MoveForwardSource.RightHand:
-                    m_ContinuousMoveProvider.forwardSource = m_RightHandForwardSource;
+                case MoveForwardSourceType.RightHand:
+                    continuousMoveProvider.forwardSource = rightHandForwardSource;
                     break;
                 default:
-                    throw new InvalidEnumArgumentException(nameof(forwardSource), (int)forwardSource, typeof(MoveForwardSource));
+                    throw new InvalidEnumArgumentException(nameof(forwardSource), (int)forwardSource, typeof(MoveForwardSourceType));
             }
         }
 
-        void SetBindingMasks(string controlSchemeName)
+        private void SetBindingMasks(string controlSchemeName)
         {
-            foreach (var actionReference in m_Actions)
+            foreach (InputActionReference actionReference in actions)
             {
                 if (actionReference == null)
+                {
                     continue;
+                }
 
-                var action = actionReference.action;
+                InputAction action = actionReference.action;
+                
                 if (action == null)
                 {
                     Debug.LogError($"Cannot set binding mask on {actionReference} since the action could not be found.", this);
@@ -426,35 +445,38 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
                 }
 
                 // Get the (optional) base control scheme and the control scheme to apply on top of base
-                var baseInputControlScheme = FindControlScheme(m_BaseControlScheme, actionReference);
-                var inputControlScheme = FindControlScheme(controlSchemeName, actionReference);
+                InputControlScheme? baseInputControlScheme = FindControlScheme(baseControlScheme, actionReference);
+                InputControlScheme? inputControlScheme = FindControlScheme(controlSchemeName, actionReference);
 
                 action.bindingMask = GetBindingMask(baseInputControlScheme, inputControlScheme);
             }
 
-            if (m_ActionMaps.Count > 0 && m_ActionAssets.Count == 0)
+            if (actionMaps.Count > 0 && actionAssets.Count == 0)
             {
                 Debug.LogError($"Cannot set binding mask on action maps since no input action asset references have been set.", this);
             }
 
-            foreach (var actionAsset in m_ActionAssets)
+            foreach (InputActionAsset actionAsset in actionAssets)
             {
                 if (actionAsset == null)
+                {
                     continue;
+                }
 
                 // Get the (optional) base control scheme and the control scheme to apply on top of base
-                var baseInputControlScheme = FindControlScheme(m_BaseControlScheme, actionAsset);
-                var inputControlScheme = FindControlScheme(controlSchemeName, actionAsset);
+                InputControlScheme? baseInputControlScheme = FindControlScheme(baseControlScheme, actionAsset);
+                InputControlScheme? inputControlScheme = FindControlScheme(controlSchemeName, actionAsset);
 
-                if (m_ActionMaps.Count == 0)
+                if (actionMaps.Count == 0)
                 {
                     actionAsset.bindingMask = GetBindingMask(baseInputControlScheme, inputControlScheme);
                     continue;
                 }
 
-                foreach (var mapName in m_ActionMaps)
+                foreach (string mapName in actionMaps)
                 {
-                    var actionMap = actionAsset.FindActionMap(mapName);
+                    InputActionMap actionMap = actionAsset.FindActionMap(mapName);
+                    
                     if (actionMap == null)
                     {
                         Debug.LogError($"Cannot set binding mask on \"{mapName}\" since the action map not be found in '{actionAsset}'.", this);
@@ -466,20 +488,25 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
             }
         }
 
-        void ClearBindingMasks()
+        private void ClearBindingMasks()
         {
             SetBindingMasks(string.Empty);
         }
 
-        InputControlScheme? FindControlScheme(string controlSchemeName, InputActionReference action)
+        private InputControlScheme? FindControlScheme(string controlSchemeName, InputActionReference action)
         {
             if (action == null)
+            {
                 throw new ArgumentNullException(nameof(action));
+            }
 
             if (string.IsNullOrEmpty(controlSchemeName))
+            {
                 return null;
+            }
 
-            var asset = action.asset;
+            InputActionAsset asset = action.asset;
+            
             if (asset == null)
             {
                 Debug.LogError($"Cannot find control scheme \"{controlSchemeName}\" for '{action}' since it does not belong to an {nameof(InputActionAsset)}.", this);
@@ -489,15 +516,20 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
             return FindControlScheme(controlSchemeName, asset);
         }
 
-        InputControlScheme? FindControlScheme(string controlSchemeName, InputActionAsset asset)
+        private InputControlScheme? FindControlScheme(string controlSchemeName, InputActionAsset asset)
         {
             if (asset == null)
+            {
                 throw new ArgumentNullException(nameof(asset));
+            }
 
             if (string.IsNullOrEmpty(controlSchemeName))
+            {
                 return null;
+            }
 
-            var scheme = asset.FindControlScheme(controlSchemeName);
+            InputControlScheme? scheme = asset.FindControlScheme(controlSchemeName);
+            
             if (scheme == null)
             {
                 Debug.LogError($"Cannot find control scheme \"{controlSchemeName}\" in '{asset}'.", this);
@@ -507,7 +539,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Examples
             return scheme;
         }
 
-        static InputBinding? GetBindingMask(InputControlScheme? baseInputControlScheme, InputControlScheme? inputControlScheme)
+        private static InputBinding? GetBindingMask(InputControlScheme? baseInputControlScheme, InputControlScheme? inputControlScheme)
         {
             if (inputControlScheme.HasValue)
             {

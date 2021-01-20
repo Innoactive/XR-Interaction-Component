@@ -244,8 +244,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             {
                 RayInteractor interactor = (RayInteractor)targetObject;
                 
-                
-                if (interactor.GetComponent<XRController>() == null)
+                if (interactor.GetComponent<XRController>() == null && interactor.GetComponent<ActionBasedController>() == null)
                 {
                     EditorGUILayout.HelpBox(Tooltips.MissingRequiredController, MessageType.Warning, true);
                     break;

@@ -154,6 +154,14 @@
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "UI Mode Activate",
+                    "type": "Button",
+                    "id": "e79be11e-456a-469f-afa0-e7569cbecd83",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -398,6 +406,17 @@
                     "action": "Teleport Mode Activate",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0cf3d989-0294-42f6-9fe6-751db7fe2d47",
+                    "path": "<XRController>{LeftHand}/gripPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "UI Mode Activate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -506,6 +525,14 @@
                     "type": "Value",
                     "id": "6f7cf253-7062-443b-b10f-2be48a33f027",
                     "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "UI Mode Active",
+                    "type": "Button",
+                    "id": "2610cf9a-103e-4523-832c-5daefb9ba8b4",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
                 }
@@ -739,6 +766,17 @@
                     "processors": "",
                     "groups": "Generic XR Controller",
                     "action": "Teleport Mode Activate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ae7ba8b1-27b2-4ba3-a3f4-2afd79d45e03",
+                    "path": "<XRController>{RightHand}/gripPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "UI Mode Active",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
