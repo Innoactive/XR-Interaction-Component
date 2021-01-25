@@ -67,7 +67,7 @@ namespace Innoactive.Creator.XRInteraction
             /// <summary>
             /// Use continuous turning to smoothly rotate the direction you are facing by a specified speed.
             /// </summary>
-            Continuous,
+            Continuous
         }
 
         /// <summary>
@@ -367,40 +367,31 @@ namespace Innoactive.Creator.XRInteraction
 
         private void SetTurnStyle(TurnStyleType style)
         {
-            switch (style)
+            if (style != TurnStyleType.Snap && style != TurnStyleType.Continuous)
             {
-                case TurnStyleType.Snap:
-                    if (continuousTurnProvider != null)
-                    {
-                        continuousTurnProvider.enabled = false;
-                    }
-
-                    if (snapTurnProvider != null)
-                    {
-                        // TODO: If the Continuous Turn and Snap Turn providers both use the same
-                        // action, then disabling the first provider will cause the action to be
-                        // disabled, so the action needs to be enabled, which is done by forcing
-                        // the OnEnable() of the second provider to be called.
-                        // ReSharper disable Unity.InefficientPropertyAccess
-                        snapTurnProvider.enabled = false;
-                        snapTurnProvider.enabled = true;
-                        // ReSharper restore Unity.InefficientPropertyAccess
-                        snapTurnProvider.enableTurnLeftRight = true;
-                    }
-                    break;
-                case TurnStyleType.Continuous:
-                    if (snapTurnProvider != null)
-                    {
-                        snapTurnProvider.enableTurnLeftRight = false;
-                    }
-
-                    if (continuousTurnProvider != null)
-                    {
-                        continuousTurnProvider.enabled = true;
-                    }
-                    break;
-                default:
-                    throw new InvalidEnumArgumentException(nameof(style), (int)style, typeof(TurnStyleType));
+                throw new InvalidEnumArgumentException(nameof(style), (int)style, typeof(TurnStyleType));
+            }
+            
+            if (continuousTurnProvider != null)
+            {
+                continuousTurnProvider.enabled = style != TurnStyleType.Snap;
+            }
+            
+            if (snapTurnProvider != null)
+            {
+                if (style == TurnStyleType.Snap)
+                {
+                    // TODO: If the Continuous Turn and Snap Turn providers both use the same
+                    // action, then disabling the first provider will cause the action to be
+                    // disabled, so the action needs to be enabled, which is done by forcing
+                    // the OnEnable() of the second provider to be called.
+                    // ReSharper disable Unity.InefficientPropertyAccess
+                    snapTurnProvider.enabled = false;
+                    snapTurnProvider.enabled = true;
+                    // ReSharper restore Unity.InefficientPropertyAccess
+                }
+                
+                snapTurnProvider.enableTurnLeftRight = style == TurnStyleType.Snap;
             }
         }
 

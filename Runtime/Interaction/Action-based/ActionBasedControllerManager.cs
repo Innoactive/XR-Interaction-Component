@@ -19,6 +19,9 @@ namespace Innoactive.Creator.XRInteraction
     {
         private const int ControllerManagerUpdateOrder = 10;
 
+        /// <summary>
+        /// Reference to an interaction state.
+        /// </summary>
         public enum StateID
         {
             None,
@@ -681,16 +684,16 @@ namespace Innoactive.Creator.XRInteraction
             InputAction cancelTeleportModeAction = GetInputAction(teleportModeCancel);
             InputAction uiModeAction = GetInputAction(uiModeActivate);
 
-            bool triggerTeleportMode = teleportModeAction != null && teleportModeAction.triggered;
-            bool cancelTeleport = cancelTeleportModeAction != null && cancelTeleportModeAction.triggered;
-            bool triggerUIMode = uiModeAction != null && uiModeAction.triggered;
+            bool isUIModeTriggered = uiModeAction != null && uiModeAction.triggered;
+            bool isTriggerTeleportMode = teleportModeAction != null && teleportModeAction.triggered;
+            bool shouldCancelTeleport = cancelTeleportModeAction != null && cancelTeleportModeAction.triggered;
 
-            if (triggerUIMode)
+            if (isUIModeTriggered)
             {
                 TransitionState(selectState, uiState);
                 return;
             }
-            else if (triggerTeleportMode && cancelTeleport == false)
+            else if (isTriggerTeleportMode && shouldCancelTeleport == false)
             {
                 TransitionState(selectState, teleportState);
                 return;
@@ -714,10 +717,10 @@ namespace Innoactive.Creator.XRInteraction
             InputAction teleportModeAction = GetInputAction(teleportModeActivate);
             InputAction cancelTeleportModeAction = GetInputAction(teleportModeCancel);
 
-            bool cancelTeleport = cancelTeleportModeAction != null && cancelTeleportModeAction.triggered;
-            bool releasedTeleport = teleportModeAction != null && teleportModeAction.phase == InputActionPhase.Waiting;
+            bool shouldCancelTeleport = cancelTeleportModeAction != null && cancelTeleportModeAction.triggered;
+            bool isTeleportModeReleased = teleportModeAction != null && teleportModeAction.phase == InputActionPhase.Waiting;
 
-            if (cancelTeleport || releasedTeleport)
+            if (shouldCancelTeleport || isTeleportModeReleased)
             {
                 TransitionState(teleportState, selectState);
             }
@@ -735,9 +738,9 @@ namespace Innoactive.Creator.XRInteraction
         private void OnUpdateUIState()
         {
             // Transition from UI state to Select state when we release the UI trigger
-            InputAction triggerUIMode = GetInputAction(uiModeActivate);
+            InputAction isUIModeTriggered = GetInputAction(uiModeActivate);
 
-            bool isButtonReleased = triggerUIMode != null && triggerUIMode.phase == InputActionPhase.Waiting;
+            bool isButtonReleased = isUIModeTriggered != null && isUIModeTriggered.phase == InputActionPhase.Waiting;
 
             if (isButtonReleased)
             {
