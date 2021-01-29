@@ -103,17 +103,19 @@ namespace Innoactive.Creator.XRInteraction
                 interactableObject = gameObject.GetComponent<InteractableObject>();
             }
 
-#if XRIT_0_10_OR_NEWER
-            interactableObject.onFirstHoverEntered.AddListener(OnTouched);
-            interactableObject.onSelectEntered.AddListener(OnGrabbed);
-            interactableObject.onSelectExited.AddListener(OnReleased);
+#if XRIT_1_0_OR_NEWER
+            interactableObject.firstHoverEntered.AddListener(OnTouched);
+            interactableObject.selectEntered.AddListener(OnGrabbed);
+            interactableObject.selectExited.AddListener(OnReleased);
+            interactableObject.activated.AddListener(OnUsed);
+            interactableObject.deactivated.AddListener(OnUnused);
 #else
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
             interactableObject.onSelectExit.AddListener(OnReleased);
-#endif
             interactableObject.onActivate.AddListener(OnUsed);
             interactableObject.onDeactivate.AddListener(OnUnused);
+#endif
         }
 
         private void OnDisable()
@@ -124,17 +126,24 @@ namespace Innoactive.Creator.XRInteraction
                 externalHighlights.Clear();
             }
             
-#if XRIT_0_10_OR_NEWER
-            interactableObject?.onFirstHoverEntered.RemoveListener(OnTouched);
-            interactableObject?.onSelectEntered.RemoveListener(OnGrabbed);
-            interactableObject?.onSelectExited.RemoveListener(OnReleased);
+            if (interactableObject == false)
+            {
+                return;
+            }
+            
+#if XRIT_1_0_OR_NEWER
+            interactableObject.firstHoverEntered.RemoveListener(OnTouched);
+            interactableObject.selectEntered.RemoveListener(OnGrabbed);
+            interactableObject.selectExited.RemoveListener(OnReleased);
+            interactableObject.activated.RemoveListener(OnUsed);
+            interactableObject.deactivated.RemoveListener(OnUnused);
 #else
-            interactableObject?.onFirstHoverEnter.RemoveListener(OnTouched);
-            interactableObject?.onSelectEnter.RemoveListener(OnGrabbed);
-            interactableObject?.onSelectExit.RemoveListener(OnReleased);
+            interactableObject.onFirstHoverEnter.RemoveListener(OnTouched);
+            interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
+            interactableObject.onSelectExit.RemoveListener(OnReleased);
+            interactableObject.onActivate.RemoveListener(OnUsed);
+            interactableObject.onDeactivate.RemoveListener(OnUnused);
 #endif
-            interactableObject?.onActivate.RemoveListener(OnUsed);
-            interactableObject?.onDeactivate.RemoveListener(OnUnused);
         }
 
         private void OnValidate()
@@ -225,6 +234,33 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
 
+#if XRIT_1_0_OR_NEWER
+        private void OnTouched(HoverEnterEventArgs arguments)
+        {
+            OnTouchHighlight();
+        }
+        
+        private void OnGrabbed(SelectEnterEventArgs arguments)
+        {
+            OnGrabHighlight();
+        }
+        
+        private void OnReleased(SelectExitEventArgs arguments)
+        {
+            OnTouchHighlight();
+        }
+        
+        private void OnUsed(ActivateEventArgs arguments)
+        {
+            OnUseHighlight();
+        }
+        
+        private void OnUnused(DeactivateEventArgs arg0)
+        {
+            OnGrabHighlight();
+        }
+#else
+
         private void OnTouched(XRBaseInteractor interactor)
         {
             OnTouchHighlight();
@@ -249,7 +285,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             OnGrabHighlight();
         }
-
+#endif
         private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
         {
             if (highlightMeshRenderer == null || renderers == null || renderers.Any() == false)

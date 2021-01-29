@@ -25,6 +25,11 @@
             "name": "com.unity.xr.interaction.toolkit",
             "expression": "0.10.0-preview",
             "define": "XRIT_0_10_OR_NEWER"
+        },
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "1.0.0-pre.2",
+            "define": "XRIT_1_0_OR_NEWER"
         }
     ],
     "noEngineReferences": false

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -145,7 +142,15 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (IsActivated)
             {
+#if XRIT_1_0_OR_NEWER
+                OnDeactivated(new DeactivateEventArgs
+                {
+                    interactable =  this,
+                    interactor = selectingInteractor
+                });
+#else
                 OnDeactivate(selectingInteractor);
+#endif
             }
             
             StartCoroutine(StopInteractingForOneFrame());
@@ -156,26 +161,58 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         public virtual void ForceUse()
         {
+#if XRIT_1_0_OR_NEWER
+            OnActivated(new ActivateEventArgs
+            {
+                interactable = this,
+                interactor = selectingInteractor
+            });
+#else
             OnActivate(selectingInteractor);
+#endif
         }
 
         internal void ForceSelectEnter(XRBaseInteractor interactor)
         {
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            OnSelectEntering(new SelectEnterEventArgs
+            {
+                interactable = this,
+                interactor = interactor
+            });
+#elif XRIT_0_10_OR_NEWER
             OnSelectEntering(interactor);
 #else
             OnSelectEnter(interactor);
 #endif
         }
         
+#if XRIT_1_0_OR_NEWER
+        /// <summary>
+        /// This method is called by the Interaction Manager
+        /// right before the Interactor first initiates selection of an Interactable
+        /// in a first pass.
+        /// </summary>
+        /// <param name="arguments">Event data containing the Interactor that is initiating the selection.</param>
+        /// <remarks>
+        /// <paramref name="arguments"/> is only valid during this method call, do not hold a reference to it.
+        /// </remarks>
+        /// <seealso cref="OnSelectEntered(SelectEnterEventArgs)"/>
+        protected override void OnSelectEntering(SelectEnterEventArgs arguments)
+        {
+            base.OnSelectEntering(arguments);
+            XRBaseInteractor interactor = arguments.interactor;
+#elif XRIT_0_10_OR_NEWER
         /// <summary>This method is called by the interaction manager 
         /// when the interactor first initiates selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is initiating the selection.</param>
-#if XRIT_0_10_OR_NEWER
         protected override void OnSelectEntering(XRBaseInteractor interactor)
         {
             base.OnSelectEntering(interactor);
 #else
+        /// <summary>This method is called by the interaction manager 
+        /// when the interactor first initiates selection of an interactable.</summary>
+        /// <param name="interactor">Interactor that is initiating the selection.</param>
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
@@ -191,15 +228,33 @@ namespace Innoactive.Creator.XRInteraction
                 }
             }
         }
-
+        
+#if XRIT_1_0_OR_NEWER
+        /// <summary>
+        /// This method is called by the Interaction Manager
+        /// right before the Interactor ends selection of an Interactable
+        /// in a first pass.
+        /// </summary>
+        /// <param name="arguments">Event data containing the Interactor that is ending the selection.</param>
+        /// <remarks>
+        /// <paramref name="arguments"/> is only valid during this method call, do not hold a reference to it.
+        /// </remarks>
+        /// <seealso cref="OnSelectExited(SelectExitEventArgs)"/>
+        protected override void OnSelectExiting(SelectExitEventArgs arguments)
+        {
+            base.OnSelectExiting(arguments);
+            XRBaseInteractor interactor = arguments.interactor;
+#elif XRIT_0_10_OR_NEWER
         /// <summary>This method is called by the interaction manager 
         /// when the interactor ends selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is ending the selection.</param>
-#if XRIT_0_10_OR_NEWER
         protected override void OnSelectExiting(XRBaseInteractor interactor)
         {
             base.OnSelectExiting(interactor);
 #else
+        /// <summary>This method is called by the interaction manager 
+        /// when the interactor ends selection of an interactable.</summary>
+        /// <param name="interactor">Interactor that is ending the selection.</param>
         protected override void OnSelectExit(XRBaseInteractor interactor)
         {
             base.OnSelectExit(interactor);
@@ -209,7 +264,26 @@ namespace Innoactive.Creator.XRInteraction
                 selectingSocket = null;
             }
         }
-
+        
+#if XRIT_1_0_OR_NEWER
+        /// <summary>
+        /// This method is called by the <see cref="XRBaseControllerInteractor"/>
+        /// when the Interactor begins an activation event on this selected Interactable.
+        /// </summary>
+        /// <param name="arguments">Event data containing the Interactor that is sending the activate event.</param>
+        /// <remarks>
+        /// <paramref name="arguments"/> is only valid during this method call, do not hold a reference to it.
+        /// </remarks>
+        /// <seealso cref="OnDeactivated"/>
+        protected override void OnActivated(ActivateEventArgs arguments)
+        {
+            if (isUsable)
+            {
+                IsActivated = true;
+                base.OnActivated(arguments);
+            }
+        }
+#else
         /// <summary>This method is called by the interaction manager 
         /// when the interactor sends an activation event down to an interactable.</summary>
         /// <param name="interactor">Interactor that is sending the activation event.</param>
@@ -221,7 +295,28 @@ namespace Innoactive.Creator.XRInteraction
                 base.OnActivate(interactor);
             }
         }
+#endif
 
+#if XRIT_1_0_OR_NEWER
+        /// <summary>
+        /// This method is called by the <see cref="XRBaseControllerInteractor"/>
+        /// when the Interactor ends an activation event on this selected Interactable.
+        /// </summary>
+        /// <param name="arguments">Event data containing the Interactor that is sending the deactivate event.</param>
+        /// <remarks>
+        /// <paramref name="arguments"/> is only valid during this method call, do not hold a reference to it.
+        /// </remarks>
+        /// <seealso cref="OnActivated"/>
+        protected override void OnDeactivated(DeactivateEventArgs arguments)
+        {
+            if (isUsable)
+            {
+                IsActivated = false;
+                base.OnDeactivated(arguments);
+            }
+        }
+        
+#else
         /// <summary>This method is called by the interaction manager 
         /// when the interactor sends a deactivation event down to an interactable.</summary>
         /// <param name="interactor">Interactor that is sending the activation event.</param>
@@ -233,6 +328,7 @@ namespace Innoactive.Creator.XRInteraction
                 base.OnDeactivate(interactor);
             }
         }
+#endif
 
         private IEnumerator StopInteractingForOneFrame()
         {
@@ -242,7 +338,7 @@ namespace Innoactive.Creator.XRInteraction
             if (selectingSocket != null)
             {
                 SnapZone snapZone = selectingSocket as SnapZone;
-                snapZone.ForceUnselect();
+                snapZone?.ForceUnselect();
             }
             
             yield return new WaitUntil(() => hoveringInteractors.Count == 0 && selectingInteractor == null);

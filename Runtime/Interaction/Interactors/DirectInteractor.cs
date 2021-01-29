@@ -65,7 +65,40 @@ namespace Innoactive.Creator.XRInteraction
             forceGrab = true;
         }
 
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+        /// <summary>
+        /// This method is called by the Interaction Manager
+        /// right before the Interactor first initiates selection of an Interactable
+        /// in a first pass.
+        /// </summary>
+        /// <param name="arguments">Event data containing the Interactable that is being selected.</param>
+        /// <remarks>
+        /// <paramref name="arguments"/> is only valid during this method call, do not hold a reference to it.
+        /// </remarks>
+        /// <seealso cref="OnSelectEntered(SelectEnterEventArgs)"/>
+        protected override void OnSelectEntering(SelectEnterEventArgs arguments)
+        {
+            XRBaseInteractable interactable = arguments.interactable;
+            InteractableObject interactableObject = interactable as InteractableObject;
+            
+            if (precisionGrab && interactableObject.attachTransform == null)
+            {
+                switch (interactableObject.movementType)
+                {
+                    case XRBaseInteractable.MovementType.VelocityTracking:
+                    case XRBaseInteractable.MovementType.Kinematic:
+                        attachTransform.SetPositionAndRotation(interactable.transform.position, interactable.transform.rotation);
+                        break;
+                    case XRBaseInteractable.MovementType.Instantaneous:
+                        Debug.LogWarning("Precision Grab is currently not compatible with interactable objects with Movement Type configured as Instantaneous.\n"
+                        + $"Please change the Movement Type in {interactable.name}.", interactable);
+                        break;
+                }
+            }
+
+            base.OnSelectEntering(arguments);
+        }
+#elif XRIT_0_10_OR_NEWER
         /// <summary>
         /// This method is called when the interactor first initiates selection of an interactable.
         /// </summary>
@@ -84,27 +117,12 @@ namespace Innoactive.Creator.XRInteraction
                         break;
                     case XRBaseInteractable.MovementType.Instantaneous:
                         Debug.LogWarning("Precision Grab is currently not compatible with interactable objects with Movement Type configured as Instantaneous.\n"
-                        + $"Please change the Movement Type in {interactable.name}.", interactable);
+                                         + $"Please change the Movement Type in {interactable.name}.", interactable);
                         break;
                 }
             }
-            
-            base.OnSelectEntering(interactable);
-        }
-        
-        /// <summary>
-        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
-        /// </summary>
-        /// <param name="interactable">Interactable that is no longer selected.</param>
-        protected override void OnSelectExiting(XRBaseInteractable interactable)
-        {
-            base.OnSelectExiting(interactable);
 
-            if (precisionGrab)
-            {
-                attachTransform.localPosition = initialAttachPosition;
-                attachTransform.localRotation = initialAttachRotation;
-            }
+            base.OnSelectEntering(interactable);
         }
 #else
         /// <summary>
@@ -131,7 +149,31 @@ namespace Innoactive.Creator.XRInteraction
             
             base.OnSelectEnter(interactable);
         }
+#endif
         
+#if XRIT_1_0_OR_NEWER
+        /// <summary>
+        /// This method is called by the Interaction Manager
+        /// right before the Interactor ends selection of an Interactable
+        /// in a first pass.
+        /// </summary>
+        /// <param name="arguments">Event data containing the Interactable that is no longer selected.</param>
+        /// <remarks>
+        /// <paramref name="arguments"/> is only valid during this method call, do not hold a reference to it.
+        /// </remarks>
+        /// <seealso cref="OnSelectExited(SelectExitEventArgs)"/>
+        protected override void OnSelectExiting(SelectExitEventArgs arguments)
+        {
+            base.OnSelectExiting(arguments);
+#elif XRIT_0_10_OR_NEWER
+        /// <summary>
+        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
+        /// </summary>
+        /// <param name="interactable">Interactable that is no longer selected.</param>
+        protected override void OnSelectExiting(XRBaseInteractable interactable)
+        {
+            base.OnSelectExiting(interactable);
+#else
         /// <summary>
         /// This method is called by the interaction manager when the interactor ends selection of an interactable.
         /// </summary>
@@ -139,13 +181,13 @@ namespace Innoactive.Creator.XRInteraction
         protected override void OnSelectExit(XRBaseInteractable interactable)
         {
             base.OnSelectExit(interactable);
-            
+#endif
             if (precisionGrab)
             {
                 attachTransform.localPosition = initialAttachPosition;
                 attachTransform.localRotation = initialAttachRotation;
             }
         }
-#endif
+        
     }
 }
