@@ -109,6 +109,12 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.selectExited.AddListener(OnReleased);
             interactableObject.activated.AddListener(OnUsed);
             interactableObject.deactivated.AddListener(OnUnused);
+#elif XRIT_0_10_OR_NEWER
+            interactableObject.onFirstHoverEntered.AddListener(OnTouched);
+            interactableObject.onSelectEntered.AddListener(OnGrabbed);
+            interactableObject.onSelectExited.AddListener(OnReleased);
+            interactableObject.onActivate.AddListener(OnUsed);
+            interactableObject.onDeactivate.AddListener(OnUnused);
 #else
             interactableObject.onFirstHoverEnter.AddListener(OnTouched);
             interactableObject.onSelectEnter.AddListener(OnGrabbed);
@@ -137,6 +143,12 @@ namespace Innoactive.Creator.XRInteraction
             interactableObject.selectExited.RemoveListener(OnReleased);
             interactableObject.activated.RemoveListener(OnUsed);
             interactableObject.deactivated.RemoveListener(OnUnused);
+#elif XRIT_0_10_OR_NEWER
+            interactableObject.onFirstHoverEntered.RemoveListener(OnTouched);
+            interactableObject.onSelectEntered.RemoveListener(OnGrabbed);
+            interactableObject.onSelectExited.RemoveListener(OnReleased);
+            interactableObject.onActivate.RemoveListener(OnUsed);
+            interactableObject.onDeactivate.RemoveListener(OnUnused);
 #else
             interactableObject.onFirstHoverEnter.RemoveListener(OnTouched);
             interactableObject.onSelectEnter.RemoveListener(OnGrabbed);
