@@ -16,7 +16,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private void SetupXR()
         {
             RemoveMainCamera();
-#if ENABLE_LEGACY_INPUT_MANAGER && XRIT_0_10_OR_NEWER
+#if ENABLE_INPUT_SYSTEM && XRIT_0_10_OR_NEWER
             SetupPrefab("[XR_Setup_Action_Based]");
 #else
             SetupPrefab("[XR_Setup_Device_Based]");
