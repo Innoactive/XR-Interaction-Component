@@ -161,7 +161,11 @@ namespace Innoactive.CreatorEditor.XRInteraction
             {
                 DirectInteractor interactor = (DirectInteractor)targetObject;
                 
+#if XRIT_0_10_OR_NEWER
+                if (interactor.GetComponent<XRController>() == null && interactor.GetComponent<ActionBasedController>() == null)
+#else
                 if (interactor.GetComponent<XRController>() == null)
+#endif
                 {
                     EditorGUILayout.HelpBox(Tooltips.MissingRequiredController, MessageType.Warning, true);
                     break;

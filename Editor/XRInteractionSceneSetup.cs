@@ -1,6 +1,6 @@
-﻿using Innoactive.CreatorEditor.BasicInteraction;
+﻿using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using Innoactive.CreatorEditor.BasicInteraction;
 
 namespace Innoactive.CreatorEditor.XRInteraction
 {
@@ -9,6 +9,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// </summary>
     public class XRInteractionSceneSetup : InteractionFrameworkSceneSetup
     {
+        private const string Title = "Obsolete XR Ring detected";
+
         /// <inheritdoc />
         public override void Setup()
         {
@@ -17,8 +19,32 @@ namespace Innoactive.CreatorEditor.XRInteraction
         
         private void SetupXR()
         {
+            DeleteStaticObject("[XR_Setup]");
             RemoveMainCamera();
-            SetupPrefab("[XR_Setup]");
+            
+#if ENABLE_INPUT_SYSTEM && XRIT_0_10_OR_NEWER
+            DeleteStaticObject("[XR_Setup_Device_Based]");
+            SetupPrefab("[XR_Setup_Action_Based]");
+#else
+            DeleteStaticObject("[XR_Setup_Action_Based]");
+            SetupPrefab("[XR_Setup_Device_Based]");
+#endif
+        }
+
+        private void DeleteStaticObject(string objectName)
+        {
+            GameObject oldRig = GameObject.Find(objectName);
+            
+            if (oldRig != null)
+            {
+                string Message = $"Creator changed the XR Rig loading to a new dynamic system, you have a static {objectName} in the current scene, do you want to delete it?";
+                
+                if (EditorUtility.DisplayDialog(Title, Message, "Delete", "Skip"))
+                {
+                    EditorUtility.SetDirty(oldRig);
+                    Object.DestroyImmediate(oldRig);
+                }
+            }
         }
     }
 }
