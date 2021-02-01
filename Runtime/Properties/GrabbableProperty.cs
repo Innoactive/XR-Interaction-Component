@@ -43,7 +43,10 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            Interactable.selectEntered.AddListener(HandleXRGrabbed);
+            Interactable.selectExited.AddListener(HandleXRUngrabbed);
+#elif XRIT_0_10_OR_NEWER
             Interactable.onSelectEntered.AddListener(HandleXRGrabbed);
             Interactable.onSelectExited.AddListener(HandleXRUngrabbed);
 #else
@@ -58,7 +61,10 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnDisable();
         
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            Interactable.selectEntered.RemoveListener(HandleXRGrabbed);
+            Interactable.selectExited.RemoveListener(HandleXRUngrabbed);
+#elif XRIT_0_10_OR_NEWER
             Interactable.onSelectEntered.RemoveListener(HandleXRGrabbed);
             Interactable.onSelectExited.RemoveListener(HandleXRUngrabbed);
 #else
@@ -66,19 +72,27 @@ namespace Innoactive.Creator.XRInteraction.Properties
             Interactable.onSelectExit.RemoveListener(HandleXRUngrabbed);
 #endif
         }
-        
+
         protected void Reset()
         {
             Interactable.IsGrabbable = true;
             GetComponent<Rigidbody>().isKinematic = false;
         }
 
+#if XRIT_1_0_OR_NEWER
+        private void HandleXRGrabbed(SelectEnterEventArgs arguments)
+#else
         private void HandleXRGrabbed(XRBaseInteractor interactor)
+#endif
         {
             EmitGrabbed();
         }
 
+#if XRIT_1_0_OR_NEWER
+        private void HandleXRUngrabbed(SelectExitEventArgs arguments)
+#else
         private void HandleXRUngrabbed(XRBaseInteractor interactor)
+#endif
         {
             EmitUngrabbed();
         }

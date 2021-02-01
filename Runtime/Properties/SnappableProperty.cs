@@ -58,7 +58,10 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            Interactable.selectEntered.AddListener(HandleSnappedToDropZone);
+            Interactable.selectExited.AddListener(HandleUnsnappedFromDropZone);
+#elif XRIT_0_10_OR_NEWER
             Interactable.onSelectEntered.AddListener(HandleSnappedToDropZone);
             Interactable.onSelectExited.AddListener(HandleUnsnappedFromDropZone);
 #else
@@ -71,7 +74,10 @@ namespace Innoactive.Creator.XRInteraction.Properties
         
         protected new virtual void OnDisable()
         {
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            Interactable.selectEntered.RemoveListener(HandleSnappedToDropZone);
+            Interactable.selectExited.RemoveListener(HandleUnsnappedFromDropZone);
+#elif XRIT_0_10_OR_NEWER
             Interactable.onSelectEntered.RemoveListener(HandleSnappedToDropZone);
             Interactable.onSelectEntered.RemoveListener(HandleUnsnappedFromDropZone);
 #else
@@ -80,9 +86,15 @@ namespace Innoactive.Creator.XRInteraction.Properties
 #endif
         }
         
+#if XRIT_1_0_OR_NEWER
+        private void HandleSnappedToDropZone(SelectEnterEventArgs arguments)
+        {
+            XRBaseInteractor interactor = arguments.interactor;
+#else
         private void HandleSnappedToDropZone(XRBaseInteractor interactor)
         {
-            SnappedZone = interactor.GetComponent<SnapZoneProperty>();
+#endif
+        SnappedZone = interactor.GetComponent<SnapZoneProperty>();
 
             if (SnappedZone == null)
             {
@@ -98,7 +110,11 @@ namespace Innoactive.Creator.XRInteraction.Properties
             EmitSnapped();
         }
         
+#if XRIT_1_0_OR_NEWER
+        private void HandleUnsnappedFromDropZone(SelectExitEventArgs arguments)
+#else
         private void HandleUnsnappedFromDropZone(XRBaseInteractor interactor)
+#endif
         {
             SnappedZone = null;
             EmitUnsnapped();
