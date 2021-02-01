@@ -206,6 +206,7 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor first initiates selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is initiating the selection.</param>
+        [System.Obsolete("OnSelectEntering(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectEntering(XRBaseInteractor interactor)
         {
             base.OnSelectEntering(interactor);
@@ -213,6 +214,7 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor first initiates selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is initiating the selection.</param>
+        [System.Obsolete("OnSelectEnter(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectEnter(XRBaseInteractor interactor)
         {
             base.OnSelectEnter(interactor);
@@ -248,6 +250,7 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor ends selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is ending the selection.</param>
+        [System.Obsolete("OnSelectExiting(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectExiting(XRBaseInteractor interactor)
         {
             base.OnSelectExiting(interactor);
@@ -255,6 +258,7 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor ends selection of an interactable.</summary>
         /// <param name="interactor">Interactor that is ending the selection.</param>
+        [System.Obsolete("OnSelectExit(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectExit(XRBaseInteractor interactor)
         {
             base.OnSelectExit(interactor);
@@ -287,6 +291,7 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor sends an activation event down to an interactable.</summary>
         /// <param name="interactor">Interactor that is sending the activation event.</param>
+        [System.Obsolete("OnActivate(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnActivate(XRBaseInteractor interactor)
         {
             if (isUsable)
@@ -320,6 +325,7 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>This method is called by the interaction manager 
         /// when the interactor sends a deactivation event down to an interactable.</summary>
         /// <param name="interactor">Interactor that is sending the activation event.</param>
+        [System.Obsolete("OnDeactivate(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnDeactivate(XRBaseInteractor interactor)
         {
             if (isUsable)

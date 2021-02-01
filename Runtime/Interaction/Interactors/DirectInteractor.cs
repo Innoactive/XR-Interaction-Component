@@ -103,6 +103,7 @@ namespace Innoactive.Creator.XRInteraction
         /// This method is called when the interactor first initiates selection of an interactable.
         /// </summary>
         /// <param name="interactable">Interactable that is being selected.</param>
+        [System.Obsolete("OnSelectEntering(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectEntering(XRBaseInteractable interactable)
         {
             InteractableObject interactableObject = interactable as InteractableObject;
@@ -129,6 +130,7 @@ namespace Innoactive.Creator.XRInteraction
         /// This method is called when the interactor first initiates selection of an interactable.
         /// </summary>
         /// <param name="interactable">Interactable that is being selected.</param>
+        [System.Obsolete("OnSelectEnter(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectEnter(XRBaseInteractable interactable)
         {
             InteractableObject interactableObject = interactable as InteractableObject;
@@ -170,6 +172,7 @@ namespace Innoactive.Creator.XRInteraction
         /// This method is called by the interaction manager when the interactor ends selection of an interactable.
         /// </summary>
         /// <param name="interactable">Interactable that is no longer selected.</param>
+        [System.Obsolete("OnSelectExiting(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectExiting(XRBaseInteractable interactable)
         {
             base.OnSelectExiting(interactable);
@@ -178,6 +181,7 @@ namespace Innoactive.Creator.XRInteraction
         /// This method is called by the interaction manager when the interactor ends selection of an interactable.
         /// </summary>
         /// <param name="interactable">Interactable that is no longer selected.</param>
+        [System.Obsolete("OnSelectExit(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
         protected override void OnSelectExit(XRBaseInteractable interactable)
         {
             base.OnSelectExit(interactable);
