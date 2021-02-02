@@ -29,6 +29,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private SerializedProperty gravityOnDetachProperty;
         private SerializedProperty retainTransformParentProperty;
         
+#if XRIT_1_0_OR_NEWER
+        private SerializedProperty customReticle;
+#endif
+        
         private SerializedProperty onFirstHoverEntered;
         private SerializedProperty onHoverEntered;
         private SerializedProperty onHoverExited;
@@ -78,6 +82,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public static readonly GUIContent IsGrabbable = new GUIContent("Is Grabbable", "Determines if this Interactable Object can be grabbed.");
             public static readonly GUIContent IsUsable = new GUIContent("Is Usable", "Determines if this Interactable Object can be used.");
             public static readonly GUIContent HighlightOptions = new GUIContent("Enable Highlighting", "Adds an InteractableHighlighter component to this Interactable.");
+
+#if XRIT_1_0_OR_NEWER
+            public static readonly GUIContent CustomReticle = EditorGUIUtility.TrTextContent("Custom Reticle", "The reticle that will appear at the end of the line when it is valid.");
+#endif
         }
 
         private void OnEnable()
@@ -101,9 +109,16 @@ namespace Innoactive.CreatorEditor.XRInteraction
             throwSmoothingCurveProperty = serializedObject.FindProperty("m_ThrowSmoothingCurve");
             throwVelocityScaleProperty = serializedObject.FindProperty("m_ThrowVelocityScale");
             throwAngularVelocityScaleProperty = serializedObject.FindProperty("m_ThrowAngularVelocityScale");
-            gravityOnDetachProperty = serializedObject.FindProperty("m_GravityOnDetach");
             retainTransformParentProperty = serializedObject.FindProperty("m_RetainTransformParent");
             interactionManager = serializedObject.FindProperty("m_InteractionManager");
+            
+#if XRIT_1_0_OR_NEWER
+            gravityOnDetachProperty = serializedObject.FindProperty("m_ForceGravityOnDetach");
+            customReticle = serializedObject.FindProperty("m_CustomReticle");
+#else
+            gravityOnDetachProperty = serializedObject.FindProperty("m_GravityOnDetach");
+#endif
+                
 #if XRIT_0_10_OR_NEWER
             onFirstHoverEntered = serializedObject.FindProperty("m_OnFirstHoverEntered");
             onHoverEntered = serializedObject.FindProperty("m_OnHoverEntered");
@@ -153,6 +168,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
             EditorGUILayout.PropertyField(interactionManager, Tooltips.InteractionManager);
             EditorGUILayout.PropertyField(interactionLayerMaskProperty, Tooltips.InteractionLayerMask);
             EditorGUILayout.PropertyField(collidersProperty, Tooltips.Colliders, true);
+            
+#if XRIT_1_0_OR_NEWER
+            EditorGUILayout.PropertyField(customReticle, Tooltips.CustomReticle);
+#endif
             
             EditorGUILayout.Space();
 
