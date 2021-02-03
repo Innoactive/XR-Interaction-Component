@@ -8,7 +8,7 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
     {
         protected bool IsEventManagerInScene()
         {
-            return GameObject.FindObjectOfType<XRInteractionManager>() != null;
+            return Object.FindObjectOfType<XRInteractionManager>() != null;
         }
     }
 }
