@@ -1,4 +1,5 @@
-﻿namespace Innoactive.Creator.Components.Runtime.Rigs
+﻿#if XRIT_1_0_OR_NEWER
+namespace Innoactive.Creator.Components.Runtime.Rigs
 {
     /// <summary>
     /// 
@@ -14,7 +15,7 @@
         /// <inheritdoc />
         public override bool CanBeUsed()
         {
-#if ENABLE_INPUT_SYSTEM && XRIT_1_0_OR_NEWER
+#if ENABLE_INPUT_SYSTEM
             return IsEventManagerInScene() == false;
 #else
             return false;
@@ -32,3 +33,4 @@
         }
     }
 }
+#endif

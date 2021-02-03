@@ -6,44 +6,34 @@ using UnityEngine;
 namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
 {
     /// <summary>
-    /// Utility class that ensures all Creator's prefabs are properly setup in the project.
+    /// 
     /// </summary>
-    [InitializeOnLoad]
-    internal static class XRSimulatorImporter
+    internal class XRSimulatorImporter
     {
-        private const string SamplePrefabName = "XR Device Simulator";
-        private const string ActionRigName = "[XR_Setup_Action_Based]";
-        private const string PrefabName = "[XR_Setup_Simulator]";
-        private const string SimulatorPathKey = "";
+        public string SimulatorRigPath = null;
+        public string SimulatorPathKey = null;
         
-        static XRSimulatorImporter()
-        {
-            string simulatorRigPath = EditorPrefs.GetString(SimulatorPathKey);
-            
-            if (string.IsNullOrEmpty(simulatorRigPath) || AssetDatabase.GetMainAssetTypeAtPath(simulatorRigPath) == null)
-            {
-                DependencyManager.OnPostProcess += OnPostProcess;
-            }
-        }
+        private string samplePrefabName = "XR Device Simulator";
+        private string actionRigName = "[XR_Setup_Action_Based]";
+        private string simulatorPrefabName = "[XR_Setup_Simulator]";
 
-        private static void OnPostProcess(object sender, DependencyManager.DependenciesEnabledEventArgs e)
+        public XRSimulatorImporter()
         {
-            DependencyManager.OnPostProcess -= OnPostProcess;
-            ImportSimulatorRig();
+            SimulatorRigPath = EditorPrefs.GetString(SimulatorPathKey);
         }
         
-        private static void ImportSimulatorRig()
+        public void ImportSimulatorRig()
         {
-            GameObject simulator = LoadPrefab(SamplePrefabName, "Samples", out string simulatorRigPath);
-            GameObject actionRig = LoadPrefab(ActionRigName, "Innoactive", out string actionRigPath);
+            GameObject simulator = LoadPrefab(samplePrefabName, "Samples", out string simulatorRigPath);
+            GameObject actionRig = LoadPrefab(actionRigName, "Innoactive", out string actionRigPath);
 
             if (simulator == null || actionRig == null)
             {
-                Debug.LogError($"{PrefabName} could not be generated. {(simulator == null ? SamplePrefabName : ActionRigName)} is missing.");
+                Debug.LogError($"{simulatorPrefabName} could not be generated. {(simulator == null ? samplePrefabName : actionRigName)} is missing.");
                 return;
             }
 
-            simulatorRigPath = $"{Path.GetDirectoryName(actionRigPath)}/{PrefabName}.prefab";
+            simulatorRigPath = $"{Path.GetDirectoryName(actionRigPath)}/{simulatorPrefabName}.prefab";
 
             simulator.transform.SetParent(actionRig.transform);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(actionRig, simulatorRigPath);
@@ -55,7 +45,7 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
             PrefabUtility.UnloadPrefabContents(prefab);
         }
         
-        private static GameObject LoadPrefab(string prefabName, string searchFolder, out string assetPath)
+        private GameObject LoadPrefab(string prefabName, string searchFolder, out string assetPath)
         {
             string filter = $"t:Prefab {prefabName}";
             string[] prefabsGUIDs = AssetDatabase.FindAssets(filter, new[] {$"Assets/{searchFolder}"});
