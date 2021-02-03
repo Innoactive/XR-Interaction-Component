@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-
-namespace Innoactive.Creator.Components.Runtime.Rigs
+﻿namespace Innoactive.Creator.Components.Runtime.Rigs
 {
     /// <summary>
     /// 
