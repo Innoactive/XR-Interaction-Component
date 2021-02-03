@@ -10,7 +10,7 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
         public override string Name { get; } = "XR Simulator";
         
         /// <inheritdoc />
-        public override string PrefabName { get; } = "[XR_Simulator_Setup]";
+        public override string PrefabName { get; } = "[[XR_Setup_Simulator]]";
 
         /// <inheritdoc />
         public override bool CanBeUsed()
