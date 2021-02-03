@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
 {
     /// <summary>
-    /// Helper class for generate a new XR Simulator Rig out of the `[XR_Setup_Action_Based]` and the `XR Device Simulator` sample.
+    /// Helper class to generate a new XR Simulator Rig out of the `[XR_Setup_Action_Based]` and the `XR Device Simulator` sample.
     /// </summary>
     internal class XRSimulatorImporter
     {
