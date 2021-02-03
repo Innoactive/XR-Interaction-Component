@@ -22,9 +22,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             
 #if XRIT_1_0_OR_NEWER
             XRSimulatorImporter simulatorImporter = new XRSimulatorImporter();
-            string simulatorRigPath = EditorPrefs.GetString(simulatorImporter.SimulatorPathKey);
 
-            if (string.IsNullOrEmpty(simulatorRigPath) || AssetDatabase.GetMainAssetTypeAtPath(simulatorRigPath) == null)
+            if (string.IsNullOrEmpty(simulatorImporter.SimulatorRigPath) || AssetDatabase.GetMainAssetTypeAtPath(simulatorImporter.SimulatorRigPath) == null)
             {
                 simulatorImporter.ImportSimulatorRig();
             }

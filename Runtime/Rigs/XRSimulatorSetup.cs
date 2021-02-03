@@ -1,8 +1,7 @@
-﻿#if XRIT_1_0_OR_NEWER
-namespace Innoactive.Creator.Components.Runtime.Rigs
+﻿namespace Innoactive.Creator.Components.Runtime.Rigs
 {
     /// <summary>
-    /// 
+    /// Setup for XR Device Simulator.
     /// </summary>
     public class XRSimulatorSetup : XRSetupBase
     {
@@ -15,7 +14,7 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
         /// <inheritdoc />
         public override bool CanBeUsed()
         {
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && XRIT_1_0_OR_NEWER
             return IsEventManagerInScene() == false;
 #else
             return false;
@@ -25,7 +24,9 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
         /// <inheritdoc />
         public override string GetSetupTooltip()
         {
-#if ENABLE_INPUT_SYSTEM
+#if !XRIT_1_0_OR_NEWER
+            return "Please upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.";
+#elif ENABLE_INPUT_SYSTEM
             return "Can't be used while there is already a XRInteractionManager in the scene.";
 #else
             return "Enable the new input system to allow using this rig.";
@@ -33,4 +34,3 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
         }
     }
 }
-#endif
