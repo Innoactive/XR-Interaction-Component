@@ -86,7 +86,6 @@ namespace Innoactive.Creator.XRInteraction.Properties
 #if XRIT_1_0_OR_NEWER
             SnapZone.selectEntered.RemoveListener(HandleObjectSnapped);
             SnapZone.selectExited.RemoveListener(HandleObjectUnsnapped);
-
 #elif XRIT_0_10_OR_NEWER
             SnapZone.onSelectEntered.RemoveListener(HandleObjectSnapped);
             SnapZone.onSelectExited.RemoveListener(HandleObjectUnsnapped);

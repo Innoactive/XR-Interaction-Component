@@ -180,6 +180,12 @@ namespace Innoactive.Creator.XRInteraction
                 interactable = this,
                 interactor = interactor
             });
+            
+            OnSelectEntered(new SelectEnterEventArgs
+            {
+                interactable = this,
+                interactor = interactor
+            });
 #elif XRIT_0_10_OR_NEWER
             OnSelectEntering(interactor);
 #else
