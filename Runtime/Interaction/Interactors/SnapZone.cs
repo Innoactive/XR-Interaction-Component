@@ -205,7 +205,10 @@ namespace Innoactive.Creator.XRInteraction
             
             snapZoneHoverTargets.Clear();
             
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            selectEntered.AddListener(OnAttach);
+            selectExited.AddListener(OnDetach);
+#elif XRIT_0_10_OR_NEWER
             onSelectEntered.AddListener(OnAttach);
             onSelectExited.AddListener(OnDetach);
 #else
@@ -221,7 +224,10 @@ namespace Innoactive.Creator.XRInteraction
             AttachParent();
             snapZoneHoverTargets.Clear();
 
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+            selectEntered.RemoveListener(OnAttach);
+            selectExited.RemoveListener(OnDetach);
+#elif XRIT_0_10_OR_NEWER
             onSelectEntered.RemoveListener(OnAttach);
             onSelectExited.RemoveListener(OnDetach);
 #else
@@ -230,8 +236,15 @@ namespace Innoactive.Creator.XRInteraction
 #endif
         }
 
+
+#if XRIT_1_0_OR_NEWER
+        private void OnAttach(SelectEnterEventArgs arguments)
+        {
+            XRBaseInteractable interactable = arguments.interactable;
+#else
         private void OnAttach(XRBaseInteractable interactable)
         {
+#endif
             if (interactable != null)
             {
                 Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
@@ -240,8 +253,14 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
         
+#if XRIT_1_0_OR_NEWER
+        private void OnDetach(SelectExitEventArgs arguments)
+        {
+            XRBaseInteractable interactable = arguments.interactable;
+#else
         private void OnDetach(XRBaseInteractable interactable)
         {
+#endif
             if (interactable != null)
             {
                 Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
@@ -469,7 +488,19 @@ namespace Innoactive.Creator.XRInteraction
 
             if (interactable.IsSelectableBy(this))
             {
-#if XRIT_0_10_OR_NEWER
+#if XRIT_1_0_OR_NEWER
+                OnSelectEntering(new SelectEnterEventArgs
+                {
+                    interactable = interactable,
+                    interactor = this
+                });
+                
+                OnSelectEntered(new SelectEnterEventArgs
+                {
+                    interactable = interactable,
+                    interactor = this
+                });
+#elif XRIT_0_10_OR_NEWER
                 OnSelectEntering(interactable);
 #else
                 OnSelectEnter(interactable);
@@ -480,8 +511,7 @@ namespace Innoactive.Creator.XRInteraction
                     interactableObject.ForceSelectEnter(this);
                 }
                 
-                interactable.transform.position = attachTransform.position;
-                interactable.transform.rotation = attachTransform.rotation;
+                interactable.transform.SetPositionAndRotation(attachTransform.position, attachTransform.rotation);
                 ForceSelectTarget = interactable;
             }
             else

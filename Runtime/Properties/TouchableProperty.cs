@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Creator.Core.Properties;
@@ -42,7 +41,11 @@ namespace Innoactive.Creator.XRInteraction.Properties
         protected override void OnEnable()
         {
             base.OnEnable();
-#if XRIT_0_10_OR_NEWER
+            
+#if XRIT_1_0_OR_NEWER
+            Interactable.firstHoverEntered.AddListener(HandleXRTouched);
+            Interactable.lastHoverExited.AddListener(HandleXRUntouched);
+#elif XRIT_0_10_OR_NEWER
             Interactable.onFirstHoverEntered.AddListener(HandleXRTouched);
             Interactable.onLastHoverExited.AddListener(HandleXRUntouched);
 #else
@@ -56,7 +59,11 @@ namespace Innoactive.Creator.XRInteraction.Properties
         protected override void OnDisable()
         {
             base.OnDisable();
-#if XRIT_0_10_OR_NEWER
+            
+#if XRIT_1_0_OR_NEWER
+            Interactable.firstHoverEntered.RemoveListener(HandleXRTouched);
+            Interactable.lastHoverExited.RemoveListener(HandleXRUntouched);
+#elif XRIT_0_10_OR_NEWER
             Interactable.onFirstHoverEntered.RemoveListener(HandleXRTouched);
             Interactable.onLastHoverExited.RemoveListener(HandleXRUntouched);
 #else
@@ -71,12 +78,20 @@ namespace Innoactive.Creator.XRInteraction.Properties
             gameObject.GetComponent<Rigidbody>().isKinematic = false;
         }
 
+#if XRIT_1_0_OR_NEWER
+        private void HandleXRTouched(HoverEnterEventArgs arguments)
+#else
         private void HandleXRTouched(XRBaseInteractor interactor)
+#endif
         {
             EmitTouched();
         }
 
+#if XRIT_1_0_OR_NEWER
+        private void HandleXRUntouched(HoverExitEventArgs arguments)
+#else
         private void HandleXRUntouched(XRBaseInteractor interactor)
+#endif
         {
             EmitUntouched();
         }
