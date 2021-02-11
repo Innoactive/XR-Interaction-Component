@@ -15,7 +15,7 @@
         public override bool CanBeUsed()
         {
 #if ENABLE_LEGACY_INPUT_MANAGER
-            return IsEventManagerInScene() == false;
+            return IsEventManagerInScene() == false && IsPrefabMissing == false;
 #else
             return false;
 #endif
@@ -24,6 +24,11 @@
         /// <inheritdoc />
         public override string GetSetupTooltip()
         {
+            if (IsPrefabMissing)
+            {
+                return $"The prefab {PrefabName} is missing in the Resources folder.";
+            }
+            
 #if ENABLE_LEGACY_INPUT_MANAGER
             return "Can't be used while there is already a XRInteractionManager in the scene.";
 #else

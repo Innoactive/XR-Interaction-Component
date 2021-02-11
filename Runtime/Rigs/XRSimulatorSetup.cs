@@ -10,12 +10,12 @@
         
         /// <inheritdoc />
         public override string PrefabName { get; } = "[XR_Setup_Simulator]";
-
+        
         /// <inheritdoc />
         public override bool CanBeUsed()
         {
 #if ENABLE_INPUT_SYSTEM && XRIT_1_0_OR_NEWER
-            return IsEventManagerInScene() == false;
+            return IsEventManagerInScene() == false && IsPrefabMissing == false;
 #else
             return false;
 #endif
@@ -24,6 +24,11 @@
         /// <inheritdoc />
         public override string GetSetupTooltip()
         {
+            if (IsPrefabMissing)
+            {
+                return $"The prefab {PrefabName} is missing in the Resources folder.";
+            }
+            
 #if !XRIT_1_0_OR_NEWER
             return "Please upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.";
 #elif ENABLE_INPUT_SYSTEM
