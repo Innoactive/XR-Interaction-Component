@@ -61,6 +61,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         public override void Highlight(Color highlightColor)
         {
             CurrentHighlightColor = highlightColor;
+            IsHighlighted = true;
             Highlighter.StartHighlighting(SceneObject.UniqueName, highlightColor);
             EmitHighlightEvent();
         }
@@ -69,6 +70,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         public override void Unhighlight()
         {
             CurrentHighlightColor = null;
+            IsHighlighted = false;
             Highlighter.StopHighlighting(SceneObject.UniqueName);
             EmitUnhighlightEvent();
         }
