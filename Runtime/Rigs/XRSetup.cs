@@ -17,7 +17,7 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
         public override bool CanBeUsed()
         {
 #if ENABLE_INPUT_SYSTEM
-            return IsEventManagerInScene() == false;
+            return IsEventManagerInScene() == false && IsPrefabMissing == false;
 #else
             return false;
 #endif
@@ -26,6 +26,11 @@ namespace Innoactive.Creator.Components.Runtime.Rigs
         /// <inheritdoc />
         public override string GetSetupTooltip()
         {
+            if (IsPrefabMissing)
+            {
+                return $"The prefab {PrefabName} is missing in the Resources folder.";
+            }
+            
 #if ENABLE_INPUT_SYSTEM
             return "Can't be used while there is already a XRInteractionManager in the scene.";
 #else
