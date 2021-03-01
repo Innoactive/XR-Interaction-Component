@@ -10,7 +10,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     /// </summary>
     public class XRInteractionSceneSetup : InteractionFrameworkSceneSetup
     {
-        private const string Title = "Obsolete XR Ring detected";
+        private const string Title = "Obsolete XR Rig detected";
         
         /// <inheritdoc />
         public override string Key { get; } = "XRInteractionSetup";
