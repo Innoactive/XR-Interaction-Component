@@ -55,17 +55,10 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             interactableHoverMeshMaterial = serializedObject.FindProperty("validationMaterial");
             
-#if XRIT_0_10_OR_NEWER
             onHoverEntered = serializedObject.FindProperty("m_OnHoverEntered");
             onHoverExited = serializedObject.FindProperty("m_OnHoverExited");
             onSelectEntered = serializedObject.FindProperty("m_OnSelectEntered");
             onSelectExited = serializedObject.FindProperty("m_OnSelectExited");
-#else
-            onHoverEntered = serializedObject.FindProperty("m_OnHoverEnter");
-            onHoverExited = serializedObject.FindProperty("m_OnHoverExit");
-            onSelectEntered = serializedObject.FindProperty("m_OnSelectEnter");
-            onSelectExited = serializedObject.FindProperty("m_OnSelectExit");
-#endif
         }
 
         public override void OnInspectorGUI()
