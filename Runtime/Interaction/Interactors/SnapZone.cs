@@ -424,6 +424,10 @@ namespace Innoactive.Creator.XRInteraction
             {
                 activeMaterial = snapZoneHoverTargets.Any(CanSelect) ? ValidationMaterial : InvalidMaterial;
             }
+            else
+            {
+                activeMaterial = null;
+            }
         }
 
         /// <summary>
@@ -431,7 +435,7 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected virtual void DrawHighlightMesh()
         {
-            if (PreviewMesh != null)
+            if (PreviewMesh != null && activeMaterial != null)
             {
                 Graphics.DrawMesh(PreviewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null);
             }
