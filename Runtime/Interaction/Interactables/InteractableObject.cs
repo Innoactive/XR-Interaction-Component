@@ -142,15 +142,11 @@ namespace Innoactive.Creator.XRInteraction
         {
             if (IsActivated)
             {
-#if XRIT_1_0_OR_NEWER
                 OnDeactivated(new DeactivateEventArgs
                 {
                     interactable =  this,
                     interactor = selectingInteractor
                 });
-#else
-                OnDeactivate(selectingInteractor);
-#endif
             }
             
             StartCoroutine(StopInteractingForOneFrame());
@@ -161,39 +157,18 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         public virtual void ForceUse()
         {
-#if XRIT_1_0_OR_NEWER
             OnActivated(new ActivateEventArgs
             {
                 interactable = this,
                 interactor = selectingInteractor
             });
-#else
-            OnActivate(selectingInteractor);
-#endif
         }
 
         internal void ForceSelectEnter(XRBaseInteractor interactor)
         {
-#if XRIT_1_0_OR_NEWER
-            OnSelectEntering(new SelectEnterEventArgs
-            {
-                interactable = this,
-                interactor = interactor
-            });
-            
-            OnSelectEntered(new SelectEnterEventArgs
-            {
-                interactable = this,
-                interactor = interactor
-            });
-#elif XRIT_0_10_OR_NEWER
-            OnSelectEntering(interactor);
-#else
-            OnSelectEnter(interactor);
-#endif
+            interactionManager.ForceSelect(interactor, this);
         }
-        
-#if XRIT_1_0_OR_NEWER
+
         /// <summary>
         /// This method is called by the Interaction Manager
         /// right before the Interactor first initiates selection of an Interactable
@@ -208,24 +183,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnSelectEntering(arguments);
             XRBaseInteractor interactor = arguments.interactor;
-#elif XRIT_0_10_OR_NEWER
-        /// <summary>This method is called by the interaction manager 
-        /// when the interactor first initiates selection of an interactable.</summary>
-        /// <param name="interactor">Interactor that is initiating the selection.</param>
-        [System.Obsolete("OnSelectEntering(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectEntering(XRBaseInteractor interactor)
-        {
-            base.OnSelectEntering(interactor);
-#else
-        /// <summary>This method is called by the interaction manager 
-        /// when the interactor first initiates selection of an interactable.</summary>
-        /// <param name="interactor">Interactor that is initiating the selection.</param>
-        [System.Obsolete("OnSelectEnter(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectEnter(XRBaseInteractor interactor)
-        {
-            base.OnSelectEnter(interactor);
-#endif
-            
+
             if (IsInSocket == false)
             {
                 XRSocketInteractor socket = interactor.GetComponent<XRSocketInteractor>();
@@ -237,7 +195,26 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
         
-#if XRIT_1_0_OR_NEWER
+        [System.Obsolete("OnSelectEntering(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected new void OnSelectEntering(XRBaseInteractor interactor)
+        {
+            OnSelectEntering(new SelectEnterEventArgs
+            {
+                interactor = interactor,
+                interactable = this
+            });
+        }
+
+        [System.Obsolete("OnSelectEnter(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected void OnSelectEnter(XRBaseInteractor interactor)
+        {
+            OnSelectEntering(new SelectEnterEventArgs
+            {
+                interactor = interactor,
+                interactable = this
+            });
+        }
+        
         /// <summary>
         /// This method is called by the Interaction Manager
         /// right before the Interactor ends selection of an Interactable
@@ -252,30 +229,33 @@ namespace Innoactive.Creator.XRInteraction
         {
             base.OnSelectExiting(arguments);
             XRBaseInteractor interactor = arguments.interactor;
-#elif XRIT_0_10_OR_NEWER
-        /// <summary>This method is called by the interaction manager 
-        /// when the interactor ends selection of an interactable.</summary>
-        /// <param name="interactor">Interactor that is ending the selection.</param>
-        [System.Obsolete("OnSelectExiting(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectExiting(XRBaseInteractor interactor)
-        {
-            base.OnSelectExiting(interactor);
-#else
-        /// <summary>This method is called by the interaction manager 
-        /// when the interactor ends selection of an interactable.</summary>
-        /// <param name="interactor">Interactor that is ending the selection.</param>
-        [System.Obsolete("OnSelectExit(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectExit(XRBaseInteractor interactor)
-        {
-            base.OnSelectExit(interactor);
-#endif 
+            
             if (IsInSocket && interactor == selectingSocket)
             {
                 selectingSocket = null;
             }
         }
-        
-#if XRIT_1_0_OR_NEWER
+
+        [System.Obsolete("OnSelectExiting(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected new void OnSelectExiting(XRBaseInteractor interactor)
+        {
+            OnSelectExiting(new SelectExitEventArgs
+            {
+                interactor = interactor,
+                interactable = this
+            });
+        }
+
+        [System.Obsolete("OnSelectExit(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected void OnSelectExit(XRBaseInteractor interactor)
+        {
+            OnSelectExiting(new SelectExitEventArgs
+            {
+                interactor = interactor,
+                interactable = this
+            });
+        }
+
         /// <summary>
         /// This method is called by the <see cref="XRBaseControllerInteractor"/>
         /// when the Interactor begins an activation event on this selected Interactable.
@@ -293,22 +273,17 @@ namespace Innoactive.Creator.XRInteraction
                 base.OnActivated(arguments);
             }
         }
-#else
-        /// <summary>This method is called by the interaction manager 
-        /// when the interactor sends an activation event down to an interactable.</summary>
-        /// <param name="interactor">Interactor that is sending the activation event.</param>
-        [System.Obsolete("OnActivate(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnActivate(XRBaseInteractor interactor)
-        {
-            if (isUsable)
-            {
-                IsActivated = true;
-                base.OnActivate(interactor);
-            }
-        }
-#endif
 
-#if XRIT_1_0_OR_NEWER
+        [System.Obsolete("OnActivate(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected new void OnActivate(XRBaseInteractor interactor)
+        {
+            OnActivated(new ActivateEventArgs
+            {
+                interactor = interactor,
+                interactable = this
+            });
+        }
+
         /// <summary>
         /// This method is called by the <see cref="XRBaseControllerInteractor"/>
         /// when the Interactor ends an activation event on this selected Interactable.
@@ -326,21 +301,16 @@ namespace Innoactive.Creator.XRInteraction
                 base.OnDeactivated(arguments);
             }
         }
-        
-#else
-        /// <summary>This method is called by the interaction manager 
-        /// when the interactor sends a deactivation event down to an interactable.</summary>
-        /// <param name="interactor">Interactor that is sending the activation event.</param>
+
         [System.Obsolete("OnDeactivate(XRBaseInteractor) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnDeactivate(XRBaseInteractor interactor)
+        protected new void OnDeactivate(XRBaseInteractor interactor)
         {
-            if (isUsable)
+            OnDeactivated(new DeactivateEventArgs
             {
-                IsActivated = false;
-                base.OnDeactivate(interactor);
-            }
+                interactor = interactor,
+                interactable = this
+            });
         }
-#endif
 
         private IEnumerator StopInteractingForOneFrame()
         {

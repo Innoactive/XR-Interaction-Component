@@ -1,5 +1,4 @@
-﻿#if XRIT_1_0_OR_NEWER
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -63,4 +62,3 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
         }
     }
 }
-#endif

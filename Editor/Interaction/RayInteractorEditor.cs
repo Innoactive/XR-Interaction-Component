@@ -67,17 +67,11 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private SerializedProperty onSelectEntered;
         private SerializedProperty onSelectExited;
         
-#if XRIT_0_10_OR_NEWER
         private SerializedProperty keepSelectedTargetValid;
         private SerializedProperty allowAnchorControl;
         private SerializedProperty useForceGrab;
         private SerializedProperty anchorRotateSpeed;
         private SerializedProperty anchorTranslateSpeed;
-#endif
-
-        // private bool showInteractorEvents;
-        // private bool showSoundEvents = false;
-        // private bool showHapticEvents = false;
 
         private static class Tooltips
         {
@@ -169,7 +163,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             acceleration = serializedObject.FindProperty("m_Acceleration");
             additionalFlightTime = serializedObject.FindProperty("m_AdditionalFlightTime");
             
-#if XRIT_0_10_OR_NEWER
             keepSelectedTargetValid = serializedObject.FindProperty("m_KeepSelectedTargetValid");
             allowAnchorControl = serializedObject.FindProperty("m_AllowAnchorControl");
             useForceGrab = serializedObject.FindProperty("m_UseForceGrab");
@@ -202,34 +195,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             onHoverExited = serializedObject.FindProperty("m_OnHoverExited");
             onSelectEntered = serializedObject.FindProperty("m_OnSelectEntered");
             onSelectExited = serializedObject.FindProperty("m_OnSelectExited");
-#else
-            playAudioClipOnSelectEntered = serializedObject.FindProperty("m_PlayAudioClipOnSelectEnter");
-            audioClipForOnSelectEntered = serializedObject.FindProperty("m_AudioClipForOnSelectEnter");
-            playAudioClipOnSelectExited = serializedObject.FindProperty("m_PlayAudioClipOnSelectExit");
-            audioClipForOnSelectExited = serializedObject.FindProperty("m_AudioClipForOnSelectExit");
-            playAudioClipOnHoverEntered = serializedObject.FindProperty("m_PlayAudioClipOnHoverEnter");
-            audioClipForOnHoverEntered = serializedObject.FindProperty("m_AudioClipForOnHoverEnter");
-            playAudioClipOnHoverExited = serializedObject.FindProperty("m_PlayAudioClipOnHoverExit");
-            audioClipForOnHoverExited = serializedObject.FindProperty("m_AudioClipForOnHoverExit");
-            playHapticsOnSelectEntered = serializedObject.FindProperty("m_PlayHapticsOnSelectEnter");
-            
-            hapticSelectEnterIntensity = serializedObject.FindProperty("m_HapticSelectEnterIntensity");
-            hapticSelectEnterDuration = serializedObject.FindProperty("m_HapticSelectEnterDuration");
-            playHapticsOnHoverEntered = serializedObject.FindProperty("m_PlayHapticsOnHoverEnter");
-            hapticHoverEnterIntensity = serializedObject.FindProperty("m_HapticHoverEnterIntensity");
-            hapticHoverEnterDuration = serializedObject.FindProperty("m_HapticHoverEnterDuration");
-            playHapticsOnSelectExited = serializedObject.FindProperty("m_PlayHapticsOnSelectExit");
-            hapticSelectExitIntensity = serializedObject.FindProperty("m_HapticSelectExitIntensity");
-            hapticSelectExitDuration = serializedObject.FindProperty("m_HapticSelectExitDuration");
-            playHapticsOnHoverExited = serializedObject.FindProperty("m_PlayHapticsOnHoverExit");
-            hapticHoverExitIntensity = serializedObject.FindProperty("m_HapticHoverExitIntensity");
-            hapticHoverExitDuration = serializedObject.FindProperty("m_HapticHoverExitDuration");
-            
-            onHoverEntered = serializedObject.FindProperty("m_OnHoverEnter");
-            onHoverExited = serializedObject.FindProperty("m_OnHoverExit");
-            onSelectEntered = serializedObject.FindProperty("m_OnSelectEnter");
-            onSelectExited = serializedObject.FindProperty("m_OnSelectExit");
-#endif
         }
 
         public override void OnInspectorGUI()
@@ -243,11 +208,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             foreach (Object targetObject in serializedObject.targetObjects)
             {
                 RayInteractor interactor = (RayInteractor)targetObject;
-#if XRIT_0_10_OR_NEWER
+                
                 if (interactor.GetComponent<XRController>() == null && interactor.GetComponent<ActionBasedController>() == null)
-#else
-                if (interactor.GetComponent<XRController>() == null)
-#endif
                 {
                     EditorGUILayout.HelpBox(Tooltips.MissingRequiredController, MessageType.Warning, true);
                     break;
@@ -261,7 +223,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             
             EditorGUILayout.PropertyField(enableUIInteraction, Tooltips.EnableUIInteraction);
             
-#if XRIT_0_10_OR_NEWER
             EditorGUILayout.PropertyField(useForceGrab, Tooltips.ForceGrab);
             EditorGUILayout.PropertyField(allowAnchorControl, Tooltips.AllowAnchorControl);
             
@@ -272,7 +233,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 EditorGUILayout.PropertyField(anchorTranslateSpeed, Tooltips.AnchorTranslateSpeed);
                 EditorGUI.indentLevel--;
             }
-#endif
 
             EditorGUILayout.PropertyField(attachTransform, Tooltips.AttachTransform);
 
@@ -338,9 +298,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
                     EditorGUILayout.HelpBox(Tooltips.StartingInteractableWarning, MessageType.Warning, true);
                 }
 
-#if XRIT_0_10_OR_NEWER
                 EditorGUILayout.PropertyField(keepSelectedTargetValid, Tooltips.KeepSelectedTargetValid);
-#endif
                 EditorGUILayout.PropertyField(hideControllerOnSelect, Tooltips.HideControllerOnSelect);
                 EditorGUILayout.PropertyField(hoverToSelect, Tooltips.HoverToSelect);
                 

@@ -79,11 +79,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         /// </summary>
         public void ApplySettingsToSnapZone(SnapZone snapZone)
         {
-#if XRIT_0_10_OR_NEWER
             snapZone.interactionLayerMask = InteractionLayerMask;
-#else
-            snapZone.InteractionLayerMask = InteractionLayerMask;
-#endif
             snapZone.ShownHighlightObjectColor = HighlightColor;
             snapZone.ValidationMaterial = ValidationMaterial;
             snapZone.InvalidMaterial = InvalidMaterial;
