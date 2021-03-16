@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using Innoactive.Creator.Unity;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
+using Innoactive.Creator.BasicInteraction;
 
 namespace Innoactive.Creator.XRInteraction
 {
@@ -13,8 +9,12 @@ namespace Innoactive.Creator.XRInteraction
     /// Handles highlighting for attached <see cref="InteractableObject"/>.
     /// </summary>
     [RequireComponent(typeof(InteractableObject))]
-    public sealed class InteractableHighlighter : MonoBehaviour
+    public sealed class InteractableHighlighter : DefaultHighlighter
     {
+        private string hoverID = "Hover";
+        private string selectID = "Select";
+        private string activateID = "Activate";
+        
         /// <summary>
         /// Reference to the <see cref="InteractableObject"/>.
         /// </summary>
@@ -74,26 +74,17 @@ namespace Innoactive.Creator.XRInteraction
         [SerializeField]
         private Color useHighlightColor = new Color32(0, 255, 0, 50);
 
-        private bool isBeingHighlighted;
         private Material colorTouchMaterial;
         private Material colorGrabMaterial;
         private Material colorUseMaterial;
 
-        private Dictionary<string, bool> externalHighlights = new Dictionary<string, bool>();
         private InteractableObject interactableObject;
-        
-        [SerializeField]
-        private Renderer[] renderers = {};
-        
-        [SerializeField]
-        private MeshRenderer highlightMeshRenderer = null;
-        
-        [SerializeField]
-        private MeshFilter highlightMeshFilter = null;
-        
-        private void Reset()
-        {
-            RefreshCachedRenderers();
+
+        private void Start()
+        { 
+            hoverID = $"{hoverID}{GetInstanceID()}"; 
+            selectID = $"{selectID}{GetInstanceID()}";
+            activateID = $"{activateID}{GetInstanceID()}";
         }
 
         private void OnEnable()
@@ -103,31 +94,29 @@ namespace Innoactive.Creator.XRInteraction
                 interactableObject = gameObject.GetComponent<InteractableObject>();
             }
 
-            interactableObject.firstHoverEntered.AddListener(OnTouched);
-            interactableObject.selectEntered.AddListener(OnGrabbed);
-            interactableObject.selectExited.AddListener(OnReleased);
-            interactableObject.activated.AddListener(OnUsed);
-            interactableObject.deactivated.AddListener(OnUnused);
+            interactableObject.firstHoverEntered.AddListener(OnHoverEnter);
+            interactableObject.lastHoverExited.AddListener(OnHoverExit);
+            interactableObject.selectEntered.AddListener(OnSelectEnter);
+            interactableObject.selectExited.AddListener(OnSelectExit);
+            interactableObject.activated.AddListener(OnActivateEnter);
+            interactableObject.deactivated.AddListener(OnActivateExit);
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            if (isBeingHighlighted)
-            {
-                ReenableRenderers();
-                externalHighlights.Clear();
-            }
+            base.OnDisable();
             
             if (interactableObject == false)
             {
                 return;
             }
             
-            interactableObject.firstHoverEntered.RemoveListener(OnTouched);
-            interactableObject.selectEntered.RemoveListener(OnGrabbed);
-            interactableObject.selectExited.RemoveListener(OnReleased);
-            interactableObject.activated.RemoveListener(OnUsed);
-            interactableObject.deactivated.RemoveListener(OnUnused);
+            interactableObject.firstHoverEntered.RemoveListener(OnHoverEnter);
+            interactableObject.lastHoverExited.RemoveListener(OnHoverExit);
+            interactableObject.selectEntered.RemoveListener(OnSelectEnter);
+            interactableObject.selectExited.RemoveListener(OnSelectExit);
+            interactableObject.activated.RemoveListener(OnActivateEnter);
+            interactableObject.deactivated.RemoveListener(OnActivateExit);
         }
 
         private void OnValidate()
@@ -148,125 +137,55 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
 
-        /// <summary>
-        /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightMaterial"/>.
-        /// </summary>
-        /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
+        [Obsolete("Use 'string StartHighlighting(Material highlightMaterial, string highlightID = null)' instead")]
         public void StartHighlighting(string highlightID, Material highlightMaterial)
         {
-            if (CanObjectBeHighlighted() == false)
-            {
-                return;
-            }
-            
-            if (externalHighlights.ContainsKey(highlightID) == false)
-            {
-                bool shouldContinueHighlighting = true;
-                externalHighlights.Add(highlightID, shouldContinueHighlighting);
-                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
-            }
+            StartHighlighting(highlightMaterial, highlightID);
         }
-
-        /// <summary>
-        /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightColor"/>.
-        /// </summary>
-        /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
+        
+        [Obsolete("Use 'string StartHighlighting(Color highlightColor, string highlightID = null)' instead")]
         public void StartHighlighting(string highlightID, Color highlightColor)
         {
-            if (CanObjectBeHighlighted() == false)
-            {
-                return;
-            }
-            
-            if (externalHighlights.ContainsKey(highlightID) == false)
-            {
-                bool shouldContinueHighlighting = true;
-                externalHighlights.Add(highlightID, shouldContinueHighlighting);
-                Material highlightMaterial = NewHighlightMaterial(highlightColor);
-                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
-            }
+            StartHighlighting(highlightColor, highlightID);
         }
-
-        /// <summary>
-        /// Highlights this <see cref="InteractableObject"/> with given <paramref name="highlightTexture"/>.
-        /// </summary>
-        /// <remarks>Every highlight requires an ID to avoid duplications.</remarks>
+        
+        [Obsolete("Use 'string StartHighlighting(Texture highlightTexture, string highlightID = null)' instead")]
         public void StartHighlighting(string highlightID, Texture highlightTexture)
         {
-            if (CanObjectBeHighlighted() == false)
-            {
-                return;
-            }
-            
-            if (externalHighlights.ContainsKey(highlightID) == false)
-            {
-                bool shouldContinueHighlighting = true;
-                externalHighlights.Add(highlightID, shouldContinueHighlighting);
-                Material highlightMaterial = NewHighlightMaterial(highlightTexture);
-                StartCoroutine(Highlight(highlightMaterial, ()=> externalHighlights[highlightID], highlightID));
-            }
+            StartHighlighting(highlightTexture, highlightID);
         }
 
-        /// <summary>
-        /// Stops a highlight of given <paramref name="highlightID"/>.
-        /// </summary>
-        public void StopHighlighting(string highlightID)
+        private void OnHoverEnter(HoverEnterEventArgs arguments)
         {
-            if (externalHighlights.ContainsKey(highlightID))
-            {
-                externalHighlights[highlightID] = false;
-            }
-        }
-
-        private void OnTouched(HoverEnterEventArgs arguments)
-        {
-            OnTouchHighlight();
+            HighlightHoverAction();
         }
         
-        private void OnGrabbed(SelectEnterEventArgs arguments)
+        private void OnHoverExit(HoverExitEventArgs arg0)
         {
-            OnGrabHighlight();
+            StopHighlighting(hoverID);
         }
         
-        private void OnReleased(SelectExitEventArgs arguments)
+        private void OnSelectEnter(SelectEnterEventArgs arguments)
         {
-            OnTouchHighlight();
+            HighlightSelectAction();
         }
         
-        private void OnUsed(ActivateEventArgs arguments)
+        private void OnSelectExit(SelectExitEventArgs arguments)
         {
-            OnUseHighlight();
+            StopHighlighting(selectID);
         }
         
-        private void OnUnused(DeactivateEventArgs arg0)
+        private void OnActivateEnter(ActivateEventArgs arguments)
         {
-            OnGrabHighlight();
-        }
-        
-        private IEnumerator Highlight(Material highlightMaterial, Func<bool> shouldContinueHighlighting, string highlightID = "")
-        {
-            if (highlightMeshRenderer == null || renderers == null || renderers.Any() == false)
-            {
-                RefreshCachedRenderers();
-            }
-
-            while (shouldContinueHighlighting())
-            {
-                DisableRenders();
-                highlightMeshRenderer.sharedMaterial = highlightMaterial;
-            
-                yield return null;
-            }
-
-            ReenableRenderers();
-
-            if (string.IsNullOrEmpty(highlightID) == false && externalHighlights.ContainsKey(highlightID))
-            {
-                externalHighlights.Remove(highlightID);
-            }
+            HighlightActivateAction();
         }
 
-        private void OnTouchHighlight()
+        private void OnActivateExit(DeactivateEventArgs arg0)
+        {
+            StopHighlighting(activateID);
+        }
+
+        private void HighlightHoverAction()
         {
             if (ShouldHighlightTouching())
             {
@@ -280,17 +199,17 @@ namespace Innoactive.Creator.XRInteraction
                 {
                     if (colorTouchMaterial == null)
                     {
-                        colorTouchMaterial = NewHighlightMaterial(touchHighlightColor);
+                        colorTouchMaterial = CreateHighlightMaterial(touchHighlightColor);
                     }
 
                     highlightMaterial = colorTouchMaterial;
                 }
-
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightTouching));
+                
+                StartHighlighting(highlightMaterial, hoverID);
             }
         }
 
-        private void OnGrabHighlight()
+        private void HighlightSelectAction()
         {
             if (ShouldHighlightGrabbing())
             {
@@ -304,17 +223,17 @@ namespace Innoactive.Creator.XRInteraction
                 {
                     if (colorGrabMaterial == null)
                     {
-                        colorGrabMaterial = NewHighlightMaterial(grabHighlightColor);
+                        colorGrabMaterial = CreateHighlightMaterial(grabHighlightColor);
                     }
 
                     highlightMaterial = colorGrabMaterial;
                 }
                 
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightGrabbing));
+                StartHighlighting(highlightMaterial, selectID);
             }
         }
 
-        private void OnUseHighlight()
+        private void HighlightActivateAction()
         {
             if (ShouldHighlightUsing())
             {
@@ -328,213 +247,14 @@ namespace Innoactive.Creator.XRInteraction
                 {
                     if (colorUseMaterial == null)
                     {
-                        colorUseMaterial = NewHighlightMaterial(useHighlightColor);
+                        colorUseMaterial = CreateHighlightMaterial(useHighlightColor);
                     }
 
                     highlightMaterial = colorUseMaterial;
                 }
                 
-                StartCoroutine(Highlight(highlightMaterial, ShouldHighlightUsing));
+                StartHighlighting(highlightMaterial, activateID);
             }
-        }
-
-        internal void ForceRefreshCachedRenderers()
-        {
-            if (isBeingHighlighted)
-            {
-                return;
-            }
-            
-            ReenableRenderers();
-
-            if (Application.isPlaying && gameObject.isStatic)
-            {
-                return;
-            }
-            
-            renderers = default;
-            RefreshCachedRenderers();
-        }
-
-        private void RefreshCachedRenderers()
-        {
-            if (highlightMeshRenderer != null && renderers != null && renderers.Any())
-            {
-                return;
-            }
-            
-            if (highlightMeshRenderer == null)
-            {
-                GenerateHighlightRenderer();
-            }
-            else
-            {
-                highlightMeshRenderer.enabled = false;
-                highlightMeshRenderer.gameObject.SetActive(false);
-            }
-
-            renderers = GetComponentsInChildren<SkinnedMeshRenderer>()
-                .Where(skinnedMeshRenderer => skinnedMeshRenderer.gameObject.activeInHierarchy && skinnedMeshRenderer.enabled)
-                .Concat<Renderer>(GetComponentsInChildren<MeshRenderer>()
-                    .Where(meshRenderer => meshRenderer.gameObject.activeInHierarchy && meshRenderer.enabled)).ToArray();
-
-            if (renderers == null || renderers.Any() == false)
-            {
-                throw new NullReferenceException($"{name} has no renderers to be highlighted.");
-            }
-
-            GeneratePreviewMesh();
-        }
-
-        private void GenerateHighlightRenderer()
-        {
-            Transform child = transform.Find("Highlight Renderer");
-
-            if (child == null)
-            {
-                child = new GameObject("Highlight Renderer").transform;
-            }
-            
-            child.SetPositionAndRotation(transform.position, transform.rotation);
-            child.SetParent(transform);
-            
-            highlightMeshFilter = child.gameObject.GetOrAddComponent<MeshFilter>();
-            highlightMeshRenderer = child.gameObject.GetOrAddComponent<MeshRenderer>();
-
-            highlightMeshRenderer.enabled = false;
-            highlightMeshRenderer.gameObject.SetActive(false);
-        }
-
-        private void GeneratePreviewMesh()
-        {
-            bool isAnyPartOfStaticBatch = false;
-            List<CombineInstance> meshes = new List<CombineInstance>();
-
-            Vector3 cachedPosition = transform.position;
-            Quaternion cachedRotation = transform.rotation;
-            
-            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-
-            try
-            {
-                foreach (Renderer renderer in renderers)
-                {
-                    Type renderType = renderer.GetType();
-
-                    if (renderType == typeof(MeshRenderer))
-                    {
-                        MeshFilter meshFilter = renderer.GetComponent<MeshFilter>();
-
-                        if (meshFilter.sharedMesh == null)
-                        {
-                            continue;
-                        }
-
-                        if (renderer.isPartOfStaticBatch)
-                        {
-                            isAnyPartOfStaticBatch = true;
-                        }
-
-                        for (int i = 0; i < meshFilter.sharedMesh.subMeshCount; i++)
-                        {
-                            CombineInstance combineInstance = new CombineInstance
-                            {
-                                subMeshIndex = i,
-                                mesh = meshFilter.sharedMesh,
-                                transform = meshFilter.transform.localToWorldMatrix
-                            };
-
-                            meshes.Add(combineInstance);
-                        }
-                    }
-                    else if (renderType == typeof(SkinnedMeshRenderer))
-                    {
-                        SkinnedMeshRenderer skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
-
-                        if (skinnedMeshRenderer.sharedMesh == null)
-                        {
-                            continue;
-                        }
-
-                        if (renderer.isPartOfStaticBatch)
-                        {
-                            isAnyPartOfStaticBatch = true;
-                        }
-
-                        for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
-                        {
-                            CombineInstance combineInstance = new CombineInstance
-                            {
-                                subMeshIndex = i,
-                                mesh = skinnedMeshRenderer.sharedMesh,
-                                transform = skinnedMeshRenderer.transform.localToWorldMatrix
-                            };
-
-                            meshes.Add(combineInstance);
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                transform.SetPositionAndRotation(cachedPosition, cachedRotation);
-            }
-
-            if (isAnyPartOfStaticBatch)
-            {
-                throw new NullReferenceException($"{name} is marked as 'Batching Static', no preview mesh to be highlighted could be generated at runtime.\n" +
-                                                 "In order to fix this issue, please either remove the static flag of this GameObject or simply " +
-                                                 "select it in edit mode so a preview mesh could be generated and cached.");
-            } 
-            
-            if (meshes.Any())
-            {
-                Mesh previewMesh = new Mesh();
-                previewMesh.CombineMeshes(meshes.ToArray());
-                
-                highlightMeshFilter.mesh = previewMesh;            }
-            else
-            {
-                throw new NullReferenceException($"{name} has no valid meshes to be highlighted.");
-            }
-        }
-
-        private void DisableRenders()
-        {
-            if (highlightMeshRenderer != null)
-            {
-                highlightMeshRenderer.enabled = true;
-                highlightMeshRenderer.gameObject.SetActive(true);
-            }
-
-            foreach (Renderer renderer in renderers)
-            {
-                if (renderer != null)
-                {
-                    renderer.enabled = false;
-                }
-            }
-
-            isBeingHighlighted = true;
-        }
-
-        private void ReenableRenderers()
-        {
-            if (highlightMeshRenderer != null)
-            {
-                highlightMeshRenderer.enabled = false;
-                highlightMeshRenderer.gameObject.SetActive(false);
-            }
-
-            foreach (Renderer renderer in renderers)
-            {
-                if (renderer != null)
-                {
-                    renderer.enabled = true;
-                }
-            }
-
-            isBeingHighlighted = false;
         }
 
         private bool ShouldHighlightTouching()
@@ -560,65 +280,6 @@ namespace Innoactive.Creator.XRInteraction
         private bool ShouldHighlightUsing()
         {
             return allowOnUseHighlight && interactableObject.IsActivated && interactableObject.isSelected;
-        }
-
-        private Material NewHighlightMaterial(Color highlightColor)
-        {
-            Material material = CreateHighlightMaterial();
-            material.color = highlightColor;
-
-            // In case the color has some level of transparency,
-            // we set the Material's Rendering Mode to Transparent. 
-            if (Mathf.Approximately(highlightColor.a, 1f) == false)
-            {
-                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-                material.SetInt("_ZWrite", 0);
-                material.DisableKeyword("_ALPHATEST_ON");
-                material.DisableKeyword("_ALPHABLEND_ON");
-                material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-                material.renderQueue = 3000;
-            }
-            
-            return material;
-        }
-
-        private Material NewHighlightMaterial(Texture mainTexture)
-        {
-            Material material = CreateHighlightMaterial();
-            material.mainTexture = mainTexture;
-            return material;
-        }
-
-        private Material CreateHighlightMaterial()
-        {
-            string shaderName = GraphicsSettings.currentRenderPipeline ? "Universal Render Pipeline/Lit" : "Standard";
-            Shader defaultShader = Shader.Find(shaderName);
-
-            if (defaultShader == null)
-            {
-                throw new NullReferenceException($"{name} failed to create a default material," + 
-                    $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
-            }
-
-            return new Material(defaultShader);
-        }
-
-        private bool CanObjectBeHighlighted()
-        {
-            if (enabled == false)
-            {
-                Debug.LogError($"{GetType().Name} component is disabled for {name} and can not be highlighted.", gameObject);
-                return false;
-            }
-            
-            if (gameObject.activeInHierarchy == false)
-            {
-                Debug.LogError($"{name} is disabled and can not be highlighted.", gameObject);
-                return false;
-            }
-
-            return true;
         }
     }
 }

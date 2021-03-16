@@ -4,11 +4,14 @@ using UnityEngine.TestTools;
 using UnityEngine;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
+using Innoactive.Creator.BasicInteraction;
 using Innoactive.Creator.Core;
 using Innoactive.Creator.Core.Behaviors;
 using Innoactive.Creator.Core.Configuration;
 using Innoactive.Creator.Core.Configuration.Modes;
 using Innoactive.Creator.Core.SceneObjects;
+using Innoactive.Creator.Core.Utils;
 using Innoactive.Creator.Tests.Utils;
 using Innoactive.Creator.XRInteraction;
 using Innoactive.Creator.XRInteraction.Properties;
@@ -39,39 +42,29 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
         private const string targetName = "XR Interactable";
 
         [UnityTest]
-        public IEnumerator CreateHighlightProperty()
+        public IEnumerator CreateHighlightPropertyWhitoutInteractableHighlighter()
         {
             // Given an empty GameObject.
             GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
             interactable.name = targetName;
-            
-            Assert.That(interactable.GetComponent<InteractableObject>() == null);
-            Assert.That(interactable.GetComponent<InteractableHighlighter>() == null);
-            Assert.That(interactable.GetComponent<HighlightProperty>() == null);
-            Assert.That(interactable.GetComponent<TrainingSceneObject>() == null);
-            Assert.That(interactable.GetComponent<Rigidbody>() == null);
-            
-            // When we add a HighlightProperty to it.
-            interactable.AddComponent<HighlightProperty>();
 
-            // Then it also get all required dependencies.
-            Assert.That(interactable.GetComponent<InteractableObject>() != null);
-            Assert.That(interactable.GetComponent<InteractableHighlighter>() != null);
-            Assert.That(interactable.GetComponent<HighlightProperty>() != null);
-            Assert.That(interactable.GetComponent<TrainingSceneObject>() != null);
-            Assert.That(interactable.GetComponent<Rigidbody>() != null);
+            foreach (Type highlighterImplementation in ReflectionUtils.GetConcreteImplementationsOf<IHighlighter>())
+            {
+                Assert.That(interactable.GetComponent(highlighterImplementation) == null);
+            }
+
+            // When we add a DummyHighlightProperty to it.
+            interactable.AddComponent<DummyHighlightProperty>();
             
-            Assert.AreEqual(1, interactable.GetComponents<InteractableObject>().Length);
-            Assert.AreEqual(1, interactable.GetComponents<InteractableHighlighter>().Length);
-            Assert.AreEqual(1, interactable.GetComponents<HighlightProperty>().Length);
-            Assert.AreEqual(1, interactable.GetComponents<TrainingSceneObject>().Length);
-            Assert.AreEqual(1, interactable.GetComponents<Rigidbody>().Length);
+            bool highlighterExists = ReflectionUtils.GetConcreteImplementationsOf<IHighlighter>().Any(highlighterImplementation => interactable.GetComponent(highlighterImplementation) != null);
+
+            Assert.IsTrue(highlighterExists);
 
             yield break;
         }
         
         [UnityTest]
-        public IEnumerator CreateDummyHighlightProperty()
+        public IEnumerator CreateDummyHighlightPropertyWhitInteractableHighlighter()
         {
             // Given an empty GameObject.
             GameObject interactable = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -84,6 +77,7 @@ namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
             Assert.That(interactable.GetComponent<Rigidbody>() == null);
             
             // When we add a DummyHighlightProperty to it.
+            interactable.AddComponent<InteractableHighlighter>();
             interactable.AddComponent<DummyHighlightProperty>();
 
             // Then it also get all required dependencies.
