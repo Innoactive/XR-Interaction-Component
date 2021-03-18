@@ -3,6 +3,10 @@ using UnityEngine;
 using Innoactive.Creator.XRInteraction;
 using UnityEngine.XR.Interaction.Toolkit;
 
+using System;
+using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
+
 namespace Innoactive.CreatorEditor.XRInteraction
 {
     /// <summary>
@@ -424,7 +428,84 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 EditorGUILayout.PropertyField(onSelectExited);
             }
 
+            // Only supported on PBR
+            if (GraphicsSettings.currentRenderPipeline != null)
+            {
+                return;
+            }
+            
+            foreach (Object targetObject in serializedObject.targetObjects)
+            {
+                if (GUILayout.Button(EditorGUIUtility.TrTempContent("Light Saber Mode")))
+                {
+                    SetLightSabers(targetObject);
+                }
+            }
+
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void SetLightSabers(Object gameObject)
+        {
+            RayInteractor rayInteractor = gameObject as RayInteractor;
+            rayInteractor.maxRaycastDistance = 10;
+
+            Color lightSaberColor = CreateColor();
+            LineRenderer lineRenderer = rayInteractor.GetComponent<LineRenderer>();
+            Material lightSaberMaterial = CreateMaterial(lightSaberColor);
+
+            lineRenderer.sharedMaterial = lightSaberMaterial;
+            lineRenderer.colorGradient = CreateGradient(lightSaberColor);
+        }
+        
+        private Material CreateMaterial(Color lightSaberColor)
+        {
+            string shaderName = "Standard";
+            Shader defaultShader = Shader.Find(shaderName);
+
+            if (defaultShader == null)
+            {
+                throw new NullReferenceException($"{name} failed to create a default material," + 
+                                                 $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
+            }
+
+            Material lightSaberMaterial = new Material(defaultShader);
+            lightSaberMaterial.mainTexture = Texture2D.whiteTexture;
+            lightSaberMaterial.color = lightSaberColor;
+            
+            lightSaberMaterial.SetColor("_EMISSION", lightSaberColor);
+            lightSaberMaterial.EnableKeyword("_EMISSION");
+            
+            return lightSaberMaterial;
+        }
+
+        private Color CreateColor()
+        {
+            return Convert.ToInt32(EditorApplication.timeSinceStartup * 10) % 2 == 0 ? Color.blue : Color.red;
+        }
+
+        private Gradient CreateGradient(Color lightSaberColor)
+        {
+            Gradient gradient = new Gradient();
+            
+            GradientColorKey[] colorKey = new GradientColorKey[2];
+            GradientAlphaKey[] alphaKey = new GradientAlphaKey[2];
+
+            // Populate the color keys at the relative time 0 and 1 (0 and 100%)
+            colorKey[0].color = lightSaberColor;
+            colorKey[0].time = 0.0f;
+            colorKey[1].color = lightSaberColor;
+            colorKey[1].time = 1.0f;
+
+            // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
+            alphaKey[0].alpha = 1.0f;
+            alphaKey[0].time = 0.0f;
+            alphaKey[1].alpha = 0.0f;
+            alphaKey[1].time = 1.0f;
+
+            gradient.SetKeys(colorKey, alphaKey);
+
+            return gradient;
         }
     }
 }
