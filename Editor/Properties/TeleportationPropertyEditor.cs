@@ -2,6 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using Innoactive.Creator.Core.Properties;
+using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Innoactive.CreatorEditor.XRInteraction
@@ -59,6 +60,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             {
                 GameObject anchorPrefab = CreateVisualEffect(teleportationAnchor);
                 ConfigureTeleportationAnchor(teleportationAnchor, anchorPrefab.transform);
+                ConfigureCollider(teleportationAnchor);
                 
                 isSetup = true;
             }
@@ -91,6 +93,14 @@ namespace Innoactive.CreatorEditor.XRInteraction
             teleportAnchor.interactionLayerMask = 1 << teleportLayer;
             teleportAnchor.customReticle = Resources.Load<GameObject>(ReticlePrefab);
             teleportAnchor.matchOrientation = MatchOrientation.TargetUpAndForward;
+        }
+
+        private void ConfigureCollider(TeleportationProperty teleportationAnchor)
+        {
+            BoxCollider propertyCollider = teleportationAnchor.GetComponent<BoxCollider>();
+
+            propertyCollider.center = new Vector3(0f, 0.02f, 0f);
+            propertyCollider.size = new Vector3(1f, 0.01f, 1f);
         }
     }
 }

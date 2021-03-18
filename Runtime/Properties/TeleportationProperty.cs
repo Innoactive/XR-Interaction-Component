@@ -11,7 +11,7 @@ namespace Innoactive.Creator.Core.Properties
     /// <remarks>
     /// This implementation is based on 'TeleportationAnchor'.
     /// </remarks>
-    [RequireComponent(typeof(TeleportationAnchor))]
+    [RequireComponent(typeof(TeleportationAnchor), typeof(BoxCollider))]
     public class TeleportationProperty : LockableProperty, ITeleportationProperty
     {
         /// <inheritdoc />
