@@ -429,14 +429,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
             }
 
             // Only supported on PBR
-            if (GraphicsSettings.currentRenderPipeline != null)
+            if (GraphicsSettings.currentRenderPipeline == null && GUILayout.Button(EditorGUIUtility.TrTempContent("Light Saber Mode")))
             {
-                return;
-            }
-            
-            foreach (Object targetObject in serializedObject.targetObjects)
-            {
-                if (GUILayout.Button(EditorGUIUtility.TrTempContent("Light Saber Mode")))
+                foreach (Object targetObject in serializedObject.targetObjects)
                 {
                     SetLightSabers(targetObject);
                 }
@@ -448,14 +443,22 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private void SetLightSabers(Object gameObject)
         {
             RayInteractor rayInteractor = gameObject as RayInteractor;
-            rayInteractor.maxRaycastDistance = 10;
-
+            SerializedProperty rayDistance = serializedObject.FindProperty("m_MaxRaycastDistance");
+            rayDistance.floatValue = 1f;
+            
             Color lightSaberColor = CreateColor();
             LineRenderer lineRenderer = rayInteractor.GetComponent<LineRenderer>();
             Material lightSaberMaterial = CreateMaterial(lightSaberColor);
 
+            lineRenderer.widthMultiplier = 1f;
             lineRenderer.sharedMaterial = lightSaberMaterial;
             lineRenderer.colorGradient = CreateGradient(lightSaberColor);
+
+            lineRenderer.sharedMaterial.mainTexture = Texture2D.whiteTexture;
+            
+            lineRenderer.sharedMaterial.SetColor("_Color", lightSaberColor);
+            lineRenderer.sharedMaterial.SetColor("_EmissionColor", lightSaberColor * 3);
+            lineRenderer.sharedMaterial.EnableKeyword("_EMISSION");
         }
         
         private Material CreateMaterial(Color lightSaberColor)
@@ -468,15 +471,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
                 throw new NullReferenceException($"{name} failed to create a default material," + 
                                                  $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
             }
-
-            Material lightSaberMaterial = new Material(defaultShader);
-            lightSaberMaterial.mainTexture = Texture2D.whiteTexture;
-            lightSaberMaterial.color = lightSaberColor;
             
-            lightSaberMaterial.SetColor("_EMISSION", lightSaberColor);
-            lightSaberMaterial.EnableKeyword("_EMISSION");
-            
-            return lightSaberMaterial;
+            return new Material(defaultShader);
         }
 
         private Color CreateColor()
