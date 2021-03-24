@@ -20,7 +20,7 @@ ExportedObj/
 *.svd
 
 # Creator generated files
-*[XR_Setup_Simulator]*
+*\[XR_Setup_Simulator\]*
 
 # Unity3D generated meta files
 *.pidb.meta
