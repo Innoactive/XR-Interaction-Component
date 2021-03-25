@@ -1,4 +1,5 @@
 ﻿using System;
+using Innoactive.Creator.BasicInteraction;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Creator.Core.Properties;
@@ -27,17 +28,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         public ISnappableProperty SnappedObject { get; set; }
 
         /// <inheritdoc />
-        public GameObject SnapZoneObject
-        {
-            get
-            {
-                if (SnapZone != null)
-                {
-                    return SnapZone.gameObject;
-                }
-                return null;
-            }
-        }
+        public GameObject SnapZoneObject => SnapZone.gameObject;
 
         /// <summary>
         /// Returns the SnapZone component.

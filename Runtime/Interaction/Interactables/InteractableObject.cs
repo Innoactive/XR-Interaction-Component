@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Innoactive.Creator.BasicInteraction;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -9,7 +10,7 @@ namespace Innoactive.Creator.XRInteraction
     /// Can attach to selecting interactor and follow it around while obeying physics (and inherit velocity when released).
     /// </summary>
     /// <remarks>Adds extra control over applicable interactions.</remarks>
-    public class InteractableObject : XRGrabInteractable
+    public class InteractableObject : XRGrabInteractable, IInteractableObject
     {
         [SerializeField]
         private bool isTouchable = true;
@@ -38,6 +39,9 @@ namespace Innoactive.Creator.XRInteraction
                 return internalRigidbody;
             }
         }
+
+        /// <inheritdoc/>
+        public GameObject GameObject => gameObject;
 
         /// <summary>
         /// Determines if this <see cref="InteractableObject"/> can be touched.

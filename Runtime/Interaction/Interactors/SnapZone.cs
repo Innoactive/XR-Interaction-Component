@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Innoactive.Creator.BasicInteraction;
+using Innoactive.Creator.BasicInteraction.Properties;
 using Innoactive.Creator.BasicInteraction.Validation;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -17,7 +19,7 @@ namespace Innoactive.Creator.XRInteraction
     /// Adds the functionality to force the selection and unselection of specific interactables.
     /// It also adds a highlighter to emphasize the position of the socket.
     /// </remarks>
-    public class SnapZone : XRSocketInteractor
+    public class SnapZone : XRSocketInteractor, ISnapZone
     {
         /// <summary>
         /// Gets or sets whether <see cref="ShownHighlightObject"/> is shown or not.
@@ -26,7 +28,16 @@ namespace Innoactive.Creator.XRInteraction
         
         [SerializeField]
         private GameObject shownHighlightObject = null;
+        
+        /// <inheritdoc />
+        public bool IsEmpty => SnappedObject == null;
 
+        /// <inheritdoc />
+        public ISnappableProperty SnappedObject => selectTarget == null ? null : selectTarget.GetComponent<ISnappableProperty>();
+
+        /// <inheritdoc />
+        public Transform Anchor => attachTransform;
+        
         /// <summary>
         /// The 'GameObject' whose mesh is drawn to emphasize the position of the snap zone.
         /// If none is supplied, no highlight object is shown.
@@ -513,6 +524,44 @@ namespace Innoactive.Creator.XRInteraction
                 }
             }
 
+            return true;
+        }
+
+        /// <inheritdoc />
+        public bool CanSnap(ISnappableProperty target)
+        {
+            XRBaseInteractable interactableObject = target.SceneObject.GameObject.GetComponent<XRBaseInteractable>();
+
+            if (interactableObject == null)
+            {
+                return false;
+            }
+
+            return CanSelect(interactableObject);
+        }
+
+        /// <inheritdoc />
+        public bool ForceSnap(ISnappableProperty target)
+        {
+            XRBaseInteractable interactableObject = target.SceneObject.GameObject.GetComponent<XRBaseInteractable>();
+
+            if (interactableObject == null)
+            {
+                return false;
+            }
+            
+            ForceSelect(interactableObject);
+            return true;
+        }
+
+        /// <inheritdoc />
+        public bool ForceRelease()
+        {
+            if (IsEmpty)
+            {
+                return false;
+            }
+            ForceUnselect();
             return true;
         }
     }
