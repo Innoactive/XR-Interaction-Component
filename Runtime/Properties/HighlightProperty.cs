@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Innoactive.Creator.BasicInteraction;
+using UnityEngine;
 using Innoactive.Creator.Core.Properties;
 using Innoactive.Creator.Unity;
 
@@ -15,16 +17,22 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// </summary>
         public Color? CurrentHighlightColor { get; protected set; }
             
+        [Obsolete("Use 'DefaultHighlighter' instead.")]
+        protected InteractableHighlighter Highlighter
+        {
+            get { return DefaultHighlighter as InteractableHighlighter; }
+        }
+
         /// <summary>
-        /// The <see cref="InteractableHighlighter"/> which is used to highlight the <see cref="Core.SceneObjects.TrainingSceneObject"/>.
+        /// The <see cref="DefaultHighlighter"/> which is used to highlight the <see cref="Core.SceneObjects.TrainingSceneObject"/>.
         /// </summary>
-        protected InteractableHighlighter Highlighter;
+        protected DefaultHighlighter DefaultHighlighter;
 
         protected override void OnEnable()
         {
             base.OnEnable();
 
-            if (Highlighter == null)
+            if (DefaultHighlighter == null)
             {
                 Initialize();
             }
@@ -47,6 +55,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
                 ownInteractableObject.IsGrabbable = false;
                 ownInteractableObject.IsTouchable = false;
                 ownInteractableObject.IsUsable = false;
+                
                 // If the gameObject had no rigidbody and thus was unaffected by physics, make it kinematic.
                 if (ownRigidbody == null)
                 {
@@ -54,7 +63,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
                 }
             }
 
-            Highlighter = gameObject.GetOrAddComponent<InteractableHighlighter>();
+            InteractableHighlighter interactableHighlighter = GetComponent<InteractableHighlighter>();
+            DefaultHighlighter = interactableHighlighter == null ? gameObject.GetOrAddComponent<DefaultHighlighter>() : interactableHighlighter;
         }
 
         /// <inheritdoc/>
@@ -62,7 +72,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             CurrentHighlightColor = highlightColor;
             IsHighlighted = true;
-            Highlighter.StartHighlighting(SceneObject.UniqueName, highlightColor);
+            DefaultHighlighter.StartHighlighting(highlightColor, SceneObject.UniqueName);
             EmitHighlightEvent();
         }
 
@@ -71,7 +81,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             CurrentHighlightColor = null;
             IsHighlighted = false;
-            Highlighter.StopHighlighting(SceneObject.UniqueName);
+            DefaultHighlighter.StopHighlighting(SceneObject.UniqueName);
             EmitUnhighlightEvent();
         }
     }
