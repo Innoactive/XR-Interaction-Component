@@ -14,34 +14,12 @@ namespace Innoactive.Creator.XRInteraction
         /// <summary>
         /// Current rotation of the XR Rig.
         /// </summary>
-        public override Quaternion CurrentRotation
-        {
-            get
-            {
-                if (rigManipulationProvider != null)
-                {
-                    return RigManipulationProvider.system.xrRig.rig.transform.rotation;
-                }
-
-                return Quaternion.identity;
-            }
-        }
+        public override Quaternion CurrentRotation => RigManipulationProvider.system.xrRig.transform.rotation;
 
         /// <summary>
         /// Current position of the XR Rig.
         /// </summary>
-        public override Vector3 CurrentPosition
-        {
-            get
-            {
-                if (rigManipulationProvider != null)
-                {
-                    return RigManipulationProvider.system.xrRig.rig.transform.position;
-                }
-
-                return Vector3.forward;
-            }
-        }
+        public override Vector3 CurrentPosition => RigManipulationProvider.system.xrRig.transform.position;
 
         /// <summary>
         /// Locomotion provider to directly manipulate the XR Rig.
