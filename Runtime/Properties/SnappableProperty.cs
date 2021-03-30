@@ -122,10 +122,9 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// </summary>
         public void FastForwardSnapInto(ISnapZoneProperty snapZone)
         {
-            SnapZone snapDropZone = snapZone?.SnapZoneObject.GetComponent<SnapZone>();
-            if (snapDropZone != null)
+            if (snapZone != null && snapZone is SnapZoneProperty snapDropZone)
             {
-                snapDropZone.ForceSelect(Interactable);
+                snapDropZone.SnapZone.ForceSnap(this);
             }
         }
     }
