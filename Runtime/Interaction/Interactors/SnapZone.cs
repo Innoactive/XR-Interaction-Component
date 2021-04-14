@@ -198,7 +198,10 @@ namespace Innoactive.Creator.XRInteraction
         {  
             if (interactable != null)
             {
-                snapZoneHoverTargets.Add(interactable);
+                if (snapZoneHoverTargets.Contains(interactable) == false)
+                {
+                    snapZoneHoverTargets.Add(interactable);
+                }
             }
         }
 
