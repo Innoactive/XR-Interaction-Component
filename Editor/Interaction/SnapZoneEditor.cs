@@ -20,7 +20,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
         private SerializedProperty attachTransform;
         private SerializedProperty startingSelectedInteractable;
 
-        private SerializedProperty interactableHoverMeshMaterial;
+        private SerializedProperty interactableHoverMeshValidMaterial;
+        private SerializedProperty interactableHoverMeshInvalidMaterial;
         
         private SerializedProperty onHoverEntered;
         private SerializedProperty onHoverExited;
@@ -38,7 +39,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             public static readonly GUIContent ShowHighlightInEditor = new GUIContent("Show Highlight in Editor", "Enable this to show how the object will be positioned later on.");
             public static readonly GUIContent ShownHighlightObject = new GUIContent("Shown Highlight Object", "The game object whose mesh is drawn to emphasize the position of the snap zone. If none is supplied, no highlight object is shown.");
             public static readonly GUIContent ShownHighlightObjectColor = new GUIContent("Shown Highlight Object Color", "The color of the material used to draw the \"Shown Highlight Object\". Use the alpha value to specify the degree of transparency.");
-            public static readonly GUIContent InteractableHoverMeshMaterial = new GUIContent("Validation Hover Material", "Material used for rendering interactable meshes on hover (a default material will be created if none is supplied).");
+            public static readonly GUIContent InteractableHoverMeshMaterial = new GUIContent("Valid Hover Material", "Material used for rendering interactable meshes on hover (a default material will be created if none is supplied).");
+            public static readonly GUIContent InteractableHoverMeshInvalidMaterial = new GUIContent("Invalid Hover Material", "Material used for rendering interactable meshes on hover, when invalid (a default material will be created if none is supplied).");
         }
 
         private void OnEnable()
@@ -53,7 +55,8 @@ namespace Innoactive.CreatorEditor.XRInteraction
             attachTransform = serializedObject.FindProperty("m_AttachTransform");
             startingSelectedInteractable = serializedObject.FindProperty("m_StartingSelectedInteractable");
 
-            interactableHoverMeshMaterial = serializedObject.FindProperty("validationMaterial");
+            interactableHoverMeshValidMaterial = serializedObject.FindProperty("validationMaterial");
+            interactableHoverMeshInvalidMaterial = serializedObject.FindProperty("invalidMaterial");
             
             onHoverEntered = serializedObject.FindProperty("m_OnHoverEntered");
             onHoverExited = serializedObject.FindProperty("m_OnHoverExited");
@@ -85,7 +88,9 @@ namespace Innoactive.CreatorEditor.XRInteraction
             EditorGUILayout.PropertyField(shownHighlightObjectColor, Tooltips.ShownHighlightObjectColor);
             bool isPreviewMeshChanged = EditorGUI.EndChangeCheck();
             
-            EditorGUILayout.PropertyField(interactableHoverMeshMaterial, Tooltips.InteractableHoverMeshMaterial);
+            EditorGUILayout.PropertyField(interactableHoverMeshValidMaterial, Tooltips.InteractableHoverMeshMaterial);
+            EditorGUILayout.PropertyField(interactableHoverMeshInvalidMaterial, Tooltips.InteractableHoverMeshInvalidMaterial);
+            
             EditorGUI.indentLevel--;
             
             EditorGUILayout.PropertyField(socketActive, Tooltips.SocketActive);
