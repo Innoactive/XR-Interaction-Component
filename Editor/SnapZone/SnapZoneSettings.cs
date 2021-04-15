@@ -16,7 +16,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
     {
         private const string MaterialsPath = "Assets/Resources/SnapZones";
         private static SnapZoneSettings settings;
-        
+
         /// <summary>
         /// Only Interactables with this LayerMask will interact with this <see cref="Innoactive.Creator.XRInteraction.SnapZone"/>.
         /// </summary>
@@ -28,7 +28,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         /// </summary>
         [Tooltip("This color is used as the snap zone highlight color when no object is hovering but `Snap Zone Active` is true.")]
         public Color HighlightColor = new Color32(64, 200, 255, 50);
-        
+
         [SerializeField]
         [Tooltip("The material used for the highlight object. Should be transparent.\n\n[This field overrides 'HighlightColor']")]
         private Material highlightMaterial;
@@ -37,13 +37,13 @@ namespace Innoactive.CreatorEditor.XRInteraction
         /// This color is used when a valid <see cref="InteractableObject"/> is hovering a <see cref="SnapZone"/>.
         /// </summary>
         [Tooltip("This color is used when a valid object is hovering the snap zone.")]
-        public Color ValidationColor = new Color32(0, 255, 0, 50);
-        
+        public Color ValidationColor = new Color32(70, 255, 0, 126);
+
         /// <summary>
         /// This color is used when an invalid <see cref="InteractableObject"/> is hovering a <see cref="SnapZone"/>.
         /// </summary>
         [Tooltip("This color is used when an invalid object is hovering the snap zone.")]
-        public Color InvalidColor = new Color32(255, 0, 0, 50);
+        public Color InvalidColor = new Color32(255, 25, 0, 126);
 
         [SerializeField]
         [Tooltip("The material shown when a valid object is hovering the snap zone. Should be transparent.\n\n[This field overrides 'ValidHighlightColor']")]
@@ -62,7 +62,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
         /// The material used for the highlight object, when a valid object is hovering. Should be transparent.
         /// </summary>
         public Material ValidationMaterial => SetupValidationMaterial();
-        
+
         /// <summary>
         /// The material used for the highlight object, when an invalid object is hovering. Should be transparent.
         /// </summary>
@@ -84,13 +84,13 @@ namespace Innoactive.CreatorEditor.XRInteraction
             snapZone.ValidationMaterial = ValidationMaterial;
             snapZone.InvalidMaterial = InvalidMaterial;
         }
-        
+
         private static SnapZoneSettings RetrieveSnapZoneSettings()
         {
             if (settings == null)
             {
                 string filter = "t:ScriptableObject SnapZoneSettings";
-                    
+
                 foreach (string guid in AssetDatabase.FindAssets(filter))
                 {
                     string assetPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -102,53 +102,53 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             return settings;
         }
-        
+
         private static SnapZoneSettings CreateNewConfiguration()
         {
             SnapZoneSettings snapZoneSettings = CreateInstance<SnapZoneSettings>();
-            
+
             string filePath = "Assets/Resources";
-            
+
             if (Directory.Exists(filePath) == false)
             {
                 Directory.CreateDirectory(filePath);
             }
-            
+
             AssetDatabase.CreateAsset(snapZoneSettings, $"{filePath}/{nameof(SnapZoneSettings)}.asset");
             AssetDatabase.Refresh();
-            
+
             return snapZoneSettings;
         }
-        
+
         private Material SetupHighlightMaterial()
         {
             if (highlightMaterial == null)
             {
                 highlightMaterial = UseDefaultMaterial("SnapZoneHighlightMaterial");
             }
-                
+
             highlightMaterial.color = HighlightColor;
             return highlightMaterial;
         }
-        
+
         private Material SetupInvalidMaterial()
         {
             if (invalidMaterial == null)
             {
                 invalidMaterial = UseDefaultMaterial("SnapZoneInvalidMaterial");
             }
-                
+
             invalidMaterial.color = InvalidColor;
             return invalidMaterial;
         }
-        
+
         private Material SetupValidationMaterial()
         {
             if (validationMaterial == null)
             {
                 validationMaterial = UseDefaultMaterial("SnapZoneValidationMaterial");
             }
-                
+
             validationMaterial.color = ValidationColor;
             return validationMaterial;
         }
@@ -159,7 +159,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             {
                 Directory.CreateDirectory(MaterialsPath);
             }
-            
+
             string filePath = $"{MaterialsPath}/{materialName}.mat";
 
             if (File.Exists(filePath))
@@ -188,12 +188,12 @@ namespace Innoactive.CreatorEditor.XRInteraction
 
             if (defaultShader == null)
             {
-                throw new NullReferenceException($"{nameof(GetType)} failed to create a default material," + 
+                throw new NullReferenceException($"{nameof(GetType)} failed to create a default material," +
                     $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
             }
-            
+
             Material material = new Material(defaultShader);
-            
+
             material.SetFloat("_Mode", 3);
             material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
             material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
