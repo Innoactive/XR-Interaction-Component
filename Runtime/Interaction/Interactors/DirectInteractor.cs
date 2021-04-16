@@ -64,8 +64,7 @@ namespace Innoactive.Creator.XRInteraction
         {
             forceGrab = true;
         }
-
-#if XRIT_1_0_OR_NEWER
+        
         /// <summary>
         /// This method is called by the Interaction Manager
         /// right before the Interactor first initiates selection of an Interactable
@@ -98,62 +97,28 @@ namespace Innoactive.Creator.XRInteraction
 
             base.OnSelectEntering(arguments);
         }
-#elif XRIT_0_10_OR_NEWER
-        /// <summary>
-        /// This method is called when the interactor first initiates selection of an interactable.
-        /// </summary>
-        /// <param name="interactable">Interactable that is being selected.</param>
-        [System.Obsolete("OnSelectEntering(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectEntering(XRBaseInteractable interactable)
-        {
-            InteractableObject interactableObject = interactable as InteractableObject;
-            
-            if (precisionGrab && interactableObject.attachTransform == null)
-            {
-                switch (interactableObject.movementType)
-                {
-                    case XRBaseInteractable.MovementType.VelocityTracking:
-                    case XRBaseInteractable.MovementType.Kinematic:
-                        attachTransform.SetPositionAndRotation(interactable.transform.position, interactable.transform.rotation);
-                        break;
-                    case XRBaseInteractable.MovementType.Instantaneous:
-                        Debug.LogWarning("Precision Grab is currently not compatible with interactable objects with Movement Type configured as Instantaneous.\n"
-                                         + $"Please change the Movement Type in {interactable.name}.", interactable);
-                        break;
-                }
-            }
 
-            base.OnSelectEntering(interactable);
-        }
-#else
-        /// <summary>
-        /// This method is called when the interactor first initiates selection of an interactable.
-        /// </summary>
-        /// <param name="interactable">Interactable that is being selected.</param>
-        [System.Obsolete("OnSelectEnter(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectEnter(XRBaseInteractable interactable)
+        [System.Obsolete("OnSelectEntering(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected new void OnSelectEntering(XRBaseInteractable interactable)
         {
-            InteractableObject interactableObject = interactable as InteractableObject;
-            
-            if (precisionGrab && interactableObject.attachTransform == null)
+            OnSelectEntering(new SelectEnterEventArgs
             {
-                switch (interactableObject.movementType)
-                {
-                    case XRBaseInteractable.MovementType.VelocityTracking:
-                    case XRBaseInteractable.MovementType.Kinematic:
-                        attachTransform.SetPositionAndRotation(interactableObject.Rigidbody.worldCenterOfMass, interactable.transform.rotation);
-                        break;
-                    case XRBaseInteractable.MovementType.Instantaneous:
-                        attachTransform.SetPositionAndRotation(interactable.transform.position, interactable.transform.rotation);
-                        break;
-                }
-            }
-            
-            base.OnSelectEnter(interactable);
+                interactable = interactable,
+                interactor = this
+            });
         }
-#endif
-        
-#if XRIT_1_0_OR_NEWER
+
+        [System.Obsolete("OnSelectEnter(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected void OnSelectEnter(XRBaseInteractable interactable)
+        {
+            OnSelectEntering(new SelectEnterEventArgs
+            {
+                interactable = interactable,
+                interactor = this
+            });
+        }
+
+
         /// <summary>
         /// This method is called by the Interaction Manager
         /// right before the Interactor ends selection of an Interactable
@@ -167,31 +132,32 @@ namespace Innoactive.Creator.XRInteraction
         protected override void OnSelectExiting(SelectExitEventArgs arguments)
         {
             base.OnSelectExiting(arguments);
-#elif XRIT_0_10_OR_NEWER
-        /// <summary>
-        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
-        /// </summary>
-        /// <param name="interactable">Interactable that is no longer selected.</param>
-        [System.Obsolete("OnSelectExiting(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectExiting(XRBaseInteractable interactable)
-        {
-            base.OnSelectExiting(interactable);
-#else
-        /// <summary>
-        /// This method is called by the interaction manager when the interactor ends selection of an interactable.
-        /// </summary>
-        /// <param name="interactable">Interactable that is no longer selected.</param>
-        [System.Obsolete("OnSelectExit(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
-        protected override void OnSelectExit(XRBaseInteractable interactable)
-        {
-            base.OnSelectExit(interactable);
-#endif
+            
             if (precisionGrab)
             {
                 attachTransform.localPosition = initialAttachPosition;
                 attachTransform.localRotation = initialAttachRotation;
             }
         }
-        
+
+        [System.Obsolete("OnSelectExiting(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected new void OnSelectExiting(XRBaseInteractable interactable)
+        {
+            OnSelectExiting(new SelectExitEventArgs
+            {
+                interactable = interactable,
+                interactor = this
+            });
+        }
+
+        [System.Obsolete("OnSelectExit(XRBaseInteractable) has been deprecated. Please, upgrade the XR Interaction Toolkit from the Package Manager to the latest available version.")]
+        protected void OnSelectExit(XRBaseInteractable interactable)
+        {
+            OnSelectExiting(new SelectExitEventArgs
+            {
+                interactable = interactable,
+                interactor = this
+            });
+        }
     }
 }

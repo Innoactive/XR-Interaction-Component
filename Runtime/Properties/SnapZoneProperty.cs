@@ -1,4 +1,5 @@
 ﻿using System;
+using Innoactive.Creator.BasicInteraction;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Innoactive.Creator.Core.Properties;
@@ -21,29 +22,13 @@ namespace Innoactive.Creator.XRInteraction.Properties
         public ModeParameter<Color> HighlightColor { get; private set; }
 
         /// <inheritdoc />
-        public bool IsObjectSnapped
-        {
-            get
-            {
-                return SnappedObject != null;
-            }
-        }
+        public bool IsObjectSnapped => SnappedObject != null;
 
         /// <inheritdoc />
         public ISnappableProperty SnappedObject { get; set; }
 
         /// <inheritdoc />
-        public GameObject SnapZoneObject
-        {
-            get
-            {
-                if (SnapZone != null)
-                {
-                    return SnapZone.gameObject;
-                }
-                return null;
-            }
-        }
+        public GameObject SnapZoneObject => SnapZone.gameObject;
 
         /// <summary>
         /// Returns the SnapZone component.
@@ -67,42 +52,21 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
         
-#if XRIT_1_0_OR_NEWER
             SnapZone.selectEntered.AddListener(HandleObjectSnapped);
             SnapZone.selectExited.AddListener(HandleObjectUnsnapped);
-#elif XRIT_0_10_OR_NEWER
-            SnapZone.onSelectEntered.AddListener(HandleObjectSnapped);
-            SnapZone.onSelectExited.AddListener(HandleObjectUnsnapped);
-#else
-            SnapZone.onSelectEnter.AddListener(HandleObjectSnapped);
-            SnapZone.onSelectExit.AddListener(HandleObjectUnsnapped);
-#endif
         }
         
         protected override void OnDisable()
         {
             base.OnDisable();
 
-#if XRIT_1_0_OR_NEWER
             SnapZone.selectEntered.RemoveListener(HandleObjectSnapped);
             SnapZone.selectExited.RemoveListener(HandleObjectUnsnapped);
-#elif XRIT_0_10_OR_NEWER
-            SnapZone.onSelectEntered.RemoveListener(HandleObjectSnapped);
-            SnapZone.onSelectExited.RemoveListener(HandleObjectUnsnapped);
-#else
-            SnapZone.onSelectEnter.RemoveListener(HandleObjectSnapped);
-            SnapZone.onSelectExit.RemoveListener(HandleObjectUnsnapped);
-#endif
         }
         
-#if XRIT_1_0_OR_NEWER
         private void HandleObjectSnapped(SelectEnterEventArgs arguments)
         {
             XRBaseInteractable interactable = arguments.interactable;
-#else
-        private void HandleObjectSnapped(XRBaseInteractable interactable)
-        {
-#endif
             SnappedObject = interactable.gameObject.GetComponent<SnappableProperty>();
             if (SnappedObject == null)
             {
@@ -114,11 +78,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
             }
         }
         
-#if XRIT_1_0_OR_NEWER
         private void HandleObjectUnsnapped(SelectExitEventArgs arguments)
-#else
-        private void HandleObjectUnsnapped(XRBaseInteractable interactable)
-#endif
         {
             if (SnappedObject != null)
             {

@@ -42,16 +42,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
             
-#if XRIT_1_0_OR_NEWER
             Interactable.firstHoverEntered.AddListener(HandleXRTouched);
             Interactable.lastHoverExited.AddListener(HandleXRUntouched);
-#elif XRIT_0_10_OR_NEWER
-            Interactable.onFirstHoverEntered.AddListener(HandleXRTouched);
-            Interactable.onLastHoverExited.AddListener(HandleXRUntouched);
-#else
-            Interactable.onFirstHoverEnter.AddListener(HandleXRTouched);
-            Interactable.onLastHoverExit.AddListener(HandleXRUntouched);
-#endif
 
             InternalSetLocked(IsLocked);
         }
@@ -60,16 +52,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnDisable();
             
-#if XRIT_1_0_OR_NEWER
             Interactable.firstHoverEntered.RemoveListener(HandleXRTouched);
             Interactable.lastHoverExited.RemoveListener(HandleXRUntouched);
-#elif XRIT_0_10_OR_NEWER
-            Interactable.onFirstHoverEntered.RemoveListener(HandleXRTouched);
-            Interactable.onLastHoverExited.RemoveListener(HandleXRUntouched);
-#else
-            Interactable.onFirstHoverEnter.RemoveListener(HandleXRTouched);
-            Interactable.onLastHoverExit.RemoveListener(HandleXRUntouched);
-#endif
         }
         
         protected void Reset()
@@ -78,20 +62,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
             gameObject.GetComponent<Rigidbody>().isKinematic = false;
         }
 
-#if XRIT_1_0_OR_NEWER
         private void HandleXRTouched(HoverEnterEventArgs arguments)
-#else
-        private void HandleXRTouched(XRBaseInteractor interactor)
-#endif
         {
             EmitTouched();
         }
 
-#if XRIT_1_0_OR_NEWER
         private void HandleXRUntouched(HoverExitEventArgs arguments)
-#else
-        private void HandleXRUntouched(XRBaseInteractor interactor)
-#endif
         {
             EmitUntouched();
         }

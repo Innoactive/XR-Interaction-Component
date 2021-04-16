@@ -58,43 +58,22 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
 
-#if XRIT_1_0_OR_NEWER
             Interactable.selectEntered.AddListener(HandleSnappedToDropZone);
             Interactable.selectExited.AddListener(HandleUnsnappedFromDropZone);
-#elif XRIT_0_10_OR_NEWER
-            Interactable.onSelectEntered.AddListener(HandleSnappedToDropZone);
-            Interactable.onSelectExited.AddListener(HandleUnsnappedFromDropZone);
-#else
-            Interactable.onSelectEnter.AddListener(HandleSnappedToDropZone);
-            Interactable.onSelectExit.AddListener(HandleUnsnappedFromDropZone);
-#endif
 
             InternalSetLocked(IsLocked);
         }
         
         protected new virtual void OnDisable()
         {
-#if XRIT_1_0_OR_NEWER
             Interactable.selectEntered.RemoveListener(HandleSnappedToDropZone);
             Interactable.selectExited.RemoveListener(HandleUnsnappedFromDropZone);
-#elif XRIT_0_10_OR_NEWER
-            Interactable.onSelectEntered.RemoveListener(HandleSnappedToDropZone);
-            Interactable.onSelectEntered.RemoveListener(HandleUnsnappedFromDropZone);
-#else
-            Interactable.onSelectEnter.RemoveListener(HandleSnappedToDropZone);
-            Interactable.onSelectEnter.RemoveListener(HandleUnsnappedFromDropZone);
-#endif
         }
         
-#if XRIT_1_0_OR_NEWER
         private void HandleSnappedToDropZone(SelectEnterEventArgs arguments)
         {
             XRBaseInteractor interactor = arguments.interactor;
-#else
-        private void HandleSnappedToDropZone(XRBaseInteractor interactor)
-        {
-#endif
-        SnappedZone = interactor.GetComponent<SnapZoneProperty>();
+            SnappedZone = interactor.GetComponent<SnapZoneProperty>();
 
             if (SnappedZone == null)
             {
@@ -110,11 +89,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
             EmitSnapped();
         }
         
-#if XRIT_1_0_OR_NEWER
         private void HandleUnsnappedFromDropZone(SelectExitEventArgs arguments)
-#else
-        private void HandleUnsnappedFromDropZone(XRBaseInteractor interactor)
-#endif
         {
             SnappedZone = null;
             EmitUnsnapped();
@@ -123,7 +98,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <inheritdoc />
         protected override void InternalSetLocked(bool lockState)
         {
-
+            
         }
         
         /// <summary>
@@ -147,10 +122,9 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// </summary>
         public void FastForwardSnapInto(ISnapZoneProperty snapZone)
         {
-            SnapZone snapDropZone = snapZone?.SnapZoneObject.GetComponent<SnapZone>();
-            if (snapDropZone != null)
+            if (snapZone != null && snapZone is SnapZoneProperty snapDropZone)
             {
-                snapDropZone.ForceSelect(Interactable);
+                snapDropZone.SnapZone.ForceSnap(this);
             }
         }
     }

@@ -94,7 +94,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             precisionGrab = serializedObject.FindProperty("precisionGrab");
             hideControllerOnSelect = serializedObject.FindProperty("m_HideControllerOnSelect");
             
-#if XRIT_0_10_OR_NEWER
             playAudioClipOnSelectEntered = serializedObject.FindProperty("m_PlayAudioClipOnSelectEntered");
             audioClipForOnSelectEntered = serializedObject.FindProperty("m_AudioClipForOnSelectEntered");
             playAudioClipOnSelectExited = serializedObject.FindProperty("m_PlayAudioClipOnSelectExited");
@@ -121,32 +120,6 @@ namespace Innoactive.CreatorEditor.XRInteraction
             onSelectExit = serializedObject.FindProperty("m_OnSelectExited");
             onHoverEnter = serializedObject.FindProperty("m_OnHoverEntered");
             onHoverExit = serializedObject.FindProperty("m_OnHoverExited");
-#else
-            playAudioClipOnSelectEntered = serializedObject.FindProperty("m_PlayAudioClipOnSelectEnter");
-            audioClipForOnSelectEntered = serializedObject.FindProperty("m_AudioClipForOnSelectEnter");
-            playAudioClipOnSelectExited = serializedObject.FindProperty("m_PlayAudioClipOnSelectExit");
-            audioClipForOnSelectExited = serializedObject.FindProperty("m_AudioClipForOnSelectExit");
-            playAudioClipOnHoverEntered = serializedObject.FindProperty("m_PlayAudioClipOnHoverEnter");
-            audioClipForOnHoverEntered = serializedObject.FindProperty("m_AudioClipForOnHoverEnter");
-            playAudioClipOnHoverExited = serializedObject.FindProperty("m_PlayAudioClipOnHoverExit");
-            audioClipForOnHoverExited = serializedObject.FindProperty("m_AudioClipForOnHoverExit");
-            playHapticsOnSelectEntered = serializedObject.FindProperty("m_PlayHapticsOnSelectEnter");
-            hapticSelectEnterIntensity = serializedObject.FindProperty("m_HapticSelectEnterIntensity");
-            hapticSelectEnterDuration = serializedObject.FindProperty("m_HapticSelectEnterDuration");
-            playHapticsOnHoverEntered = serializedObject.FindProperty("m_PlayHapticsOnHoverEnter");
-            hapticHoverEnterIntensity = serializedObject.FindProperty("m_HapticHoverEnterIntensity");
-            hapticHoverEnterDuration = serializedObject.FindProperty("m_HapticHoverEnterDuration");
-            playHapticsOnSelectExited = serializedObject.FindProperty("m_PlayHapticsOnSelectExit");
-            hapticSelectExitIntensity = serializedObject.FindProperty("m_HapticSelectExitIntensity");
-            hapticSelectExitDuration = serializedObject.FindProperty("m_HapticSelectExitDuration");
-            playHapticsOnHoverExited = serializedObject.FindProperty("m_PlayHapticsOnHoverExit");
-            hapticHoverExitIntensity = serializedObject.FindProperty("m_HapticHoverExitIntensity");
-            hapticHoverExitDuration = serializedObject.FindProperty("m_HapticHoverExitDuration");
-            onSelectEnter = serializedObject.FindProperty("m_OnSelectEnter");
-            onSelectExit = serializedObject.FindProperty("m_OnSelectExit");
-            onHoverEnter = serializedObject.FindProperty("m_OnHoverEnter");
-            onHoverExit = serializedObject.FindProperty("m_OnHoverExit");
-#endif
         }
 
         public override void OnInspectorGUI()
@@ -161,11 +134,7 @@ namespace Innoactive.CreatorEditor.XRInteraction
             {
                 DirectInteractor interactor = (DirectInteractor)targetObject;
                 
-#if XRIT_0_10_OR_NEWER
                 if (interactor.GetComponent<XRController>() == null && interactor.GetComponent<ActionBasedController>() == null)
-#else
-                if (interactor.GetComponent<XRController>() == null)
-#endif
                 {
                     EditorGUILayout.HelpBox(Tooltips.MissingRequiredController, MessageType.Warning, true);
                     break;

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Innoactive.Creator.BasicInteraction;
+using Innoactive.Creator.BasicInteraction.Properties;
 using Innoactive.Creator.BasicInteraction.Validation;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -17,7 +19,7 @@ namespace Innoactive.Creator.XRInteraction
     /// Adds the functionality to force the selection and unselection of specific interactables.
     /// It also adds a highlighter to emphasize the position of the socket.
     /// </remarks>
-    public class SnapZone : XRSocketInteractor
+    public class SnapZone : XRSocketInteractor, ISnapZone
     {
         /// <summary>
         /// Gets or sets whether <see cref="ShownHighlightObject"/> is shown or not.
@@ -26,14 +28,23 @@ namespace Innoactive.Creator.XRInteraction
         
         [SerializeField]
         private GameObject shownHighlightObject = null;
+        
+        /// <inheritdoc />
+        public bool IsEmpty => SnappedObject == null;
 
+        /// <inheritdoc />
+        public ISnappableProperty SnappedObject => selectTarget == null ? null : selectTarget.GetComponent<ISnappableProperty>();
+
+        /// <inheritdoc />
+        public Transform Anchor => attachTransform;
+        
         /// <summary>
         /// The 'GameObject' whose mesh is drawn to emphasize the position of the snap zone.
         /// If none is supplied, no highlight object is shown.
         /// </summary>
         public GameObject ShownHighlightObject
         {
-            get { return shownHighlightObject; }
+            get => shownHighlightObject;
             set
             {
                 shownHighlightObject = value;
@@ -150,17 +161,14 @@ namespace Innoactive.Creator.XRInteraction
                 return previewMesh;
             }
             
-            set
-            {
-                previewMesh = value;
-            }
+            set => previewMesh = value;
         }
 
         private Transform initialParent;
         private Material activeMaterial;
         private Vector3 tmpCenterOfMass;
         private List<Validator> validators = new List<Validator>();
-        private List<XRBaseInteractable> snapZoneHoverTargets = new List<XRBaseInteractable>();
+        private readonly List<XRBaseInteractable> snapZoneHoverTargets = new List<XRBaseInteractable>();
         
         protected override void Awake()
         {
@@ -190,7 +198,10 @@ namespace Innoactive.Creator.XRInteraction
         {  
             if (interactable != null)
             {
-                snapZoneHoverTargets.Add(interactable);
+                if (snapZoneHoverTargets.Contains(interactable) == false)
+                {
+                    snapZoneHoverTargets.Add(interactable);
+                }
             }
         }
 
@@ -205,16 +216,8 @@ namespace Innoactive.Creator.XRInteraction
             
             snapZoneHoverTargets.Clear();
             
-#if XRIT_1_0_OR_NEWER
             selectEntered.AddListener(OnAttach);
             selectExited.AddListener(OnDetach);
-#elif XRIT_0_10_OR_NEWER
-            onSelectEntered.AddListener(OnAttach);
-            onSelectExited.AddListener(OnDetach);
-#else
-            onSelectEnter.AddListener(OnAttach);
-            onSelectExit.AddListener(OnDetach);
-#endif
         }
 
         protected override void OnDisable()
@@ -224,27 +227,14 @@ namespace Innoactive.Creator.XRInteraction
             AttachParent();
             snapZoneHoverTargets.Clear();
 
-#if XRIT_1_0_OR_NEWER
             selectEntered.RemoveListener(OnAttach);
             selectExited.RemoveListener(OnDetach);
-#elif XRIT_0_10_OR_NEWER
-            onSelectEntered.RemoveListener(OnAttach);
-            onSelectExited.RemoveListener(OnDetach);
-#else
-            onSelectEnter.RemoveListener(OnAttach);
-            onSelectExit.RemoveListener(OnDetach);
-#endif
         }
-
-
-#if XRIT_1_0_OR_NEWER
+        
         private void OnAttach(SelectEnterEventArgs arguments)
         {
             XRBaseInteractable interactable = arguments.interactable;
-#else
-        private void OnAttach(XRBaseInteractable interactable)
-        {
-#endif
+            
             if (interactable != null)
             {
                 Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
@@ -253,14 +243,10 @@ namespace Innoactive.Creator.XRInteraction
             }
         }
         
-#if XRIT_1_0_OR_NEWER
         private void OnDetach(SelectExitEventArgs arguments)
         {
             XRBaseInteractable interactable = arguments.interactable;
-#else
-        private void OnDetach(XRBaseInteractable interactable)
-        {
-#endif
+            
             if (interactable != null)
             {
                 Rigidbody rigid = interactable.gameObject.GetComponent<Rigidbody>();
@@ -336,7 +322,7 @@ namespace Innoactive.Creator.XRInteraction
         }
 
         /// <summary>
-        /// Updates the <see cref="HighlightMeshFilterCache"/> property using the current <see cref="ShownHighlightObject"/>.
+        /// Updates the <see cref="previewMesh"/> property using the current <see cref="ShownHighlightObject"/>.
         /// </summary>
         protected virtual void UpdateHighlightMeshFilterCache()
         {
@@ -357,10 +343,12 @@ namespace Innoactive.Creator.XRInteraction
                 
                 for (int i = 0; i < skinnedMeshRenderer.sharedMesh.subMeshCount; i++)
                 {
-                    CombineInstance combineInstance = new CombineInstance();
-                    combineInstance.mesh = skinnedMeshRenderer.sharedMesh;
-                    combineInstance.subMeshIndex = i;
-                    combineInstance.transform = skinnedMeshRenderer.transform.localToWorldMatrix;
+                    CombineInstance combineInstance = new CombineInstance
+                    {
+                        mesh = skinnedMeshRenderer.sharedMesh,
+                        subMeshIndex = i,
+                        transform = skinnedMeshRenderer.transform.localToWorldMatrix
+                    };
 
                     meshes.Add(combineInstance);
                 }
@@ -427,11 +415,7 @@ namespace Innoactive.Creator.XRInteraction
             
             foreach (XRBaseInteractable target in snapZoneHoverTargets)
             {
-#if XRIT_0_10_OR_NEWER
                 if (hoverTargets.Contains(target) || target.isSelected)
-#else
-                if (m_HoverTargets.Contains(target) || target.isSelected)
-#endif
                 {
                     continue;
                 }
@@ -454,6 +438,10 @@ namespace Innoactive.Creator.XRInteraction
             {
                 activeMaterial = snapZoneHoverTargets.Any(CanSelect) ? ValidationMaterial : InvalidMaterial;
             }
+            else
+            {
+                activeMaterial = null;
+            }
         }
 
         /// <summary>
@@ -461,7 +449,7 @@ namespace Innoactive.Creator.XRInteraction
         /// </summary>
         protected virtual void DrawHighlightMesh()
         {
-            if (PreviewMesh != null)
+            if (PreviewMesh != null && activeMaterial != null)
             {
                 Graphics.DrawMesh(PreviewMesh, attachTransform.localToWorldMatrix, activeMaterial, gameObject.layer, null);
             }
@@ -488,29 +476,7 @@ namespace Innoactive.Creator.XRInteraction
 
             if (interactable.IsSelectableBy(this))
             {
-#if XRIT_1_0_OR_NEWER
-                OnSelectEntering(new SelectEnterEventArgs
-                {
-                    interactable = interactable,
-                    interactor = this
-                });
-                
-                OnSelectEntered(new SelectEnterEventArgs
-                {
-                    interactable = interactable,
-                    interactor = this
-                });
-#elif XRIT_0_10_OR_NEWER
-                OnSelectEntering(interactable);
-#else
-                OnSelectEnter(interactable);
-#endif
-                
-                if (interactable is InteractableObject interactableObject)
-                {
-                    interactableObject.ForceSelectEnter(this);
-                }
-                
+                interactionManager.ForceSelect(this, interactable);
                 interactable.transform.SetPositionAndRotation(attachTransform.position, attachTransform.rotation);
                 ForceSelectTarget = interactable;
             }
@@ -561,6 +527,44 @@ namespace Innoactive.Creator.XRInteraction
                 }
             }
 
+            return true;
+        }
+
+        /// <inheritdoc />
+        public bool CanSnap(ISnappableProperty target)
+        {
+            XRBaseInteractable interactableObject = target.SceneObject.GameObject.GetComponent<XRBaseInteractable>();
+
+            if (interactableObject == null)
+            {
+                return false;
+            }
+
+            return CanSelect(interactableObject);
+        }
+
+        /// <inheritdoc />
+        public bool ForceSnap(ISnappableProperty target)
+        {
+            XRBaseInteractable interactableObject = target.SceneObject.GameObject.GetComponent<XRBaseInteractable>();
+
+            if (interactableObject == null)
+            {
+                return false;
+            }
+            
+            ForceSelect(interactableObject);
+            return true;
+        }
+
+        /// <inheritdoc />
+        public bool ForceRelease()
+        {
+            if (IsEmpty)
+            {
+                return false;
+            }
+            ForceUnselect();
             return true;
         }
     }

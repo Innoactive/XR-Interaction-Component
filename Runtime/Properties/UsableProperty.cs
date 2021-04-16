@@ -18,13 +18,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// <summary>
         /// Returns true if the GameObject is being used.
         /// </summary>
-        public virtual bool IsBeingUsed
-        {
-            get
-            {
-                return Interactable != null && Interactable.IsActivated;
-            }
-        }
+        public virtual bool IsBeingUsed => Interactable != null && Interactable.IsActivated;
 
         /// <summary>
         /// Reference to attached <see cref="InteractableObject"/>.
@@ -48,13 +42,9 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnEnable();
             
-#if XRIT_1_0_OR_NEWER
             Interactable.activated.AddListener(HandleXRUsageStarted);
             Interactable.deactivated.AddListener(HandleXRUsageStopped);
-#else
-            Interactable.onActivate.AddListener(HandleXRUsageStarted);
-            Interactable.onDeactivate.AddListener(HandleXRUsageStopped);
-#endif
+            
             InternalSetLocked(IsLocked);
         }
 
@@ -62,13 +52,8 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             base.OnDisable();
 
-#if XRIT_1_0_OR_NEWER
             Interactable.activated.RemoveListener(HandleXRUsageStarted);
             Interactable.deactivated.RemoveListener(HandleXRUsageStopped);
-#else
-            Interactable.onActivate.RemoveListener(HandleXRUsageStarted);
-            Interactable.onDeactivate.RemoveListener(HandleXRUsageStopped);
-#endif
         }
 
         protected void Reset()
@@ -77,20 +62,12 @@ namespace Innoactive.Creator.XRInteraction.Properties
             gameObject.GetComponent<Rigidbody>().isKinematic = false;
         }
 
-#if XRIT_1_0_OR_NEWER
         private void HandleXRUsageStarted(ActivateEventArgs arguments)
-#else
-        private void HandleXRUsageStarted(XRBaseInteractor interactor)
-#endif
         {
             EmitUsageStarted();
         }
 
-#if XRIT_1_0_OR_NEWER
         private void HandleXRUsageStopped(DeactivateEventArgs arguments)
-#else
-        private void HandleXRUsageStopped(XRBaseInteractor interactor)
-#endif
         {
             EmitUsageStopped();
         }

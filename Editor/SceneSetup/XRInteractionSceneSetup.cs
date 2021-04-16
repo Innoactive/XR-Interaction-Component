@@ -20,14 +20,12 @@ namespace Innoactive.CreatorEditor.XRInteraction
         {
             DeleteStaticObject("[XR_Setup]");
             
-#if XRIT_1_0_OR_NEWER
             XRSimulatorImporter simulatorImporter = new XRSimulatorImporter();
 
             if (string.IsNullOrEmpty(simulatorImporter.SimulatorRigPath) || AssetDatabase.GetMainAssetTypeAtPath(simulatorImporter.SimulatorRigPath) == null)
             {
                 simulatorImporter.ImportSimulatorRig();
             }
-#endif
         }
 
         private void DeleteStaticObject(string objectName)
