@@ -16,7 +16,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// Returns null, otherwise.
         /// </summary>
         public Color? CurrentHighlightColor { get; protected set; }
-            
+
         [Obsolete("Use 'DefaultHighlighter' instead.")]
         protected InteractableHighlighter Highlighter
         {
@@ -72,7 +72,14 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             CurrentHighlightColor = highlightColor;
             IsHighlighted = true;
-            DefaultHighlighter.StartHighlighting(highlightColor, SceneObject.UniqueName);
+            if (HighlightMaterial != null)
+            {
+                DefaultHighlighter.StartHighlighting(new Material(HighlightMaterial) {color = highlightColor});
+            }
+            else
+            {
+                DefaultHighlighter.StartHighlighting(highlightColor, SceneObject.UniqueName); 
+            }
             EmitHighlightEvent();
         }
 
