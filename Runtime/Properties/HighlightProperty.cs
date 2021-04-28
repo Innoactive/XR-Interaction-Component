@@ -72,14 +72,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         {
             CurrentHighlightColor = highlightColor;
             IsHighlighted = true;
-            if (HighlightMaterial != null)
-            {
-                DefaultHighlighter.StartHighlighting(new Material(HighlightMaterial) {color = highlightColor});
-            }
-            else
-            {
-                DefaultHighlighter.StartHighlighting(highlightColor, SceneObject.UniqueName); 
-            }
+            DefaultHighlighter.StartHighlighting(highlightColor, SceneObject.UniqueName); 
             EmitHighlightEvent();
         }
 
