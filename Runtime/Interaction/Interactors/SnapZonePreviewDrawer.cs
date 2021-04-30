@@ -19,7 +19,7 @@ namespace Innoactive.Creator.XRInteraction
         private MeshFilter filter;
         private MeshRenderer meshRenderer;
         
-        private void Start()
+        private void OnEnable()
         {
             if (Application.isPlaying)
             {
