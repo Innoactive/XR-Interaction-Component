@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using Innoactive.Creator.BasicInteraction;
 using UnityEngine;
 
 namespace Innoactive.Creator.XRInteraction
@@ -8,7 +7,7 @@ namespace Innoactive.Creator.XRInteraction
     /// Draws a preview of SnapZone highlight.
     /// </summary>
     [ExecuteInEditMode]
-    public class SnapZonePreviewDrawer : MonoBehaviour
+    public class SnapZonePreviewDrawer : MonoBehaviour, IExcludeFromHighlightMesh
     {
         /// <summary>
         /// The parent SnapZone.
@@ -20,7 +19,7 @@ namespace Innoactive.Creator.XRInteraction
         private MeshFilter filter;
         private MeshRenderer meshRenderer;
         
-        private void Start()
+        private void OnEnable()
         {
             if (Application.isPlaying)
             {

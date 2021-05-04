@@ -16,7 +16,7 @@ namespace Innoactive.Creator.XRInteraction.Properties
         /// Returns null, otherwise.
         /// </summary>
         public Color? CurrentHighlightColor { get; protected set; }
-            
+
         [Obsolete("Use 'DefaultHighlighter' instead.")]
         protected InteractableHighlighter Highlighter
         {
