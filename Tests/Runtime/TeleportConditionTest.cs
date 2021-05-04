@@ -1,25 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Innoactive.Creator.BasicInteraction.Conditions;
-using Innoactive.Creator.Core;
-using Innoactive.Creator.Core.Properties;
-using Innoactive.Creator.Tests.Utils;
+﻿using System;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using System.Collections;
+using System.Reflection;
+using Innoactive.Creator.Core;
+using Innoactive.Creator.Tests.Utils;
+using Innoactive.Creator.BasicInteraction.Conditions;
+using Innoactive.Creator.Core.Properties;
 
 namespace Innoactive.Creator.XRInteraction.Tests.Conditions
 {
     public class TeleportConditionTest : RuntimeTests
     {
-        public class TeleportationPropertyMock : TeleportationProperty
-        {
-            public new void EmitTeleported()
-            {
-                base.EmitTeleported();
-            }
-        }
-        
         [SetUp]
         public override void SetUp()
         {
@@ -167,6 +160,16 @@ namespace Innoactive.Creator.XRInteraction.Tests.Conditions
             // Then nothing happens.
             Assert.AreEqual(Stage.Active, condition.LifeCycle.Stage);
             Assert.IsFalse(condition.IsCompleted);
+        }
+    }
+    
+    public class TeleportationPropertyMock : TeleportationProperty
+    {
+        public void EmitTeleported()
+        {
+            Type type = typeof(TeleportationProperty);
+            FieldInfo fieldInfo = type.GetField("wasUsedToTeleport", BindingFlags.Instance | BindingFlags.NonPublic);
+            fieldInfo?.SetValue(this, true);
         }
     }
 }
