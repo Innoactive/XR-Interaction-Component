@@ -1,6 +1,6 @@
 # XR Interaction Component
 
-This component implements interactions in VR using the Unity XR Interaction framework.
+This [Innoactive Creator](https://github.com/Innoactive/Creator) components implements interactions in VR using the Unity XR Interaction framework.
 
 For more information visit: [Creator Core](https://github.com/Innoactive/Creator)
 
