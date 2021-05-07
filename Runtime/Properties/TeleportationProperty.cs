@@ -33,15 +33,29 @@ namespace Innoactive.Creator.Core.Properties
         protected override void OnEnable()
         {
             base.OnEnable();
-            
-            teleportationInteractable.teleportationProvider.endLocomotion += EmitTeleported;
+
+            if (teleportationInteractable.teleportationProvider != null)
+            {
+                teleportationInteractable.teleportationProvider.endLocomotion += EmitTeleported;
+            }
+            else
+            {
+                Debug.LogWarning($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
+            }
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            
-            teleportationInteractable.teleportationProvider.endLocomotion -= EmitTeleported;
+
+            if (teleportationInteractable.teleportationProvider != null)
+            {
+                teleportationInteractable.teleportationProvider.endLocomotion -= EmitTeleported;
+            }
+            else
+            {
+                Debug.LogWarning($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
+            }
         }
 
         /// <inheritdoc />
@@ -61,7 +75,14 @@ namespace Innoactive.Creator.Core.Properties
                 destinationRotation = teleportationInteractable.teleportAnchorTransform.rotation
             };
 
-            teleportationInteractable.teleportationProvider.QueueTeleportRequest(teleportRequest);
+            if (teleportationInteractable.teleportationProvider != null)
+            {
+                teleportationInteractable.teleportationProvider.QueueTeleportRequest(teleportRequest);
+            }
+            else
+            {
+                Debug.LogError($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
+            }
         }
 
         /// <inheritdoc />
