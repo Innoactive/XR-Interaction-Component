@@ -34,35 +34,30 @@ namespace Innoactive.Creator.Core.Properties
         {
             base.OnEnable();
 
-            switch (teleportationInteractable.teleportTrigger)
+            if (teleportationInteractable.teleportationProvider != null)
             {
-                case BaseTeleportationInteractable.TeleportTrigger.OnActivated:
-                    teleportationInteractable.activated.AddListener(args =>
-                    {
-                        EmitTeleported();
-                    });
-                    break;
-                case BaseTeleportationInteractable.TeleportTrigger.OnDeactivated:
-                    teleportationInteractable.deactivated.AddListener(args =>
-                    {
-                        EmitTeleported();
-                    });
-                    break;
-                case BaseTeleportationInteractable.TeleportTrigger.OnSelectEntered:
-                    teleportationInteractable.selectEntered.AddListener(args =>
-                    {
-                        EmitTeleported();
-                    });
-                    break;
-                case BaseTeleportationInteractable.TeleportTrigger.OnSelectExited:
-                    teleportationInteractable.selectExited.AddListener(args =>
-                    {
-                        EmitTeleported();
-                    });
-                    break;
+                teleportationInteractable.teleportationProvider.endLocomotion += EmitTeleported;
+            }
+            else
+            {
+                Debug.LogWarning($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
             }
         }
-        
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            if (teleportationInteractable.teleportationProvider != null)
+            {
+                teleportationInteractable.teleportationProvider.endLocomotion -= EmitTeleported;
+            }
+            else
+            {
+                Debug.LogWarning($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
+            }
+        }
+
         /// <inheritdoc />
         public void Initialize()
         {
@@ -80,7 +75,14 @@ namespace Innoactive.Creator.Core.Properties
                 destinationRotation = teleportationInteractable.teleportAnchorTransform.rotation
             };
 
-            teleportationInteractable.teleportationProvider.QueueTeleportRequest(teleportRequest);
+            if (teleportationInteractable.teleportationProvider != null)
+            {
+                teleportationInteractable.teleportationProvider.QueueTeleportRequest(teleportRequest);
+            }
+            else
+            {
+                Debug.LogError($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
+            }
         }
 
         /// <inheritdoc />
@@ -102,10 +104,21 @@ namespace Innoactive.Creator.Core.Properties
             }
         }
         
-        protected void EmitTeleported()
+        protected void EmitTeleported(LocomotionSystem locomotionSystem)
         {
-            wasUsedToTeleport = true;
-            Teleported?.Invoke(this, EventArgs.Empty);
+            if (wasUsedToTeleport == false)
+            {
+                Vector3 rigPosition = locomotionSystem.xrRig.rig.transform.position;
+                Vector3 anchorPosition = teleportationInteractable.teleportAnchorTransform.position;
+                Vector2 flatRigPosition = new Vector2(rigPosition.x, rigPosition.z);
+                Vector2 flatAnchorPosition = new Vector2(anchorPosition.x, anchorPosition.z);
+
+                if (Vector3.Distance(flatRigPosition, flatAnchorPosition) < 0.1)
+                {
+                    wasUsedToTeleport = true;
+                    Teleported?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
     }
 }
