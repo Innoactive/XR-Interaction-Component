@@ -1,7 +1,7 @@
-﻿using Innoactive.Creator.BasicInteraction;
+﻿using VPG.Creator.BasicInteraction;
 using UnityEngine;
 
-namespace Innoactive.Creator.XRInteraction
+namespace VPG.Creator.XRInteraction
 {
     /// <summary>
     /// Locomotion handler for Unity XR.

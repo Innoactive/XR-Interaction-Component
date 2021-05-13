@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine;
-using Innoactive.CreatorEditor.BasicInteraction;
-using Innoactive.CreatorEditor.PackageManager.XRInteraction;
+using VPG.CreatorEditor.BasicInteraction;
+using VPG.CreatorEditor.PackageManager.XRInteraction;
 
-namespace Innoactive.CreatorEditor.XRInteraction
+namespace VPG.CreatorEditor.XRInteraction
 {
     /// <summary>
     /// Scene setup for XR-Interaction.

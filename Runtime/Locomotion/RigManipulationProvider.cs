@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XRInteraction
+namespace VPG.Creator.XRInteraction
 {
     /// <summary>
     /// Locomotion provider to directly manipulate the XRRig's position and rotation.

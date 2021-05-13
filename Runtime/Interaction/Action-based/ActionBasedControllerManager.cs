@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XRInteraction
+namespace VPG.Creator.XRInteraction
 {
     /// <summary>
     /// Use this class to map input actions to each controller state (mode)

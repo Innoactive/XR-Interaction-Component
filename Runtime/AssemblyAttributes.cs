@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Innoactive.CreatorEditor.XRInteraction")]
+[assembly: InternalsVisibleTo("VPG.CreatorEditor.XRInteraction")]

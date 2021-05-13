@@ -1,17 +1,17 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Innoactive.Creator.XRInteraction;
-using Innoactive.Creator.Core.SceneObjects;
-using Innoactive.Creator.XRInteraction.Properties;
-using Innoactive.Creator.BasicInteraction.Validation;
+using VPG.Creator.XRInteraction;
+using VPG.Creator.Core.SceneObjects;
+using VPG.Creator.XRInteraction.Properties;
+using VPG.Creator.BasicInteraction.Validation;
 using UnityEditor;
 using UnityEngine;
 
-namespace Innoactive.CreatorEditor.XRInteraction
+namespace VPG.CreatorEditor.XRInteraction
 {
     /// <summary>
-    /// Custom inspector for <see cref="SnappableProperty"/>, adding a button to create <see cref="Innoactive.Creator.XRInteraction.SnapZone"/>s automatically.
+    /// Custom inspector for <see cref="SnappableProperty"/>, adding a button to create <see cref="VPG.Creator.XRInteraction.SnapZone"/>s automatically.
     /// </summary>
     [CustomEditor(typeof(SnappableProperty)), CanEditMultipleObjects]
     internal class SnappablePropertyEditor : Editor

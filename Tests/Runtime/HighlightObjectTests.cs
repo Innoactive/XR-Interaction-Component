@@ -5,20 +5,20 @@ using UnityEngine;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using Innoactive.Creator.BasicInteraction;
-using Innoactive.Creator.Core;
-using Innoactive.Creator.Core.Behaviors;
-using Innoactive.Creator.Core.Configuration;
-using Innoactive.Creator.Core.Configuration.Modes;
-using Innoactive.Creator.Core.SceneObjects;
-using Innoactive.Creator.Core.Utils;
-using Innoactive.Creator.Tests.Utils;
-using Innoactive.Creator.XRInteraction;
-using Innoactive.Creator.XRInteraction.Properties;
-using Innoactive.Creator.XRInteraction.Tests;
+using VPG.Creator.BasicInteraction;
+using VPG.Creator.Core;
+using VPG.Creator.Core.Behaviors;
+using VPG.Creator.Core.Configuration;
+using VPG.Creator.Core.Configuration.Modes;
+using VPG.Creator.Core.SceneObjects;
+using VPG.Creator.Core.Utils;
+using VPG.Creator.Tests.Utils;
+using VPG.Creator.XRInteraction;
+using VPG.Creator.XRInteraction.Properties;
+using VPG.Creator.XRInteraction.Tests;
 using Object = UnityEngine.Object;
 
-namespace Innoactive.Creator.XRInteraction.Tests.Behaviors
+namespace VPG.Creator.XRInteraction.Tests.Behaviors
 {
     public class HighlightObjectTests : RuntimeTests
     {

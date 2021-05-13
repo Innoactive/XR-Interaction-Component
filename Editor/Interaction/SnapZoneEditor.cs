@@ -1,8 +1,8 @@
-﻿using Innoactive.Creator.XRInteraction;
+﻿using VPG.Creator.XRInteraction;
 using UnityEditor;
 using UnityEngine;
 
-namespace Innoactive.CreatorEditor.XRInteraction
+namespace VPG.CreatorEditor.XRInteraction
 {
     /// <summary>
     /// Drawer class for <see cref="SnapZone"/>.

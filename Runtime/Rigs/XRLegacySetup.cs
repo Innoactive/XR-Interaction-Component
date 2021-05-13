@@ -1,4 +1,4 @@
-﻿namespace Innoactive.Creator.Components.Runtime.Rigs
+﻿namespace VPG.Creator.Components.Runtime.Rigs
 {
     /// <summary>
     /// Setup for XR with the old input system.

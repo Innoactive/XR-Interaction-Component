@@ -1,5 +1,5 @@
 {
-    "name": "Innoactive.CreatorEditor.XRInteraction",
+    "name": "VPG.CreatorEditor.XRInteraction",
     "references": [
         "GUID:c8561f9de838ac04d8feeda695bc572d",
         "GUID:e476a81b6ef7b824686666349a591a9a",

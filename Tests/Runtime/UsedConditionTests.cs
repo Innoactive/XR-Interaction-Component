@@ -2,12 +2,12 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Innoactive.Creator.Core;
-using Innoactive.Creator.Tests.Utils;
-using Innoactive.Creator.XRInteraction.Properties;
-using Innoactive.Creator.BasicInteraction.Conditions;
+using VPG.Creator.Core;
+using VPG.Creator.Tests.Utils;
+using VPG.Creator.XRInteraction.Properties;
+using VPG.Creator.BasicInteraction.Conditions;
 
-namespace Innoactive.Creator.XRInteraction.Tests.Conditions
+namespace VPG.Creator.XRInteraction.Tests.Conditions
 {
     public class UsedConditionTests : RuntimeTests
     {

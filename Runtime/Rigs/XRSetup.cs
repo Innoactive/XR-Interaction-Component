@@ -1,6 +1,6 @@
-﻿using Innoactive.Creator.BasicInteraction.RigSetup;
+﻿using VPG.Creator.BasicInteraction.RigSetup;
 
-namespace Innoactive.Creator.Components.Runtime.Rigs
+namespace VPG.Creator.Components.Runtime.Rigs
 {
     /// <summary>
     /// Setup for the standard XR rig.

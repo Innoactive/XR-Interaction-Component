@@ -1,14 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Innoactive.Creator.BasicInteraction.Conditions;
-using Innoactive.Creator.Core;
-using Innoactive.Creator.Core.Properties;
-using Innoactive.Creator.Tests.Utils;
+using VPG.Creator.BasicInteraction.Conditions;
+using VPG.Creator.Core;
+using VPG.Creator.Core.Properties;
+using VPG.Creator.Tests.Utils;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Innoactive.Creator.XRInteraction.Tests.Conditions
+namespace VPG.Creator.XRInteraction.Tests.Conditions
 {
     public class TeleportConditionTest : RuntimeTests
     {

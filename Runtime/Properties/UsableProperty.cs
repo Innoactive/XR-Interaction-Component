@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using Innoactive.Creator.Core.Properties;
-using Innoactive.Creator.BasicInteraction.Properties;
+using VPG.Creator.Core.Properties;
+using VPG.Creator.BasicInteraction.Properties;
 
-namespace Innoactive.Creator.XRInteraction.Properties
+namespace VPG.Creator.XRInteraction.Properties
 {
     /// <summary>
     /// XR implementation of <see cref="IUsableProperty"/>.

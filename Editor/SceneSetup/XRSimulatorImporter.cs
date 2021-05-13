@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
+namespace VPG.CreatorEditor.PackageManager.XRInteraction
 {
     /// <summary>
     /// Helper class to generate a new XR Simulator Rig out of the `[XR_Setup_Action_Based]` and the `XR Device Simulator` sample.
@@ -29,7 +29,7 @@ namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
         public void ImportSimulatorRig()
         {
             GameObject simulator = LoadPrefab(SamplePrefabName, "Samples", out string simulatorRigPath);
-            GameObject actionRig = LoadPrefab(ActionRigName, "Innoactive", out string actionRigPath);
+            GameObject actionRig = LoadPrefab(ActionRigName, "VPG", out string actionRigPath);
 
             if (simulator == null || actionRig == null)
             {

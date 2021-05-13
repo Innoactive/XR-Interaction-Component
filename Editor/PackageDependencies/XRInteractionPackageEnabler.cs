@@ -1,4 +1,4 @@
-﻿namespace Innoactive.CreatorEditor.PackageManager.XRInteraction
+﻿namespace VPG.CreatorEditor.PackageManager.XRInteraction
 {
     /// <summary>
     /// Adds Unity's XR-Interaction-Toolkit package as a dependency and sets specified symbol for script compilation.

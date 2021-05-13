@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using Innoactive.Creator.XRInteraction;
+using VPG.Creator.XRInteraction;
 
-namespace Innoactive.CreatorEditor.XRInteraction
+namespace VPG.CreatorEditor.XRInteraction
 {
     /// <summary>
     /// Drawer class for <see cref="InteractableHighlighter"/>.

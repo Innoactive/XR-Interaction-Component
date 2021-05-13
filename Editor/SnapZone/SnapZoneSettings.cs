@@ -3,22 +3,22 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Innoactive.Creator.XRInteraction;
-using Innoactive.Creator.Core.Runtime.Utils;
+using VPG.Creator.XRInteraction;
+using VPG.Creator.Core.Runtime.Utils;
 
-namespace Innoactive.CreatorEditor.XRInteraction
+namespace VPG.CreatorEditor.XRInteraction
 {
     /// <summary>
     /// Settings for <see cref="SnapZone"/>s for e.g. automatic creation of such snap zones.
     /// </summary>
-    [CreateAssetMenu(fileName = "SnapZoneSettings", menuName = "Innoactive/SnapZoneSettings", order = 1)]
+    [CreateAssetMenu(fileName = "SnapZoneSettings", menuName = "VPG/SnapZoneSettings", order = 1)]
     public class SnapZoneSettings : SettingsObject<SnapZoneSettings>
     {
         private const string MaterialsPath = "Assets/Resources/SnapZones";
         private static SnapZoneSettings settings;
 
         /// <summary>
-        /// Only Interactables with this LayerMask will interact with this <see cref="Innoactive.Creator.XRInteraction.SnapZone"/>.
+        /// Only Interactables with this LayerMask will interact with this <see cref="VPG.Creator.XRInteraction.SnapZone"/>.
         /// </summary>
         [Tooltip("Only Interactables with this LayerMask will interact with this SnapZone.")]
         public LayerMask InteractionLayerMask = 1;

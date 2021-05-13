@@ -2,7 +2,7 @@
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace Innoactive.Creator.XRInteraction.Tests
+namespace VPG.Creator.XRInteraction.Tests
 {
     /// <summary>
     /// Utility class for generatating mock interaction actors.
