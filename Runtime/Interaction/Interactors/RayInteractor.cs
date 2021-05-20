@@ -1,6 +1,6 @@
 ﻿using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.Creator.XRInteraction
+namespace VPG.XRInteraction
 {
     /// <summary>
     /// Interactor used for interacting with interactables at a distance. This is handled via raycasts

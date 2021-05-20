@@ -1,20 +1,20 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using VPG.Creator.XRInteraction;
-using VPG.Creator.Core.SceneObjects;
-using VPG.Creator.XRInteraction.Properties;
-using VPG.Creator.BasicInteraction.Validation;
+using VPG.XRInteraction;
+using VPG.Core.SceneObjects;
+using VPG.XRInteraction.Properties;
+using VPG.BasicInteraction.Validation;
 using UnityEditor;
 using UnityEngine;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
-    /// Custom inspector for <see cref="SnappableProperty"/>, adding a button to create <see cref="VPG.Creator.XRInteraction.SnapZone"/>s automatically.
+    /// Custom inspector for <see cref="SnappableProperty"/>, adding a button to create <see cref="VPG.XRInteraction.SnapZone"/>s automatically.
     /// </summary>
     [CustomEditor(typeof(SnappableProperty)), CanEditMultipleObjects]
-    internal class SnappablePropertyEditor : Editor
+    internal class SnappablePropertyEditor : UnityEditor.Editor
     {
         private const string PrefabPath = "Assets/Resources/SnapZones/Prefabs";
 

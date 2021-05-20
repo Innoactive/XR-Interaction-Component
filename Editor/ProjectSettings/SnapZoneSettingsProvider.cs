@@ -1,6 +1,6 @@
-﻿using VPG.Creator.XRInteraction;
-using VPG.CreatorEditor.UI;
-using VPG.CreatorEditor.XRInteraction;
+﻿using VPG.XRInteraction;
+using VPG.Editor.UI;
+using VPG.Editor.XRInteraction;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;

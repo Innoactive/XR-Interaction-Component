@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using VPG.Creator.BasicInteraction.Conditions;
-using VPG.Creator.Core;
-using VPG.Creator.Core.Configuration;
-using VPG.Creator.Core.Configuration.Modes;
-using VPG.Creator.Tests.Utils;
-using VPG.Creator.XRInteraction.Properties;
-using VPG.CreatorEditor.XRInteraction;
+using VPG.BasicInteraction.Conditions;
+using VPG.Core;
+using VPG.Core.Configuration;
+using VPG.Core.Configuration.Modes;
+using VPG.Tests.Utils;
+using VPG.XRInteraction.Properties;
+using VPG.Editor.XRInteraction;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.Creator.XRInteraction.Tests
+namespace VPG.XRInteraction.Tests
 {
     public class SnapZoneTests : RuntimeTests
     {

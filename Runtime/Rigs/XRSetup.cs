@@ -1,6 +1,6 @@
-﻿using VPG.Creator.BasicInteraction.RigSetup;
+﻿using VPG.BasicInteraction.RigSetup;
 
-namespace VPG.Creator.Components.Runtime.Rigs
+namespace VPG.Components.Runtime.Rigs
 {
     /// <summary>
     /// Setup for the standard XR rig.

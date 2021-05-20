@@ -1,4 +1,4 @@
-﻿namespace VPG.Creator.Components.Runtime.Rigs
+﻿namespace VPG.Components.Runtime.Rigs
 {
     /// <summary>
     /// Setup for XR with the old input system.

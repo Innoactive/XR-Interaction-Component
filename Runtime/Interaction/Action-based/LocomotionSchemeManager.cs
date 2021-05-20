@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.Creator.XRInteraction
+namespace VPG.XRInteraction
 {
     /// <summary>
     /// Use this class as a central manager to configure locomotion control schemes and configuration preferences.

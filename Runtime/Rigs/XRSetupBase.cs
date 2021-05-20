@@ -1,8 +1,8 @@
-﻿using VPG.Creator.BasicInteraction.RigSetup;
+﻿using VPG.BasicInteraction.RigSetup;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.Creator.Components.Runtime.Rigs
+namespace VPG.Components.Runtime.Rigs
 {
     public abstract class XRSetupBase : InteractionRigProvider
     {

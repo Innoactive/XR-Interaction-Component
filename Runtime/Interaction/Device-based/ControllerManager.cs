@@ -5,7 +5,7 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using Button = InputHelpers.Button;
 
-namespace VPG.Creator.XRInteraction
+namespace VPG.XRInteraction
 {
     /// <summary>
     /// Handles controller states interactions.

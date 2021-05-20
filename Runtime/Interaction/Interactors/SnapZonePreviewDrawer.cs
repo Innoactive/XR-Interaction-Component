@@ -1,7 +1,7 @@
-﻿using VPG.Creator.BasicInteraction;
+﻿using VPG.BasicInteraction;
 using UnityEngine;
 
-namespace VPG.Creator.XRInteraction
+namespace VPG.XRInteraction
 {
     /// <summary>
     /// Draws a preview of SnapZone highlight.

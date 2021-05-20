@@ -1,15 +1,15 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using VPG.Creator.XRInteraction;
+using VPG.XRInteraction;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
     /// Drawer class for <see cref="DirectInteractor"/>.
     /// </summary>
     [CustomEditor(typeof(DirectInteractor)), CanEditMultipleObjects]
-    internal class DirectInteractorEditor : Editor
+    internal class DirectInteractorEditor : UnityEditor.Editor
     {
         private SerializedProperty interactionManager;
         private SerializedProperty interactionLayerMask;

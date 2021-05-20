@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using VPG.Creator.BasicInteraction;
-using VPG.Creator.BasicInteraction.Properties;
-using VPG.Creator.BasicInteraction.Validation;
+using VPG.BasicInteraction;
+using VPG.BasicInteraction.Properties;
+using VPG.BasicInteraction.Validation;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.Creator.XRInteraction
+namespace VPG.XRInteraction
 {
     /// <summary>
     /// Interactor used for holding interactables via a socket.  This component is not designed to be attached to a controller

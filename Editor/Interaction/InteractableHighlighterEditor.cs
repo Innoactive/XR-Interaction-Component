@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using VPG.Creator.XRInteraction;
+using VPG.XRInteraction;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
     /// Drawer class for <see cref="InteractableHighlighter"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableHighlighter)), CanEditMultipleObjects]
-    internal class InteractableHighlighterEditor : Editor
+    internal class InteractableHighlighterEditor : UnityEditor.Editor
     {
         /// <summary>
         /// Keeps references for different interaction highlight cases.

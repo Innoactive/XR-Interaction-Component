@@ -1,14 +1,14 @@
-﻿using VPG.Creator.XRInteraction;
+﻿using VPG.XRInteraction;
 using UnityEditor;
 using UnityEngine;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
     /// Drawer class for <see cref="SnapZone"/>.
     /// </summary>
     [CustomEditor(typeof(SnapZone)), CanEditMultipleObjects]
-    internal class SnapZoneEditor : Editor
+    internal class SnapZoneEditor : UnityEditor.Editor
     {
         private SerializedProperty socketActive;
         private SerializedProperty showHighlightInEditor;

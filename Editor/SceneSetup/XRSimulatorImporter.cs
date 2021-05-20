@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace VPG.CreatorEditor.PackageManager.XRInteraction
+namespace VPG.Editor.PackageManager.XRInteraction
 {
     /// <summary>
     /// Helper class to generate a new XR Simulator Rig out of the `[XR_Setup_Action_Based]` and the `XR Device Simulator` sample.

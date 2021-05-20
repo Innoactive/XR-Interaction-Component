@@ -2,13 +2,13 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
-using VPG.Creator.Core;
-using VPG.Creator.Tests.Utils;
-using VPG.Creator.Core.Configuration;
-using VPG.Creator.XRInteraction.Properties;
-using VPG.Creator.BasicInteraction.Conditions;
+using VPG.Core;
+using VPG.Tests.Utils;
+using VPG.Core.Configuration;
+using VPG.XRInteraction.Properties;
+using VPG.BasicInteraction.Conditions;
 
-namespace VPG.Creator.XRInteraction.Tests.Conditions
+namespace VPG.XRInteraction.Tests.Conditions
 {
     public class GrabbedConditionTests : RuntimeTests
     {

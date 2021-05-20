@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using VPG.Creator.BasicInteraction;
+using VPG.BasicInteraction;
 
-namespace VPG.Creator.XRInteraction
+namespace VPG.XRInteraction
 {
     /// <summary>
     /// Handles highlighting for attached <see cref="InteractableObject"/>.

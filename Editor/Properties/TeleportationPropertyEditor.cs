@@ -1,17 +1,17 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using VPG.Creator.Core.Properties;
+using VPG.Core.Properties;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
-    /// Custom inspector for <see cref="TeleportationProperty"/>, adding a button to automatically configure <see cref="VPG.Creator.XRInteraction.TeleportationAnchor"/>s.
+    /// Custom inspector for <see cref="TeleportationProperty"/>, adding a button to automatically configure <see cref="VPG.XRInteraction.TeleportationAnchor"/>s.
     /// </summary>
     [CustomEditor(typeof(TeleportationProperty)), CanEditMultipleObjects]
-    internal class TeleportationPropertyEditor : Editor
+    internal class TeleportationPropertyEditor : UnityEditor.Editor
     {
         private const string AnchorPrefabName = "Anchor";
         private const string ReticlePrefab = "TeleportReticle";

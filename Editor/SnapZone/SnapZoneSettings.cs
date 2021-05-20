@@ -3,10 +3,10 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using VPG.Creator.XRInteraction;
-using VPG.Creator.Core.Runtime.Utils;
+using VPG.XRInteraction;
+using VPG.Core.Runtime.Utils;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
     /// Settings for <see cref="SnapZone"/>s for e.g. automatic creation of such snap zones.
@@ -18,7 +18,7 @@ namespace VPG.CreatorEditor.XRInteraction
         private static SnapZoneSettings settings;
 
         /// <summary>
-        /// Only Interactables with this LayerMask will interact with this <see cref="VPG.Creator.XRInteraction.SnapZone"/>.
+        /// Only Interactables with this LayerMask will interact with this <see cref="VPG.XRInteraction.SnapZone"/>.
         /// </summary>
         [Tooltip("Only Interactables with this LayerMask will interact with this SnapZone.")]
         public LayerMask InteractionLayerMask = 1;

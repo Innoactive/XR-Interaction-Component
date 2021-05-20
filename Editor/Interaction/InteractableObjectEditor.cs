@@ -1,14 +1,14 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using VPG.Creator.XRInteraction;
+using VPG.XRInteraction;
 
-namespace VPG.CreatorEditor.XRInteraction
+namespace VPG.Editor.XRInteraction
 {
     /// <summary>
     /// Drawer class for <see cref="InteractableObject"/>.
     /// </summary>
     [CustomEditor(typeof(InteractableObject)), CanEditMultipleObjects]
-    internal class InteractableObjectEditor : Editor
+    internal class InteractableObjectEditor : UnityEditor.Editor
     {
         private SerializedProperty attachTransformProperty;
         private SerializedProperty attachEaseInTimeProperty;

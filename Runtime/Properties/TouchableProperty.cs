@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
-using VPG.Creator.Core.Properties;
-using VPG.Creator.BasicInteraction.Properties;
+using VPG.Core.Properties;
+using VPG.BasicInteraction.Properties;
 
-namespace VPG.Creator.XRInteraction.Properties
+namespace VPG.XRInteraction.Properties
 { 
     /// <summary>
     /// XR implementation of <see cref="ITouchableProperty"/>.
