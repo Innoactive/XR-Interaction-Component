@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 internal class SnapZoneSettingsProvider : SettingsProvider
 {
-    const string Path = "Project/Creator/Snap Zones";
+    const string Path = "Project/VR Process Gizmo/Snap Zones";
 
     private Editor editor;
     
