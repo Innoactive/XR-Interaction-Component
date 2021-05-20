@@ -6,10 +6,10 @@ Preset:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: XRI Creator Continuous Move
+  m_Name: XRI VPG Snap Turn
   m_TargetType:
     m_NativeTypeID: 114
-    m_ManagedTypePPtr: {fileID: 11500000, guid: 0bf296fc962d7184ab14ad1841598d5f,
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 2213c36610e3b1c4bbf886810ed9db12,
       type: 3}
     m_ManagedTypeFallback: 
   m_Properties:
@@ -30,96 +30,92 @@ Preset:
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_MoveSpeed
+    propertyPath: m_TurnAmount
+    value: 45
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DebounceTime
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EnableTurnLeftRight
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_EnableStrafe
+    propertyPath: m_EnableTurnAround
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_UseGravity
+    propertyPath: m_LeftHandSnapTurnAction.m_UseReference
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_GravityApplicationMode
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_Name
+    value: Left Hand Snap Turn
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_Type
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_ForwardSource
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_ExpectedControlType
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_UseReference
-    value: 1
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_Id
+    value: a1d07c24-ca50-422a-a23f-685d9fabf63b
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_Name
-    value: Left Hand Move
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_Processors
+    value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_Type
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_Interactions
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_LeftHandSnapTurnAction.m_Action.m_SingletonActionBindings.Array.size
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_ExpectedControlType
+    propertyPath: m_LeftHandSnapTurnAction.m_Reference
     value: 
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_Id
-    value: 75f1b245-c357-48c8-9acb-8967bec9dda2
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_Processors
-    value: 
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_Interactions
-    value: 
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Action.m_SingletonActionBindings.Array.size
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_LeftHandMoveAction.m_Reference
-    value: 
-    objectReference: {fileID: 6972639530819350904, guid: c348712bda248c246b8c49b3db54643f,
+    objectReference: {fileID: 1010738217276881514, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_UseReference
+    propertyPath: m_RightHandSnapTurnAction.m_UseReference
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_Name
-    value: Right Hand Move
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_Name
+    value: Right Hand Snap Turn
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_Type
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_Type
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_ExpectedControlType
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_ExpectedControlType
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_Id
-    value: 6bf6c732-e011-46b1-acc5-b649a4ec5f10
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_Id
+    value: a7b54797-6974-4f75-81d0-42b9c15ef1e0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_Processors
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_Processors
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_Interactions
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_Interactions
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Action.m_SingletonActionBindings.Array.size
+    propertyPath: m_RightHandSnapTurnAction.m_Action.m_SingletonActionBindings.Array.size
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
-    propertyPath: m_RightHandMoveAction.m_Reference
+    propertyPath: m_RightHandSnapTurnAction.m_Reference
     value: 
-    objectReference: {fileID: -8198699208435500284, guid: c348712bda248c246b8c49b3db54643f,
+    objectReference: {fileID: -6493913391331992944, guid: c348712bda248c246b8c49b3db54643f,
       type: 3}

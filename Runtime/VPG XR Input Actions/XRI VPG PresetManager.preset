@@ -6,7 +6,7 @@ Preset:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: XRI Creator PresetManager
+  m_Name: XRI VPG PresetManager
   m_TargetType:
     m_NativeTypeID: 1386491679
     m_ManagedTypePPtr: {fileID: 0}
@@ -48,31 +48,22 @@ Preset:
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[1].first.m_ManagedTypePPtr
     value: 
-    objectReference: {fileID: 11500000, guid: caff514de9b15ad48ab85dcff5508221, type: 3}
+    objectReference: {fileID: 11500000, guid: 0bf296fc962d7184ab14ad1841598d5f, type: 3}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[1].first.m_ManagedTypeFallback
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[1].second.Array.size
-    value: 2
+    value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[1].second.Array.data[0].m_Preset
     value: 
-    objectReference: {fileID: 2655988077585873504, guid: 1421ad86ff3787b4dae70fe9e699a25f,
+    objectReference: {fileID: 2655988077585873504, guid: 91f9da00cfdac5d49955df2d2d820b9c,
       type: 2}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[1].second.Array.data[0].m_Filter
-    value: 
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_DefaultPresets.Array.data[1].second.Array.data[1].m_Preset
-    value: 
-    objectReference: {fileID: 2655988077585873504, guid: ffd8268f7307a0c48a067dad4a8fe060,
-      type: 2}
-  - target: {fileID: 0}
-    propertyPath: m_DefaultPresets.Array.data[1].second.Array.data[1].m_Filter
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -107,21 +98,30 @@ Preset:
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[3].first.m_ManagedTypePPtr
     value: 
-    objectReference: {fileID: 11500000, guid: 0bf296fc962d7184ab14ad1841598d5f, type: 3}
+    objectReference: {fileID: 11500000, guid: caff514de9b15ad48ab85dcff5508221, type: 3}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[3].first.m_ManagedTypeFallback
     value: 
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[3].second.Array.size
-    value: 1
+    value: 2
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[3].second.Array.data[0].m_Preset
     value: 
-    objectReference: {fileID: 2655988077585873504, guid: 91f9da00cfdac5d49955df2d2d820b9c,
+    objectReference: {fileID: 2655988077585873504, guid: 1421ad86ff3787b4dae70fe9e699a25f,
       type: 2}
   - target: {fileID: 0}
     propertyPath: m_DefaultPresets.Array.data[3].second.Array.data[0].m_Filter
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_DefaultPresets.Array.data[3].second.Array.data[1].m_Preset
+    value: 
+    objectReference: {fileID: 2655988077585873504, guid: ffd8268f7307a0c48a067dad4a8fe060,
+      type: 2}
+  - target: {fileID: 0}
+    propertyPath: m_DefaultPresets.Array.data[3].second.Array.data[1].m_Filter
     value: 
     objectReference: {fileID: 0}
