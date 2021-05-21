@@ -34,7 +34,7 @@ namespace VPG.Editor.XRInteraction
             
             if (objectToDelete != null)
             {
-                string message = $"Creator changed the XR Rig loading to a new dynamic system, you have a static {objectName} in the current scene, do you want to delete it?";
+                string message = $"VPG changed the XR Rig loading to a new dynamic system, you have a static {objectName} in the current scene, do you want to delete it?";
                 
                 if (EditorUtility.DisplayDialog(Title, message, "Delete", "Skip"))
                 {
