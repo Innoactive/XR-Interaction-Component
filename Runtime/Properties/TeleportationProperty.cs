@@ -23,6 +23,7 @@ namespace Innoactive.Creator.Core.Properties
         private TeleportationAnchor teleportationInteractable;
         private Renderer[] renderers;
         private bool wasUsedToTeleport;
+        private bool active;
 
         protected void Awake()
         {
@@ -61,6 +62,7 @@ namespace Innoactive.Creator.Core.Properties
         /// <inheritdoc />
         public void Initialize()
         {
+            active = true;
             wasUsedToTeleport = false;
         }
 
@@ -83,6 +85,8 @@ namespace Innoactive.Creator.Core.Properties
             {
                 Debug.LogError($"The 'TeleportationAnchor' from {name} is missing a reference to 'TeleportationProvider'.", gameObject);
             }
+            
+            active = false;
         }
 
         /// <inheritdoc />
@@ -106,15 +110,16 @@ namespace Innoactive.Creator.Core.Properties
         
         protected void EmitTeleported(LocomotionSystem locomotionSystem)
         {
-            if (wasUsedToTeleport == false)
+            if (active && wasUsedToTeleport == false)
             {
-                Vector3 rigPosition = locomotionSystem.xrRig.rig.transform.position;
-                Vector3 anchorPosition = teleportationInteractable.teleportAnchorTransform.position;
+                Vector3 rigPosition = locomotionSystem.xrRig.rig.transform.position.normalized;
+                Vector3 anchorPosition = teleportationInteractable.teleportAnchorTransform.position.normalized;
                 Vector2 flatRigPosition = new Vector2(rigPosition.x, rigPosition.z);
                 Vector2 flatAnchorPosition = new Vector2(anchorPosition.x, anchorPosition.z);
 
-                if (Vector3.Distance(flatRigPosition, flatAnchorPosition) < 0.1)
+                if (Vector2.Distance(flatRigPosition, flatAnchorPosition) < 0.1f)
                 {
+                    active = false;
                     wasUsedToTeleport = true;
                     Teleported?.Invoke(this, EventArgs.Empty);
                 }
