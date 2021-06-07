@@ -112,11 +112,11 @@ namespace Innoactive.Creator.Core.Properties
         {
             if (active && wasUsedToTeleport == false)
             {
-                Vector3 rigPosition = locomotionSystem.xrRig.rig.transform.position.normalized;
+                Vector3 rigPosition = locomotionSystem.xrRig.cameraGameObject.transform.position.normalized;
                 Vector3 anchorPosition = teleportationInteractable.teleportAnchorTransform.position.normalized;
                 Vector2 flatRigPosition = new Vector2(rigPosition.x, rigPosition.z);
                 Vector2 flatAnchorPosition = new Vector2(anchorPosition.x, anchorPosition.z);
-
+                
                 if (Vector2.Distance(flatRigPosition, flatAnchorPosition) < 0.1f)
                 {
                     active = false;
