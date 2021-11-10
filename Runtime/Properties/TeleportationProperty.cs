@@ -113,7 +113,7 @@ namespace Innoactive.Creator.Core.Properties
                 Vector2 flatRigPosition = new Vector2(rigPosition.x, rigPosition.z);
                 Vector2 flatAnchorPosition = new Vector2(anchorPosition.x, anchorPosition.z);
 
-                if (Vector3.Distance(flatRigPosition, flatAnchorPosition) < 0.1)
+                if (Vector3.Distance(flatRigPosition, flatAnchorPosition) < 1.0)
                 {
                     wasUsedToTeleport = true;
                     Teleported?.Invoke(this, EventArgs.Empty);
