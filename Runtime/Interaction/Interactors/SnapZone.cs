@@ -294,7 +294,49 @@ namespace Innoactive.Creator.XRInteraction
         /// <returns>A transparent <see cref="Material"/>. Null, otherwise, if Unity's "Standard" shader cannot be found.</returns>
         protected virtual Material CreateTransparentMaterial()
         {
-            string shaderName = GraphicsSettings.currentRenderPipeline ? "Universal Render Pipeline/Lit" : "Standard";
+            return GraphicsSettings.currentRenderPipeline ? CreateTransparentURPMaterial() : CreateTransparentStandardMaterial();
+        }
+        
+        /// <summary>
+        /// Creates a transparent <see cref="Material"/> using Unity's Standard URP shader.
+        /// </summary>
+        /// <returns>A transparent <see cref="Material"/>. Null, otherwise, if Unity's Standard URP shader cannot be found.</returns>
+        protected virtual Material CreateTransparentURPMaterial()
+        {
+            string shaderName = "Universal Render Pipeline/Lit";
+            Shader defaultShader = Shader.Find(shaderName);
+
+            if (defaultShader == null)
+            {
+                throw new NullReferenceException($"{name} failed to create a default material," + 
+                    $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
+            }
+
+            highlightMeshMaterial = new Material(defaultShader);
+            
+            if (highlightMeshMaterial != null)
+            {
+                highlightMeshMaterial.SetFloat("_Surface", 1);
+                highlightMeshMaterial.SetColor("_BaseColor", ShownHighlightObjectColor);
+                highlightMeshMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+                highlightMeshMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+                highlightMeshMaterial.SetInt("_ZWrite", 0);
+                highlightMeshMaterial.DisableKeyword("_ALPHATEST_ON");
+                highlightMeshMaterial.EnableKeyword("_ALPHABLEND_ON");
+                highlightMeshMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                highlightMeshMaterial.renderQueue = 3000;
+            }
+
+            return highlightMeshMaterial;
+        }
+
+        /// <summary>
+        /// Creates a transparent <see cref="Material"/> using Unity's Standard shader.
+        /// </summary>
+        /// <returns>A transparent <see cref="Material"/>. Null, otherwise, if Unity's Standard shader cannot be found.</returns>
+        protected virtual Material CreateTransparentStandardMaterial()
+        {
+            string shaderName = "Standard";
             Shader defaultShader = Shader.Find(shaderName);
 
             if (defaultShader == null)
@@ -303,18 +345,18 @@ namespace Innoactive.Creator.XRInteraction
                     $" shader \"{shaderName}\" was not found. Make sure the shader is included into the game build.");
             }
             
-            Material highlightMeshMaterial = new Material(defaultShader);
+            highlightMeshMaterial = new Material(defaultShader);
             
             if (highlightMeshMaterial != null)
             {
                 highlightMeshMaterial.SetFloat("_Mode", 3);
+                highlightMeshMaterial.SetColor("_Color", ShownHighlightObjectColor);
                 highlightMeshMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
                 highlightMeshMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
                 highlightMeshMaterial.SetInt("_ZWrite", 0);
                 highlightMeshMaterial.DisableKeyword("_ALPHATEST_ON");
                 highlightMeshMaterial.EnableKeyword("_ALPHABLEND_ON");
                 highlightMeshMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                highlightMeshMaterial.SetColor("_Color", ShownHighlightObjectColor);
                 highlightMeshMaterial.renderQueue = 3000;
             }
 
